@@ -8,6 +8,12 @@ git clone https://github.com/josephsdavid/tswgewrapped.git
 R CMD INSTALL tswgewrapped
 ```
 
+or
+
+```r
+devtools::install_github("josephsdavid/tswgewrapped")
+```
+
 ## Usage
 Currently we have wrappers for arma, arima, aruma, sigplusnoise generators and forecasters
 

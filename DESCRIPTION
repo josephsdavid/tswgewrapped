@@ -1,13 +1,13 @@
 Package: tswgewrapped
-Title: What the Package Does (One Line, Title Case)
+Title: Helpful wrappers for tswge
 Version: 0.0.0.9000
 Authors@R: 
-    person(given = "First",
-           family = "Last",
+    person(given = "David",
+           family = "Josephs",
            role = c("aut", "cre"),
-           email = "first.last@example.com")
-Description: What the package does (one paragraph).
-License: What license it uses
+           email = "josephsd@smu.edu")
+Description: This package provides several helpful wrappers for the already useful tswge package
+License: GPL3
 Encoding: UTF-8
 LazyData: true
 Imports: 
