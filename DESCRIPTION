@@ -13,4 +13,7 @@ LazyData: true
 Imports: 
     rlang,
     tswge
+Depends:
+    rlang,
+    tswge
 RoxygenNote: 6.1.1
