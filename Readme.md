@@ -35,12 +35,12 @@ arimafore <- forecast(arima, arimats, d = 4, n.ahead = 20)
 
 ### Time series transformtion
 
-We can also transform seasonal and arima time series with the `transform(type, x, n)` function:
+We can also transform seasonal and arima time series with the `tstransform(type, x, n)` function:
 
 ```r
-no_more_seasons <- transform(seasonal, sznlts, 12)
-no_more_wandering <- transform(arima, arimats, 4)
+no_more_seasons <- tstransform(seasonal, sznlts, 12)
+no_more_wandering <- tstransform(arima, arimats, 4)
 ```
 
-Note that transform can accept either strings or plain words as the type argument, and accepts "arima", "Arima", "ARIMA", "Aruma", "ARUMA", "aruma", "seasonal", "Seasonal" as possible values. 
+Note that tstransform can accept either strings or plain words as the type argument, and accepts "arima", "Arima", "ARIMA", "Aruma", "ARUMA", "aruma", "seasonal", "Seasonal" as possible values. 
 It is also important to note that when transforming arima data more than one time (n > 1), it will output the plots for each transformation step. This is on purpose! Part of good, consistent time series analysis is to examine these plots.
