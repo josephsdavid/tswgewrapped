@@ -4,7 +4,8 @@ szn_trans <- function(x,n){
 arima_trans <- function(x, n) {
     f <- artrans.wge(x, phi.tr = 1)
     if (n == 1) {
-        f
+        res <- f
+    	return(res)
     } else {
         arima_trans(f, n - 1)
     }
@@ -17,7 +18,7 @@ tstransform <- function(type, x, n){
 		type <- as.character(enexpr(type))
 	}
 	if (type %in% c('arima',"ARIMA","Arima")){
-		arima_trans(x,n)
+		return((arima_trans(x,n)))
 	}
 	if (type %in% c('ARUMA','Aruma','aruma','Seasonal','seasonal')){
 		szn_trans(x,n)
