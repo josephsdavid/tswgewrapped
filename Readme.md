@@ -133,6 +133,6 @@ forecast(aruma, examplets, phi = pqs$phi,
 Finally we can assess our forecast with the assess (ASE) function
 
 ```r
-assess(aruma, examplets, phi = pqs$phi, 
+assess(type = aruma, x = examplets, phi = pqs$phi, 
 	theta = pqs$theta, s = szns, d = int_order, n.ahead = 20)
 ```
