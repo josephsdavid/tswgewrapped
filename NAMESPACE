@@ -3,6 +3,6 @@
 export(aicbic)
 export(ase)
 export(assess)
+export(difference)
 export(forecast)
 export(generate)
-export(tstransform)

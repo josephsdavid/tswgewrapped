@@ -13,7 +13,7 @@ arima_trans <- function(x, n) {
 
 #' Time Series transformation 
 #' @export
-tstransform <- function(type, x, n){
+difference <- function(type, x, n){
 	if(is.character(enexpr(type)) == F){
 		type <- as.character(enexpr(type))
 	}

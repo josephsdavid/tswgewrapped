@@ -35,14 +35,14 @@ arimafore <- forecast(arima, arimats, d = 4, n.ahead = 20)
 
 ### Time series transformtion
 
-We can also transform seasonal and arima time series with the `tstransform(type, x, n)` function:
+We can also transform seasonal and arima time series with the `difference(type, x, n)` function:
 
 ```r
-no_more_seasons <- tstransform(seasonal, sznlts, 12)
-no_more_wandering <- tstransform(arima, arimats, 4)
+no_more_seasons <- difference(seasonal, sznlts, 12)
+no_more_wandering <- difference(arima, arimats, 4)
 ```
 
-Note that tstransform can accept either strings or plain words as the type argument, and accepts "arima", "Arima", "ARIMA", "Aruma", "ARUMA", "aruma", "seasonal", "Seasonal" as possible values. 
+Note that difference can accept either strings or plain words as the type argument, and accepts "arima", "Arima", "ARIMA", "Aruma", "ARUMA", "aruma", "seasonal", "Seasonal" as possible values. 
 It is also important to note that when transforming arima data more than one time (n > 1), it will output the plots for each transformation step. This is on purpose! Part of good, consistent time series analysis is to examine these plots.
 
 ### Model Identification
@@ -93,16 +93,16 @@ Next we have multiple tools to identify the order of the model: using Tiao-Tay o
 estim <- est.ar.wge(examplets, p = 20)
 ```
 
-However first we likely want to look for the arima order. We can do this the box jenkins method quickly with `tstransform`
+However first we likely want to look for the arima order. We can do this the box jenkins method quickly with `difference`
 
 ```r
-tstransform(arima, examplets, 5)
+difference(arima, examplets, 5)
 ```
 
 Since this recursively transforms, we can watch until the wandering component goes away, and set that value to be our order. We can also eliminate the seasonal component first too, with a fun guess and check technique
 
 ```r
-lapply(1:20, tstransform, x = examplets, type = seasonal)
+lapply(1:20, difference, x = examplets, type = seasonal)
 ```
 
 and pick which seasonal component best fits. These qualitative  combined with the quantitative Tiao-Tsay method of overfitting make up a complete, thourough, and well founded framework for determining the nonstationary orders of a time series, with a hopefully terse enough syntax that they will not tax the analyst more than they already are.  After applying either of these graphical methods to determine one, it is probably wise to overfit using the other, and then double check by doing assessing the other component qualitatively and overfit the first. Once the order is found, we can then quickly assess the ARMA order:
@@ -111,8 +111,8 @@ and pick which seasonal component best fits. These qualitative  combined with th
 library(magrittr)
 szns <- 12
 int_order <- 3
-examplets %>% transform(arima, x = ., n = int_order) %>% 
-	transform(seasonal, x = ., n = szns) -> transts
+examplets %>% difference(arima, x = ., n = int_order) %>% 
+	difference(seasonal, x = ., n = szns) -> transts
 
 aics <- aicbic(transts, p = 0:20, q = 0:5)
 
