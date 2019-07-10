@@ -44,3 +44,7 @@ no_more_wandering <- tstransform(arima, arimats, 4)
 
 Note that tstransform can accept either strings or plain words as the type argument, and accepts "arima", "Arima", "ARIMA", "Aruma", "ARUMA", "aruma", "seasonal", "Seasonal" as possible values. 
 It is also important to note that when transforming arima data more than one time (n > 1), it will output the plots for each transformation step. This is on purpose! Part of good, consistent time series analysis is to examine these plots.
+
+### Model Identification
+
+A lot of times, it is good
