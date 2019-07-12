@@ -1,0 +1,99 @@
+types <- c(rep("arima",10), rep("arma", 10), rep("aruma",10), "sigplusnoise")
+rtype <- function() sample(types,1)
+
+rszn <- function() floor(runif(1,0,25))
+
+rint <- function() floor(runif(1,0,4))
+
+rphilen <- function() floor(runif(1,0.99,20))
+
+
+rthetalen <- function() floor(runif(1,0,5))
+phicheck <- function(phi){
+	min(Mod(polyroot(c(1,-phi))))
+}
+
+rphi <- function(){
+	len <- rphilen()
+	phis <- rnorm(len, 0,1)
+	if(length(phis > 0)){
+		if (phicheck(phis) <= 1){
+			rphi()
+		}
+		else {
+			return(phis)
+		}
+	
+	}
+	else return(0)
+}
+
+rtheta <- function(){
+	len <- rthetalen()
+	thetas <- runif(len, -1.5, 1.5)
+	if(length(thetas) >0) {
+		return(thetas)
+	}
+	else {
+		return(0)
+	}
+}
+toarg <- function(strng){
+	parse_expr(strng)
+}
+rb0 <- function() runif(1, -100,100)
+rb1 <- function() runif(1, -2, 2)
+rfreq <- function() runif(2, 0, .5)
+rpsi <- function() runif(2, 0, 2*pi)
+rwnv <- function() abs(rnorm(1,1,4))
+rcof <- function() runif(2, -2, 2)
+
+rsigpn <- function(n) {
+	generate(sigplusnoise, n,
+	b0 = rb0(),
+	b1 = rb1(),
+	freq = rfreq(),
+	psi = rpsi(),
+	vara = rwnv(),
+	coef = rcof())
+}
+
+rarma <- function(n) {
+	generate(arma, n,
+	phi = rphi(),
+	theta = rtheta())
+}
+
+rarima <- function(n) {
+	generate(arima, n,
+	phi = rphi(),
+	theta = rtheta(),
+	d = rint())
+}
+
+raruma <- function(n) {
+	generate(aruma, n,
+	phi = rphi(),
+	theta = rtheta(),
+	d = rint(),
+	s = rszn())
+}
+
+#' Playground: generate a random time series for practice
+#' @export
+playground <- function(n) {
+	type <- rtype()
+	if (type == "arima"){
+		return(rarima(n))
+	}
+	if (type == "aruma"){
+		return(raruma(n))
+	}
+	if (type == "arma"){
+		return(rarma(n))
+	}
+	if (type == "sigplusnoise"){
+		return(rsigpn(n))
+	}
+}
+

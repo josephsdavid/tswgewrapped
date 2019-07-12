@@ -136,3 +136,9 @@ Finally we can assess our forecast with the assess (ASE) function
 assess(type = aruma, x = examplets, phi = pqs$phi, 
 	theta = pqs$theta, s = szns, d = int_order, n.ahead = 20)
 ```
+
+## Random time series generation:
+Generate a random time series to test yourself with `playground(n)`
+```r
+xs <- playground(400)
+```
