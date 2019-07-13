@@ -4,7 +4,7 @@
 \alias{playground}
 \title{Playground: generate a random time series for practice}
 \usage{
-playground(n)
+playground(n, plot = TRUE)
 }
 \description{
 Playground: generate a random time series for practice
