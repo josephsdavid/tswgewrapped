@@ -5,7 +5,7 @@
 \title{assessment function!
 assess a time series}
 \usage{
-assess(...)
+assess(x, ...)
 }
 \description{
 assessment function!

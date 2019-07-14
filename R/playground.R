@@ -111,4 +111,3 @@ playground <- function(n, plot = TRUE) {
 		return(rsigpn(n, p = plot))
 	}
 }
-
