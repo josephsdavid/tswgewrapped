@@ -2,7 +2,7 @@
 #' @export
 plot_res <- function(res) {
 	par(mfrow=c(2,1))
-	plot(res, type = "both")
+	plot(res, type = "b")
 	acf(res)
 	par(mfrow = c(1,1))
 }
