@@ -1,0 +1,14 @@
+#' overfit function
+#' produces an overfit table
+#' @param xs a time series
+#' @param p the order of overfitting
+#' @param type the type of estimate to make, defaults to burg
+#' @export
+#' @examples
+#' forecast(arma, LakeHuron, phi = 0.2)
+#' test <- generate(aruma, 400, s = 4)
+#' overfit(test,20)
+overfit <- function(xs, p, type = "burg") {
+	# simply displays the factor table, tossing away the rest
+	res <- est.ar.wge(xs, p, type = type)
+}
