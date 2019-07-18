@@ -1,5 +1,9 @@
 
 #' Time Series transformation 
+#' @param type either aruma/seasonal or arima, type of transformation to make
+#' @param x the time series
+#' @param n the order of transformation
+#' @return the transformed time series
 #' @export
 difference <- function(type, x, n){
 	szn_trans <- function(x,n){

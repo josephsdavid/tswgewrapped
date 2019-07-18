@@ -6,6 +6,16 @@
 \usage{
 estimate(xs, p, q = 0, type = "mle", ...)
 }
+\arguments{
+\item{xs}{the time series}
+
+\item{p}{the ar order (defaults to 0)}
+
+\item{type}{the method of estimation, defaults to maximum likelihood}
+}
+\value{
+a list of estimates
+}
 \description{
 paramater estimation function
 }

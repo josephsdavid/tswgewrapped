@@ -1,12 +1,12 @@
 Package: tswgewrapped
 Title: Helpful wrappers for tswge
-Version: 0.0.0.9000
+Version: 1.0.0.0
 Authors@R: 
     person(given = "David",
            family = "Josephs",
            role = c("aut", "cre"),
            email = "josephsd@smu.edu")
-Description: This package provides several helpful wrappers for the already useful tswge package
+Description: This package provides several helpful wrappers for the already useful tswge package. In the future, this package intends to move away from the tswge backend, to be faster, with more readable source code.
 License: GPL3
 Encoding: UTF-8
 LazyData: true

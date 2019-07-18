@@ -3,6 +3,7 @@
 #' @param xs a time series
 #' @param p the order of overfitting
 #' @param type the type of estimate to make, defaults to burg
+#' @return nothing, simply displays the factor table
 #' @export
 #' @examples
 #' forecast(arma, LakeHuron, phi = 0.2)

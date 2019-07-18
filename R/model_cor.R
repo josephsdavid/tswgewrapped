@@ -59,6 +59,10 @@ get_pq_order <- function() {
 
 #' Model Correlated data
 #' Interactively build a model of correlated data
+#' @param xs the time series to model
+#' @param parallel whether or not to run in parallel, defaults to FALSE
+#' @param cl the cluster in which to run on
+#' @return a list of model metrics and paramaters
 #' @export
 model_cor <- function(xs, parallel = FALSE, cl = NULL) {
 	ds <- guess_d_order(xs)

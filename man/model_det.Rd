@@ -6,6 +6,12 @@
 \usage{
 model_det(xs)
 }
+\arguments{
+\item{xs}{the time series}
+}
+\value{
+the model parameters and metrics, as a list
+}
 \description{
 model with deterministic signal plus noise
 }

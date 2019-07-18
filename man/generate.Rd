@@ -6,6 +6,14 @@
 \usage{
 generate(type, ...)
 }
+\arguments{
+\item{type}{either arma, aruma, sigplusnoise, or other tswge model. No quotes}
+
+\item{...}{the normal inputs to tswge}
+}
+\value{
+a time series
+}
 \description{
 generator function!
 }

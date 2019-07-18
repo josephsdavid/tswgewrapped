@@ -11,6 +11,9 @@ ase(x, xhat)
 
 \item{xhat}{the saved forecast (results of forecast function)}
 }
+\value{
+the ASE
+}
 \description{
 ASE calculator
 }

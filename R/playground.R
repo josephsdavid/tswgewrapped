@@ -95,6 +95,8 @@ raruma <- function(n, p) {
 }
 
 #' Playground: generate a random time series for practice
+#' @param n the length of the resulting time series
+#' @return a random time series, TODO add weights
 #' @export
 playground <- function(n, plot = TRUE) {
 	type <- rtype()

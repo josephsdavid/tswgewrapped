@@ -6,6 +6,12 @@
 \usage{
 plot_res(res)
 }
+\arguments{
+\item{res}{the residuals of a model}
+}
+\value{
+nothing, makes a plot
+}
 \description{
 plot the residuals of a time series
 }

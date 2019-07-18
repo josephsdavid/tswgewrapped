@@ -6,6 +6,16 @@
 \usage{
 difference(type, x, n)
 }
+\arguments{
+\item{type}{either aruma/seasonal or arima, type of transformation to make}
+
+\item{x}{the time series}
+
+\item{n}{the order of transformation}
+}
+\value{
+the transformed time series
+}
 \description{
 Time Series transformation
 }

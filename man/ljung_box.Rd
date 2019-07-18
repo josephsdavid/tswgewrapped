@@ -6,6 +6,18 @@
 \usage{
 ljung_box(x, p, q, k_val = c(24, 48))
 }
+\arguments{
+\item{x}{the time series}
+
+\item{p}{the ar order}
+
+\item{q}{the ma order}
+
+\item{k_val}{a vector of k values}
+}
+\value{
+the results of the models, in list format
+}
 \description{
 ljung box test for white noise
 }

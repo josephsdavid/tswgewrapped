@@ -7,6 +7,14 @@ assess a time series}
 \usage{
 assess(x, ...)
 }
+\arguments{
+\item{x}{the time series}
+
+\item{...}{the normal arguments to the forecast function. NOTE: we must put x first or name all of our arguments. This will be fixed}
+}
+\value{
+the ASE
+}
 \description{
 assessment function!
 assess a time series

@@ -1,6 +1,7 @@
 #' ASE calculator
 #' @param x the time series
 #' @param xhat the saved forecast (results of forecast function)
+#' @return the ASE
 #' @export
 
 ase <- function(x, xhat){

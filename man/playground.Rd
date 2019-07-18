@@ -6,6 +6,12 @@
 \usage{
 playground(n, plot = TRUE)
 }
+\arguments{
+\item{n}{the length of the resulting time series}
+}
+\value{
+a random time series, TODO add weights
+}
 \description{
 Playground: generate a random time series for practice
 }

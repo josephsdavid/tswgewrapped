@@ -5,10 +5,24 @@
 \title{aicbic function
 returns the top 5 aic and bic values for an ARMA time series}
 \usage{
-aicbic(vec, p = 0:8, q = 0:5, parallel = FALSE, cl = NULL)
+aicbic(vec, p = 0:8, q = 0:5, parallel = FALSE, cl = NULL,
+  silent = FALSE)
 }
 \arguments{
-\item{type}{either a string or plain text, defaults to "both", other values include AIC and BIC}
+\item{vec}{the vector (time series object) to operate on}
+
+\item{p}{integer vector of the ar order}
+
+\item{q}{integer vector of the ma order}
+
+\item{parallel}{whether or not to run in parallel}
+
+\item{cl}{the cluster in which to run on}
+
+\item{silent}{whether or not to run silently}
+}
+\value{
+a list of data frames of top 5 aic and bic
 }
 \description{
 aicbic function

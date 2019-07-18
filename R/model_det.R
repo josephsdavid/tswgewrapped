@@ -31,6 +31,8 @@ predict_lm <- function(xs,lmod) {
 }
 
 #' model with deterministic signal plus noise
+#' @param xs the time series
+#' @return the model parameters and metrics, as a list
 #' @export
 model_det <- function(xs){
 	xslin <- model_linear(xs)

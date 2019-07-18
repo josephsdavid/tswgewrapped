@@ -7,6 +7,16 @@ Interactively build a model of correlated data}
 \usage{
 model_cor(xs, parallel = FALSE, cl = NULL)
 }
+\arguments{
+\item{xs}{the time series to model}
+
+\item{parallel}{whether or not to run in parallel, defaults to FALSE}
+
+\item{cl}{the cluster in which to run on}
+}
+\value{
+a list of model metrics and paramaters
+}
 \description{
 Model Correlated data
 Interactively build a model of correlated data

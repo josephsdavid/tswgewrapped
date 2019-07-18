@@ -14,6 +14,9 @@ overfit(xs, p, type = "burg")
 
 \item{type}{the type of estimate to make, defaults to burg}
 }
+\value{
+nothing, simply displays the factor table
+}
 \description{
 overfit function
 produces an overfit table
