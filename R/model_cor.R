@@ -96,6 +96,8 @@ model_cor <- function(xs, parallel = FALSE, cl = NULL) {
 		    q = q,
 		    phi = phi,
 		    theta = theta,
+		    vara = est_xs$avar,
+		    mu = mean(xs),
 		    ljung_box = lj,
 		    ase = ASE
 	)
