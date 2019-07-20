@@ -93,6 +93,7 @@ model_cor <- function(xs, parallel = FALSE, cl = NULL) {
 		    s = s,
 		    d = d,
 		    p = p,
+		    q = q,
 		    phi = phi,
 		    theta = theta,
 		    ljung_box = lj,
