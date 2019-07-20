@@ -12,8 +12,7 @@ getpq <- function(x, p=8,q=5, type = "aic", silent = FALSE){
 	res <- try(aic.wge(x, p,q,type))
 	if (is.list(res)) {
 		out <- c(res$p, res$q, res$value)
-	}
-	else {
+	} else {
 		out <- c(p,q,9999)
 	}
 	out

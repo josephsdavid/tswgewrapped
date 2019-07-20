@@ -3,8 +3,7 @@ d_test <- function(xs) {
 	if(d_order > 0){
 		res <- difference(arima, xs, d_order)
 		return(list(d = d_order, result = res))
-	}
-	else { 
+	} else { 
 		res  <-  xs
 		return(list(d = d_order, result = res))
        	}
@@ -17,8 +16,9 @@ guess_d_order <- function(xs){
 	sat <- readline(prompt = "are you satisfied (y/n): ")
 	if (sat == "y"){
 		return(dguess)
+	} else {
+		guess_d_order(xs)
 	}
-	else guess_d_order(xs)
 }
 
 s_test <- function(xs) {
@@ -26,8 +26,7 @@ s_test <- function(xs) {
 	if(s_order > 0){
 		res <- difference(seasonal, xs, s_order)
 		return(list(s = s_order, result = res))
-	}
-	else { 
+	} else { 
 		res  <-  xs
 		return(list(s = s_order, result = res))
        	}
@@ -41,14 +40,15 @@ guess_s_order <- function(xs){
 	if (sat == "y"){
 		sguess
 	}
-	else guess_s_order(xs)
+	else {
+		guess_s_order(xs)
+	}
 }
 
 printaicbic <- function(xs, s, parallel = FALSE, cl = NULL){
 	if(s > 3) {
 		porder <- s+5
-	}
-	else(porder <- 8)
+	} else(porder <- 8)
 	aicbic(xs, p = 0:porder, q = 0:8, parallel, cl)
 }
 get_pq_order <- function() {

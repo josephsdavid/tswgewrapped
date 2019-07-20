@@ -100,16 +100,10 @@ raruma <- function(n, p) {
 #' @export
 playground <- function(n, plot = TRUE) {
 	type <- rtype()
-	if (type == "arima"){
-		return(rarima(n, p = plot))
-	}
-	if (type == "aruma"){
-		return(raruma(n, p = plot))
-	}
-	if (type == "arma"){
-		return(rarma(n, p = plot))
-	}
-	if (type == "sigplusnoise"){
-		return(rsigpn(n, p = plot))
-	}
+	switch(type,
+		"arima" = return(rarima(n, p = plot)),
+		"aruma" = return(raruma(n, p = plot)),
+		"arma" = return(rarma(n, p = plot)),
+		"sigplusnoise" = return(rsigpn(n, p = plot))
+	)
 }
