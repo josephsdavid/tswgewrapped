@@ -6,7 +6,7 @@
 todo: rewrite backcast and aic.wge for real speed gains
 returns the top 5 aic}
 \usage{
-aic5(x, p = 0:8, q = 0:5, type = "aic", silent = FALSE)
+aic5(x, p = 0:8, q = 0:5, type = "aic", silent = TRUE)
 }
 \arguments{
 \item{p}{integer vector of the ar order}
