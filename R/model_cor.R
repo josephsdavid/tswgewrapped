@@ -64,6 +64,10 @@ get_pq_order <- function() {
 #' @param cl the cluster in which to run on
 #' @return a list of model metrics and paramaters
 #' @export
+#' @examples
+#' xs <- playground(400)
+#' clust <- makeCluster(2L, type = "FORK")
+#' model_cor(xs, parallel = TRUE. cl = clust)
 model_cor <- function(xs, parallel = FALSE, cl = NULL) {
 	ds <- guess_d_order(xs)
 	d  <- ds$d

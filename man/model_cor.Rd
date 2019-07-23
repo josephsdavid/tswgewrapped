@@ -21,3 +21,8 @@ a list of model metrics and paramaters
 Model Correlated data
 Interactively build a model of correlated data
 }
+\examples{
+xs <- playground(400)
+clust <- makeCluster(2L, type = "FORK")
+model_cor(xs, parallel = TRUE. cl = clust)
+}

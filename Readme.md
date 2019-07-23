@@ -142,3 +142,7 @@ Generate a random time series to test yourself with `playground(n)`
 ```r
 xs <- playground(400)
 ```
+
+# Multivariate time series!
+
+
