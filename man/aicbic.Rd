@@ -28,3 +28,7 @@ a list of data frames of top 5 aic and bic
 aicbic function
 returns the top 5 aic and bic values for an ARMA time series
 }
+\examples{
+xs <- playground(200)
+aicbic(xs)
+}

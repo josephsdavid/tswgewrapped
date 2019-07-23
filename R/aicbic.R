@@ -13,6 +13,9 @@ aics <- list(
 #' @param silent whether or not to run silently
 #' @return a list of data frames of top 5 aic and bic
 #' @export
+#' @examples
+#' xs <- playground(200)
+#' aicbic(xs)
 aicbic <- function(vec, p = 0:8, q = 0:5, parallel = FALSE, cl = NULL, silent = FALSE){
 	if(parallel == TRUE){
 		parLapply(cl, aics, function(f) f(vec, p, q, silent = TRUE))

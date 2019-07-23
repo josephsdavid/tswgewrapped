@@ -25,3 +25,7 @@ aic5: slightly faster model estimations
 todo: rewrite backcast and aic.wge for real speed gains
 returns the top 5 aic
 }
+\examples{
+xs <- playground(200)
+aic5(xs)
+}

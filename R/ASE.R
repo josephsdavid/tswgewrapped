@@ -3,6 +3,10 @@
 #' @param xhat the saved forecast (results of forecast function)
 #' @return the ASE
 #' @export
+#' @examples
+#' xs <- generate(arma, 200)
+#' fore <- forecast(arma, xs, n.ahead =20, lastn = TRUE)
+#' ase(xs, fore)
 
 ase <- function(x, xhat){
 	s <- length(x) - length(xhat$f) + 1

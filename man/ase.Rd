@@ -17,3 +17,8 @@ the ASE
 \description{
 ASE calculator
 }
+\examples{
+xs <- generate(arma, 200)
+fore <- forecast(arma, xs, n.ahead =20, lastn = TRUE)
+ase(xs, fore)
+}

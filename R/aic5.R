@@ -27,6 +27,9 @@ getpq <- function(x, p=8,q=5, type = "aic", silent = FALSE){
 #' @param silent whether or not to return output
 #' @return a data frame of top 5 models
 #' @export
+#' @examples
+#' xs <- playground(200)
+#' aic5(xs)
 aic5 <- function(x, p = 0:8, q = 0:5, type= "aic", silent = FALSE){
 	ip <- expand(p,q)
 	iq <- rewrite(q,p)
