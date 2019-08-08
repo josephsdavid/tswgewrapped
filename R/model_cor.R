@@ -91,7 +91,7 @@ model_cor <- function(xs, parallel = FALSE, cl = NULL) {
   lj <- ljung_box(est_xs$res, p, q)
   pander(lj)
   ahead <- as.numeric(readline(prompt = "how far ahead do you want to forecast? "))
-  fore <- forecast(aruma, xs, phi = phi, theta = theta, s = s, d = d, n.ahead = ahead)
+  fore <- fcst(aruma, xs, phi = phi, theta = theta, s = s, d = d, n.ahead = ahead)
   ASE <- assess(type = aruma, x = xs, phi = phi, theta = theta, s = s, d = d, n.ahead = ahead, plot =FALSE)
   res <- list(
               s = s,
