@@ -1,6 +1,7 @@
-
 silence <- function(x) {
-    sink("/dev/null");x;sink();
+  sink("/dev/null")
+  x
+  sink()
 }
 
 #' Hush: make tswge shut the hell up!
@@ -8,8 +9,8 @@ silence <- function(x) {
 #' @examples
 #' hush(ljung_box(1:100, 2,4))
 hush <- function(f) {
-    silence(res <- f)
-    return(res)
+  silence(res <- f)
+  return(res)
 }
 
 
@@ -23,11 +24,11 @@ hush <- function(f) {
 #' df <- data.frame(Y = y, X = x, Z =z)
 #' lag_dfr(df, "X", 1:3)
 lag_dfr <-function(df, vars, lags){
-	out <- lapply(lags, function(x) lag(df[[vars]], x))
-	out <- do.call(cbind.data.frame,out)
-	cnames <- sapply(lags, function(x) paste(vars, x, sep = "_"))
-	colnames(out) <- cnames
-	out
+  out <- lapply(lags, function(x) lag(df[[vars]], x))
+  out <- do.call(cbind.data.frame,out)
+  cnames <- sapply(lags, function(x) paste(vars, x, sep = "_"))
+  colnames(out) <- cnames
+  out
 }
 
 #' mlag_dfr: Lag multiple columns of a data frame
@@ -41,8 +42,8 @@ lag_dfr <-function(df, vars, lags){
 #' mlag_dfr(df, c("X","Z"), 1:3)
 
 mlag_dfr <- function(df, vars, lags){
-	out <- lapply(vars, function(x) lag_dfr(df,x,lags))
-	out <- do.call(data.frame, unlist(out, recursive = FALSE))
-	cbind(df,out)
+  out <- lapply(vars, function(x) lag_dfr(df,x,lags))
+  out <- do.call(data.frame, unlist(out, recursive = FALSE))
+  cbind(df,out)
 }
 

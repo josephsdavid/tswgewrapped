@@ -6,7 +6,7 @@
 #' @return the ASE
 #' @export
 assess <- function(x, ...) {
-	bcast <- forecast(x = x,..., lastn = T)
-	ASE  <- ase(x, bcast)
-	return(ASE)
+  bcast <- forecast(x = x,..., lastn = T)
+  ASE  <- ase(x, bcast)
+  return(ASE)
 }

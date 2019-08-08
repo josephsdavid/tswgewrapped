@@ -10,6 +10,6 @@
 #' test <- generate(aruma, 400, s = 4)
 #' overfit(test,20)
 overfit <- function(xs, p, type = "burg") {
-	# simply displays the factor table, tossing away the rest
-	res <- est.ar.wge(xs, p, type = type)
+  # simply displays the factor table, tossing away the rest
+  res <- est.ar.wge(xs, p, type = type)
 }

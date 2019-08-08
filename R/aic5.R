@@ -1,21 +1,21 @@
 expand <- function(v1,v2){
-	c(sapply(v1, function (x) rep(x, length(v2)) ))
+  c(sapply(v1, function (x) rep(x, length(v2)) ))
 }
 
 rewrite <- function(v1, v2){
-	rep(v1, length(v2))
+  rep(v1, length(v2))
 }
 getpq <- function(x, p=8,q=5, type = "aic", silent = TRUE){
-	if (silent == FALSE){
-		cat("Calculating ",type," for ARMA(",p,", ", q," )\n", sep = "")
-	}
-	res <- try(aic.wge(x, p,q,type))
-	if (is.list(res)) {
-		out <- c(res$p, res$q, res$value)
-	} else {
-		out <- c(p,q,9999)
-	}
-	out
+  if (silent == FALSE){
+    cat("Calculating ",type," for ARMA(",p,", ", q," )\n", sep = "")
+  }
+  res <- try(aic.wge(x, p,q,type))
+  if (is.list(res)) {
+    out <- c(res$p, res$q, res$value)
+  } else {
+    out <- c(p,q,9999)
+  }
+  out
 }
 
 #' aic5: slightly faster model estimations
@@ -31,12 +31,12 @@ getpq <- function(x, p=8,q=5, type = "aic", silent = TRUE){
 #' xs <- playground(200)
 #' aic5(xs)
 aic5 <- function(x, p = 0:8, q = 0:5, type= "aic", silent = TRUE){
-	ip <- expand(p,q)
-	iq <- rewrite(q,p)
-	out <- mapply(function(v1,v2) getpq(x, v1, v2, type, silent), ip, iq)
-	out <- (as.data.frame(t(out)))
-	colnames(out) <- c("p","q",type)
-	head(out[order(out[, 3], decreasing = F),], 5)
+  ip <- expand(p,q)
+  iq <- rewrite(q,p)
+  out <- mapply(function(v1,v2) getpq(x, v1, v2, type, silent), ip, iq)
+  out <- (as.data.frame(t(out)))
+  colnames(out) <- c("p","q",type)
+  head(out[order(out[, 3], decreasing = F),], 5)
 
 }
 

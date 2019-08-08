@@ -1,6 +1,6 @@
 aics <- list(
-	     aic <- function(x,p = 0:8, q = 0:5,silent) aic5(x,p, q, type = "aic", silent),
-	     bic <- function(x,p = 0:8, q = 0:5,silent) aic5(x, p, q, type = "bic", silent)
+             aic <- function(x,p = 0:8, q = 0:5,silent) aic5(x,p, q, type = "aic", silent),
+             bic <- function(x,p = 0:8, q = 0:5,silent) aic5(x, p, q, type = "bic", silent)
 )
 
 #' aicbic function
@@ -17,9 +17,9 @@ aics <- list(
 #' xs <- playground(200)
 #' aicbic(xs)
 aicbic <- function(vec, p = 0:8, q = 0:5, parallel = FALSE, cl = NULL, silent = FALSE){
-	if(parallel == TRUE){
-		parLapply(cl, aics, function(f) f(vec, p, q, silent = TRUE))
-	} else {
-		lapply(aics, function(f) f(vec, p, q,silent))
-	}
+  if(parallel == TRUE){
+    parLapply(cl, aics, function(f) f(vec, p, q, silent = TRUE))
+  } else {
+    lapply(aics, function(f) f(vec, p, q,silent))
+  }
 }

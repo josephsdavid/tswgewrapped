@@ -13,10 +13,12 @@ LazyData: true
 Imports: 
     rlang,
     tswge,
-    pander
+    pander,
+    vars
 Depends:
     rlang,
     tswge,
     pander,
-    parallel
+    parallel,
+    vars
 RoxygenNote: 6.1.1
