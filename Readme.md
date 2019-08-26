@@ -18,19 +18,19 @@ devtools::install_github("josephsdavid/tswgewrapped")
 Currently we have wrappers for arma, arima, aruma, sigplusnoise generators and forecasters
 
 ### Time series generation and forecasting
-the `generate(type, ...)` function generates time series, while the `forecast(type, ...)` function forecasts
+the `generate(type, ...)` function generates time series, while the `fcst(type, ...)` function forecasts
 
 ```r
 library(tswgewrapped)
 
 armats <- generate(arma, 100, phi = 0.2, theta = 0.4, plot = F)
-armafore <- forecast(type = arma, x = armats, phi = 0.2, theta = 0.4, n.ahead = 20)
+armafore <- fcst(type = arma, x = armats, phi = 0.2, theta = 0.4, n.ahead = 20)
 
 sznlts <- generate(aruma, n = 100, phi = -.9, s = 12)
-sznlfore <- forecast(aruma, sznlts, phi = -.7, s = 12, n.ahead = 20)
+sznlfore <- fcst(aruma, sznlts, phi = -.7, s = 12, n.ahead = 20)
 
 arimats <- generate(arima, n = 100, d = 4)
-arimafore <- forecast(arima, arimats, d = 4, n.ahead = 20)
+arimafore <- fcst(arima, arimats, d = 4, n.ahead = 20)
 ```
 
 ### Time series transformtion
@@ -59,7 +59,7 @@ aicbic(no_more_wandering, p = 0:13, q = 0:5)
 We can calculate the ASE of a model with the `ase` function:
 
 ```r
-sznback <- forecast(aruma, sznlts, s = 12, phi = -.9, n.ahead = 20, lastn = T)
+sznback <- fcst(aruma, sznlts, s = 12, phi = -.9, n.ahead = 20, lastn = T)
 ase(sznlts, sznback)
 ```
 
@@ -126,7 +126,7 @@ pqs <- est.arma.wge(transts, p = 3, q = 1)
 Next we can forecast ahead with our forecast function:
 
 ```r
-forecast(aruma, examplets, phi = pqs$phi, 
+fcst(aruma, examplets, phi = pqs$phi, 
 	theta = pqs$theta, s = szns, d = int_order, n.ahead = 20)
 ```
 

@@ -24,7 +24,7 @@ hush <- function(f) {
 #' df <- data.frame(Y = y, X = x, Z =z)
 #' lag_dfr(df, "X", 1:3)
 lag_dfr <-function(df, vars, lags){
-  out <- lapply(lags, function(x) lag(df[[vars]], x))
+  out <- lapply(lags, function(x) stats::lag(df[[vars]], x))
   out <- do.call(cbind.data.frame,out)
   cnames <- sapply(lags, function(x) paste(vars, x, sep = "_"))
   colnames(out) <- cnames
