@@ -120,7 +120,7 @@ library(pander)
 pander(aics[[1]])
 pander(aics[[2]])
 
-pqs <- est.arma.wge(transts, p = 3, q = 1)
+pqs <- estimate(transts, p = 3, q = 1)
 ```
 
 Next we can forecast ahead with our forecast function:
