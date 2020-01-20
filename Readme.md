@@ -14,6 +14,12 @@ or
 devtools::install_github("josephsdavid/tswgewrapped")
 ```
 
+or
+```r
+install.packages("remotes")
+remotes::install_github("josephsdavid/tswgewrapped")
+```
+
 ## Usage
 Currently we have wrappers for arma, arima, aruma, sigplusnoise generators and forecasters
 
