@@ -19,6 +19,6 @@ ASE calculator
 }
 \examples{
 xs <- generate(arma, 200)
-fore <- forecast(arma, xs, n.ahead =20, lastn = TRUE)
+fore <- fcst(arma, xs, n.ahead =20, lastn = TRUE)
 ase(xs, fore)
 }

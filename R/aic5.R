@@ -9,7 +9,7 @@ getpq <- function(x, p=8,q=5, type = "aic", silent = TRUE){
   if (silent == FALSE){
     cat("Calculating ",type," for ARMA(",p,", ", q," )\n", sep = "")
   }
-  res <- try(aic.wge(x, p,q,type))
+  res <- try(tswge::aic.wge(x, p,q,type))
   if (is.list(res)) {
     out <- c(res$p, res$q, res$value)
   } else {

@@ -61,7 +61,7 @@ rcof <- function() runif(2, -2, 2)
 
 # random sognal plud noise
 rsigpn <- function(n, p) {
-  gen.sigplusnoise.wge( n,
+  tswge::gen.sigplusnoise.wge( n,
                        b0 = rb0(),
                        b1 = rb1(),
                        freq = rfreq(),
@@ -72,14 +72,14 @@ rsigpn <- function(n, p) {
 
 # random arma
 rarma <- function(n, p) {
-  gen.arma.wge( n,
+  tswge::gen.arma.wge( n,
                phi = rphi(),
                theta = rtheta(), plot = p)
 }
 
 # radnom arima
 rarima <- function(n, p) {
-  gen.arima.wge( n,
+  tswge::gen.arima.wge( n,
                 phi = rphi(),
                 theta = rtheta(),
                 d = rint(), plot = p)
@@ -87,7 +87,7 @@ rarima <- function(n, p) {
 
 # random aruma
 raruma <- function(n, p) {
-  gen.aruma.wge( n,
+  tswge::gen.aruma.wge( n,
                 phi = rphi(),
                 theta = rtheta(),
                 d = rint(),

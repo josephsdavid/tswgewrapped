@@ -22,7 +22,6 @@ overfit function
 produces an overfit table
 }
 \examples{
-forecast(arma, LakeHuron, phi = 0.2)
 test <- generate(aruma, 400, s = 4)
 overfit(test,20)
 }

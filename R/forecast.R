@@ -7,7 +7,7 @@
 #' fcst(arma, LakeHuron, phi = 0.2)
 
 fcst <- function(type,...){
-  phrase <- paste0("fore.", enexpr(type),".wge")
-  func <- parse_expr(phrase)
-  eval(expr((!!func)(...)))
+  phrase <- paste0("tswge::fore.", rlang::enexpr(type),".wge")
+  func <- rlang::parse_expr(phrase)
+  eval(rlang::expr((!!func)(...)))
 }
