@@ -1,15 +1,9 @@
-silence <- function(x) {
-  sink("/dev/null")
-  x
-  sink()
-}
-
 #' Hush: make tswge shut the hell up!
 #' @export
 #' @examples
 #' hush(ljung_box(1:100, 2,4))
 hush <- function(f) {
-  silence(res <- f)
+  capture.output(res <- f)
   return(res)
 }
 

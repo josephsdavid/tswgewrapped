@@ -1,4 +1,3 @@
-
 #' assessment function!
 #' assess a time series
 #' @param x the time series

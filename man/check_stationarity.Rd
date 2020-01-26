@@ -4,11 +4,11 @@
 \alias{check_stationarity}
 \title{Wrapper to check the stationarity of a Time Series}
 \usage{
-check_stationarity(data, title = "Time Series Plot", xlab = "Time",
+check_stationarity(x, title = "Time Series Plot", xlab = "Time",
   ylab = "Time Series Realization")
 }
 \arguments{
-\item{data}{time series data}
+\item{x}{time series realization}
 
 \item{title}{Title of the time series plot (output of function)}
 

@@ -1,24 +1,15 @@
 Package: tswgewrapped
 Title: Helpful wrappers for tswge
-Version: 1.0.0.4
-Authors@R: 
-    person(given = "David",
-           family = "Josephs",
-           role = c("aut", "cre"),
-           email = "josephsd@smu.edu")
+Version: 1.5.1.0
+Author: David Josephs
+Maintainer: David Josephs <josephsd@smu.edu>
+Contributor: Nikhil Gupta <guptan@smu.edu>
 Description: This package provides several helpful wrappers for the already useful tswge package. In the future, this package intends to move away from the tswge backend, to be faster, with more readable source code.
-License: GPL3
+License: AGPL-3
 Encoding: UTF-8
 LazyData: true
 Imports: 
     rlang,
     tswge,
-    pander,
-    vars
-Depends:
-    rlang,
-    tswge,
-    pander,
-    parallel,
-    vars
-RoxygenNote: 6.1.1
+    pander
+RoxygenNote: 7.0.1

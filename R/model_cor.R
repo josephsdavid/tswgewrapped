@@ -10,7 +10,7 @@ d_test <- function(xs) {
 
 }
 guess_d_order <- function(xs){
-  plotts.sample.wge(xs)
+  tswge::plotts.sample.wge(xs)
   overfit(xs, 20)
   dguess <- d_test(xs)
   sat <- readline(prompt = "are you satisfied (y/n): ")
@@ -33,7 +33,7 @@ s_test <- function(xs) {
 
 }
 guess_s_order <- function(xs){
-  plotts.sample.wge(xs)
+  tswge::plotts.sample.wge(xs)
   overfit(xs,20)
   sguess <- s_test(xs)
   sat <- readline(prompt = "are you satisfied (y/n): ")
@@ -65,9 +65,9 @@ get_pq_order <- function() {
 #' @return a list of model metrics and paramaters
 #' @export
 #' @examples
-#' xs <- playground(400)
-#' clust <- makeCluster(2L, type = "FORK")
-#' model_cor(xs, parallel = TRUE. cl = clust)
+#' \donttest{xs <- playground(400)
+#' clust <- parallel::makeCluster(2L, type = "FORK")
+#' model_cor(xs, parallel = TRUE, cl = clust)}
 model_cor <- function(xs, parallel = FALSE, cl = NULL) {
   ds <- guess_d_order(xs)
   d  <- ds$d
@@ -76,7 +76,7 @@ model_cor <- function(xs, parallel = FALSE, cl = NULL) {
   s <- ss$s
   xsds <- ss$result
   aics <- printaicbic(xsds, s, parallel, cl)
-  pander(aics)
+  pander::pander(aics)
   pqs <- get_pq_order()
   p <- pqs$p
   q <- pqs$q
@@ -89,7 +89,7 @@ model_cor <- function(xs, parallel = FALSE, cl = NULL) {
   paste("phi =", phi,"\ntheta =", theta)
   plot_res(est_xs$res)
   lj <- ljung_box(est_xs$res, p, q)
-  pander(lj)
+  pander::pander(lj)
   ahead <- as.numeric(readline(prompt = "how far ahead do you want to forecast? "))
   fore <- fcst(aruma, xs, phi = phi, theta = theta, s = s, d = d, n.ahead = ahead)
   ASE <- assess(type = aruma, x = xs, phi = phi, theta = theta, s = s, d = d, n.ahead = ahead, plot =FALSE)
