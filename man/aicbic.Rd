@@ -5,7 +5,8 @@
 \title{aicbic function
 returns the top 5 aic and bic values for an ARMA time series}
 \usage{
-aicbic(vec, p = 0:8, q = 0:5, parallel = FALSE, cl = NULL, silent = FALSE)
+aicbic(vec, p = 0:8, q = 0:5, parallel = FALSE, cl = NULL,
+  silent = FALSE)
 }
 \arguments{
 \item{vec}{the vector (time series object) to operate on}

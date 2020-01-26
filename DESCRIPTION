@@ -1,8 +1,9 @@
 Package: tswgewrapped
 Title: Helpful wrappers for tswge
-Version: 1.5.0.0
+Version: 1.5.1.0
 Author: David Josephs
 Maintainer: David Josephs <josephsd@smu.edu>
+Contributor: Nikhil Gupta <guptan@smu.edu>
 Description: This package provides several helpful wrappers for the already useful tswge package. In the future, this package intends to move away from the tswge backend, to be faster, with more readable source code.
 License: AGPL-3
 Encoding: UTF-8
