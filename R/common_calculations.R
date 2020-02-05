@@ -4,7 +4,7 @@
 #' @export
 calculate_ts_gamma0 = function(x){
   n = length(x)
-  gamma0 = var(x)*(n-1)/n
+  gamma0 = stats::var(x)*(n-1)/n
   return(gamma0)
 }
 
@@ -24,9 +24,9 @@ calculate_ts_var_of_mean = function(x){
   n=length(x) 
   nlag=n-1 
   m=mean(x)
-  v=var(x,na.rm = TRUE)
+  v=stats::var(x,na.rm = TRUE)
   gamma0=calculate_ts_gamma0(x)
-  aut=acf(x,lag.max=nlag) 
+  aut = stats::acf(x,lag.max=nlag) 
   sum=0
   for (k in 1:nlag) {
     sum=sum+(1-k/n)*aut$acf[k+1]*gamma0
@@ -43,7 +43,7 @@ calculate_ts_var_of_mean = function(x){
 calculate_ts_mean_confidence_interval = function(x, alpha = 0.05){
   xbar = calculate_ts_mean(x)
   vxbar = calculate_ts_var_of_mean(x)
-  multiplier = qnorm(1 - alpha/2)
+  multiplier = stats::qnorm(1 - alpha/2)
   ci = c(xbar - multiplier * sqrt(vxbar), xbar +  multiplier * sqrt(vxbar))
   return(ci)
 }
@@ -71,7 +71,7 @@ calculate_arp_varx = function(phi, pt, vara = 1){
   # Computes SigmaX^2 = vara/(1-phi1*rho1 - phi2*rho2 - ...)
   sum = 0
   for (i in 1:length(phi)){
-    sum = sum + phi[i] * p$aut1[i+1]
+    sum = sum + phi[i] * pt$aut1[i+1]
   }
   
   return (vara / (1 - sum))

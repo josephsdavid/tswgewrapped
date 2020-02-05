@@ -5,11 +5,12 @@
 #' @param ylab y-label of the time series plot (output of the function)
 #' @export
 check_stationarity = function(x, title = "Time Series Plot", xlab = "Time", ylab = "Time Series Realization" ){
-  plot(x, type = "l", main = title, xlab = xlab, ylab = ylab)
+  graphics::plot(x, type = "l", main = title, xlab = xlab, ylab = ylab)
   len = length(x)
   len_by_2 = round(len/2)
   seg_2_start = len_by_2+1
-  acf(x[1:len], main = "Full xset")
-  acf(x[1:len_by_2], main = "First Half ACF")
-  acf(x[seg_2_start:len], main = "Second Half ACF")
+  stats::acf(x[1:len], main = "Full Dataset")
+  stats::acf(x[1:len_by_2], main = "First Half ACF")
+  stats::acf(x[seg_2_start:len], main = "Second Half ACF")
+  return(TRUE)
 }
