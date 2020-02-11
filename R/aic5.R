@@ -39,4 +39,3 @@ aic5 <- function(x, p = 0:8, q = 0:5, type= "aic", silent = TRUE){
   head(out[order(out[, 3], decreasing = F),], 5)
 
 }
-
