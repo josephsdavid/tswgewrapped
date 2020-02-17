@@ -85,5 +85,26 @@ test_that("Differencing - Seasonality", {
 })
 
 
+test_that("White Noise Estimates", {
+  x = c(40, 30.5, 49.8, 38.3, 29.3, 48.7, 39.2, 31.7, 46.1, 42.4)
+  phi = c(-1.1, -1.78, -0.88, -0.64)
+  theta = c(0.2, -0.9)
+  info = get_all_a_calc(x, phi, theta)
+
+  expect_equal(info$all_a[1], 0)
+  expect_equal(info$all_a[2], 0)
+  expect_equal(info$all_a[3], 0)
+  expect_equal(info$all_a[4], 0)
+  expect_equal(round(info$all_a[5],3), -1.326)
+  expect_equal(round(info$all_a[6],4), -1.6572)
+  expect_equal(round(info$all_a[7],5), -2.47804)
+  expect_equal(round(info$all_a[8],6), -1.042128)
+  expect_equal(round(info$all_a[9],7), 0.5358104)
+  expect_equal(round(info$all_a[10],7), 2.4050773)
+  
+  expect_equal(round(info$vara,6), 2.967132)
+  expect_equal(round(info$stda,6), 1.722536)
+})
+
 
 

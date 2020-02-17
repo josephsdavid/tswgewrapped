@@ -166,7 +166,7 @@ compute_stda = function(all_a){
 #' @param index time value till which the white noise estimates are needed
 #' @return All white noise estimates, variance and standard deviation of these estimates
 #' @export
-return_all_a_calc = function(x, phi, theta){
+get_all_a_calc = function(x, phi, theta){
   all_a = compute_a(x = x, phi = phi, theta = theta, index = length(x))
   vara = compute_vara(all_a)
   stda = compute_stda(all_a)
