@@ -76,3 +76,99 @@ calculate_arp_varx = function(phi, pt, vara = 1){
   
   return (vara / (1 - sum))
 }
+
+#' Given an AR(p,q) realization, this function estimates the white 
+#' noise estimates using equation 6.23 (from the text book)
+#' @param x time series realization
+#' @param phi phi values of the time series
+#' @param theta theta values of the time series
+#' @param index time value till which the white noise estimates are needed
+#' @return All white noise estimates till the index
+#' @export
+compute_a = function(x, phi, theta, index){
+  
+  ## Limit 1
+  get_a_i_lesseq_p = function(index){
+    all_a = rep(0,index)  # Return all 0s till the index
+    return(all_a)
+  }
+  
+  ## Limit 2
+  get_a_i_lesseq_lenX = function(x, p, q, phi, theta, index){
+    all_a = get_a_i_lesseq_p(p)  ## get all 0's till p
+    
+    ## Then compute the values one by one till needed
+    limit = min(index, length(x))
+    for (i in (p+1):limit){
+      a = x[i] - sum(phi * x[(i-1):(i-p)]) + sum(theta * all_a[(i-1):(i-q)]) - (1 - sum(phi)) * mean(x)
+      all_a = c(all_a, a)
+    }
+    
+    return(all_a)
+  }
+  
+  ## Limit 3
+  get_a_i_more_lenX = function(x, p, q, phi, theta, index){
+    n = length(x)
+    all_a = get_a_i_lesseq_lenX(x, p, q, phi, theta, n)  ## Get all values till len(x)
+    all_a = c(all_a, rep(0, (index-n)))  ## Then append 0s after that
+    return(all_a)
+  }
+  
+  
+  p = length(phi)
+  q = length(theta)
+  
+  all_a = c()
+  
+  if (index <= p){
+    all_a = get_a_i_lesseq_p(index)
+  }
+  else if (index <= length(x)){
+    all_a = get_a_i_lesseq_lenX(x, p, q, phi, theta, index)
+  }
+  else{
+    all_a = get_a_i_more_lenX(x, p, q, phi, theta, index)
+  }
+  
+  return(all_a)
+}
+
+#' Given the white noise estimates, this function computes 
+#' the variance of the white noise. Note that non-zero terms 
+#' are removed before calcualting the variance.
+#' @param all_a White Noise Estimates
+#' @return Variance of the White Noise terms
+#' @export
+compute_vara = function(all_a){
+  subset = all_a[all_a != 0]
+  len_subset = length(subset)
+  vara = sum(subset^2)/length(subset)
+  return(vara)
+}
+
+#' Given the white noise estimates, this function computes 
+#' the standard deviation of the white noise. Note that non-zero 
+#' terms are removed before calcualting the variance.
+#' @param all_a White Noise Estimates
+#' @return Standard Deviation of the White Noise terms
+#' @export
+compute_stda = function(all_a){
+  return(sqrt(compute_vara(all_a)))
+}
+
+#' Given an AR(p,q) realization, this function estimates the white 
+#' noise estimates using equation 6.23 (from the text book), the 
+#' variance and the standard deviation of the white noise
+#' @param x time series realization
+#' @param phi phi values of the time series
+#' @param theta theta values of the time series
+#' @param index time value till which the white noise estimates are needed
+#' @return All white noise estimates, variance and standard deviation of these estimates
+#' @export
+get_all_a_calc = function(x, phi, theta){
+  all_a = compute_a(x = x, phi = phi, theta = theta, index = length(x))
+  vara = compute_vara(all_a)
+  stda = compute_stda(all_a)
+  return(list(all_a = all_a, vara = vara, stda = stda))
+}
