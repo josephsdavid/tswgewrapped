@@ -8,15 +8,13 @@ hush <- function(f) {
   return(res)
 }
 
-
-
 #' lag_dfr: Lag columns of a data frame
 #' @param df The dataframe containing the time series data
 #' @param col_name The column name (single) to be used to create the lagged variables
 #' @param lags Number of lags to create for the column
 #' @export
 #' @examples
-#' x  <-  c(2,3,5,7,9,9,5,3)
+#' x<-  c(2,3,5,7,9,9,5,3)
 #' z <- c(6,9,3,3,3,4,5,7)
 #' y <- 1:8
 #' df <- data.frame(Y = y, X = x, Z =z)

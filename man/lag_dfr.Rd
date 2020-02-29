@@ -17,7 +17,7 @@ lag_dfr(df, col_name, lags)
 lag_dfr: Lag columns of a data frame
 }
 \examples{
-x  <-  c(2,3,5,7,9,9,5,3)
+x<-  c(2,3,5,7,9,9,5,3)
 z <- c(6,9,3,3,3,4,5,7)
 y <- 1:8
 df <- data.frame(Y = y, X = x, Z =z)

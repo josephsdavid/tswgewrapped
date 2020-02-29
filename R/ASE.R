@@ -1,4 +1,5 @@
-#' ASE calculator
+#' ASE calculator (specific to tswge)
+#' Takes the last length(xhat) entries in x and compares them to xhat
 #' @param x the time series
 #' @param xhat the saved forecast (results of forecast function)
 #' @return the ASE

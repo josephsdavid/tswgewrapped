@@ -17,7 +17,7 @@ rphilen <- function() floor(stats::runif(1,0.99,20))
 # random q order
 rthetalen <- function() floor(stats::runif(1,0,5))
 
-# check if ar component is stationary (stolen from the R stats source code)
+#' check if ar component is stationary (stolen from the R stats source code)
 #' @param phi phi for AR component
 phicheck <- function(phi){
   min(Mod(polyroot(c(1,-phi))))
@@ -60,7 +60,7 @@ rpsi <- function() stats::runif(2, 0, 2*pi)
 rwnv <- function() abs(stats::rnorm(1,1,1))
 rcof <- function() stats::runif(2, -2, 2)
 
-# random signal plus noise
+#' random signal plus noise
 #' @param n the length of the resulting time series
 #' @param p TRUE|FALSE Should the resulting realization be plotted?
 rsigpn <- function(n, p) {
@@ -73,7 +73,7 @@ rsigpn <- function(n, p) {
                                coef = rcof(), plot = p)
 }
 
-# random arma
+#' random arma
 #' @param n the length of the resulting time series
 #' @param p TRUE|FALSE Should the resulting realization be plotted?
 rarma <- function(n, p) {
@@ -82,7 +82,7 @@ rarma <- function(n, p) {
                        theta = rtheta(), plot = p)
 }
 
-# radnom arima
+#' radnom arima
 #' @param n the length of the resulting time series
 #' @param p TRUE|FALSE Should the resulting realization be plotted?
 rarima <- function(n, p) {
@@ -92,7 +92,7 @@ rarima <- function(n, p) {
                         d = rint(), plot = p)
 }
 
-# random aruma
+#' random aruma
 #' @param n the length of the resulting time series
 #' @param p TRUE|FALSE Should the resulting realization be plotted?
 raruma <- function(n, p) {
