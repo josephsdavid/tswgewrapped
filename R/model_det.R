@@ -1,5 +1,5 @@
 model_linear <- function(xs){
-  t <- 1:length(xs)
+  t <- seq_along(xs)
   ts_lm <- stats::lm(xs ~ t)
   resids <- ts_lm$residuals
   pars <- tswge::aic.wge(resids, p = 0:6)

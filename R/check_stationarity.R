@@ -20,7 +20,7 @@ check_stationarity = function(data, title = "Time Series Plot", xlab = "Time", y
   
   # Plot Realization
   if (class(data) != "data.frame"){
-    data = data.frame(Data = data, Time = seq(1:length(data)))
+    data = data.frame(Data = data, Time = seq_along(data))
   }
   g1 = ggplot2::ggplot(data, ggplot2::aes_string(x = 'Time', y = 'Data')) + ggplot2::geom_line() +
     ggplot2::ggtitle(title) + ggplot2::xlab(xlab) + ggplot2::ylab(ylab) + ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5))
