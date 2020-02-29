@@ -1,6 +1,6 @@
 Package: tswgewrapped
 Title: Helpful wrappers for tswge
-Version: 1.5.2.0
+Version: 1.6.0
 Author: David Josephs
 Maintainer: David Josephs <josephsd@smu.edu>
 Contributor: Nikhil Gupta <guptan@smu.edu>
@@ -9,9 +9,12 @@ License: AGPL-3
 Encoding: UTF-8
 LazyData: true
 Imports: 
+    ggfortify,
+    ggplot2,
     rlang,
-    tswge,
-    pander
+    pander,
+    patchwork,
+    tswge
 RoxygenNote: 7.0.1
 Suggests: 
     testthat (>= 2.1.0)

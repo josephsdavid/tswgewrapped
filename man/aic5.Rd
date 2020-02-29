@@ -9,13 +9,15 @@ returns the top 5 aic}
 aic5(x, p = 0:8, q = 0:5, type = "aic", silent = TRUE)
 }
 \arguments{
+\item{x}{Time series realization}
+
 \item{p}{integer vector of the ar order}
 
 \item{q}{integer vector of the ma order}
 
-\item{silent}{whether or not to return output}
+\item{type}{metric to be used to compute top 5 models (aic, aicc, or bic)}
 
-\item{vec}{the vector (time series object) to operate on}
+\item{silent}{whether or not to return output}
 }
 \value{
 a data frame of top 5 models

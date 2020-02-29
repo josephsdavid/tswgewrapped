@@ -1,7 +1,7 @@
 d_test <- function(xs) {
   d_order <- as.numeric(readline(prompt = "enter an arima order: "))
   if(d_order > 0){
-    res <- difference(arima, xs, d_order)
+    res <- difference("arima", xs, d_order)
     return(list(d = d_order, result = res))
   } else { 
     res  <-  xs
@@ -9,6 +9,7 @@ d_test <- function(xs) {
   }
 
 }
+
 guess_d_order <- function(xs){
   tswge::plotts.sample.wge(xs)
   overfit(xs, 20)
@@ -24,7 +25,7 @@ guess_d_order <- function(xs){
 s_test <- function(xs) {
   s_order <- as.numeric(readline(prompt = "enter a seasonal order: "))
   if(s_order > 0){
-    res <- difference(seasonal, xs, s_order)
+    res <- difference("seasonal", xs, s_order)
     return(list(s = s_order, result = res))
   } else { 
     res  <-  xs
@@ -51,6 +52,7 @@ printaicbic <- function(xs, s, parallel = FALSE, cl = NULL){
   } else(porder <- 8)
   aicbic(xs, p = 0:porder, q = 0:8, parallel, cl)
 }
+
 get_pq_order <- function() {
   p <- as.numeric(readline(prompt = "enter a chosen value of p: "))
   q <- as.numeric(readline(prompt = "enter a chosen value of q: "))
@@ -91,8 +93,8 @@ model_cor <- function(xs, parallel = FALSE, cl = NULL) {
   lj <- ljung_box(est_xs$res, p, q)
   pander::pander(lj)
   ahead <- as.numeric(readline(prompt = "how far ahead do you want to forecast? "))
-  fore <- fcst(aruma, xs, phi = phi, theta = theta, s = s, d = d, n.ahead = ahead)
-  ASE <- assess(type = aruma, x = xs, phi = phi, theta = theta, s = s, d = d, n.ahead = ahead, plot =FALSE)
+  fore <- fcst("aruma", xs, phi = phi, theta = theta, s = s, d = d, n.ahead = ahead)
+  ASE <- assess(type = "aruma", x = xs, phi = phi, theta = theta, s = s, d = d, n.ahead = ahead, plot =FALSE)
   res <- list(
               s = s,
               d = d,

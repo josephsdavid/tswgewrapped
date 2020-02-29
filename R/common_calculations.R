@@ -1,3 +1,27 @@
+#' Computes Gamma (Auto Covariance of a time series realization)
+#' @param x time series realization
+#' @param k lag for which ACV needs to be calculated (Default = 0 -> Variance of the Time Series)
+#' @return Auto Covaraince at lag k
+#' @export
+calculate_ts_gamma = function(x, k = 0){
+  lhs = stats::lag(x, k) - mean(x)
+  rhs = x - mean(x)
+  gamma_k = sum(lhs * rhs, na.rm = TRUE)/length(x)
+  return(gamma_k)
+}
+
+#' Computes Rho (Auto Correlation of a time series realization)
+#' @param x time series realization
+#' @param k lag for which Auto Correlation needs to be calculated (Default = 1)
+#' @return Auto Correlation at lag k
+#' @export
+calculate_ts_rho = function(x, k = 1){
+  gamma_k = calculate_ts_gamma(x, k)
+  gamma_0 = calculate_ts_gamma(x, 0)
+  rho_k = gamma_k/gamma_0
+  return(rho_k)
+}
+
 #' Computes Gamma0 (Variance of a time series realization)
 #' @param x time series realization
 #' @return Gamma0 (Variance of the time series realization)
@@ -38,6 +62,7 @@ calculate_ts_var_of_mean = function(x){
 
 #' Computes the Confidence Interval of the Mean of a Time Series
 #' @param x time series realization
+#' @param alpha alpha value to be used for calculating the Confidence Interval
 #' @return Confidence Interval of the Mean of a Time Series
 #' @export
 calculate_ts_mean_confidence_interval = function(x, alpha = 0.05){
@@ -163,7 +188,6 @@ compute_stda = function(all_a){
 #' @param x time series realization
 #' @param phi phi values of the time series
 #' @param theta theta values of the time series
-#' @param index time value till which the white noise estimates are needed
 #' @return All white noise estimates, variance and standard deviation of these estimates
 #' @export
 get_all_a_calc = function(x, phi, theta){

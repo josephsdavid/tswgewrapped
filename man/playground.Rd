@@ -8,6 +8,8 @@ playground(n, plot = TRUE)
 }
 \arguments{
 \item{n}{the length of the resulting time series}
+
+\item{plot}{TRUE|FALSE Should the resulting realization be plotted?}
 }
 \value{
 a random time series, TODO add weights

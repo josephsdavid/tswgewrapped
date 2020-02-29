@@ -4,7 +4,14 @@
 \alias{mlag_dfr}
 \title{mlag_dfr: Lag multiple columns of a data frame}
 \usage{
-mlag_dfr(df, vars, lags)
+mlag_dfr(df, col_names, lags)
+}
+\arguments{
+\item{df}{The dataframe containing the time series data}
+
+\item{col_names}{A vector of column names to be used to create the lagged variables}
+
+\item{lags}{Number of lags to create for the column}
 }
 \description{
 mlag_dfr: Lag multiple columns of a data frame

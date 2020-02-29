@@ -2,7 +2,8 @@
 % Please edit documentation in R/ASE.R
 \name{ase}
 \alias{ase}
-\title{ASE calculator}
+\title{ASE calculator (specific to tswge)
+Takes the last length(xhat) entries in x and compares them to xhat}
 \usage{
 ase(x, xhat)
 }
@@ -15,7 +16,8 @@ ase(x, xhat)
 the ASE
 }
 \description{
-ASE calculator
+ASE calculator (specific to tswge)
+Takes the last length(xhat) entries in x and compares them to xhat
 }
 \examples{
 xs <- generate(arma, 200)

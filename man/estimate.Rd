@@ -4,14 +4,18 @@
 \alias{estimate}
 \title{paramater estimation function}
 \usage{
-estimate(xs, p, q = 0, type = "mle", ...)
+estimate(xs, p = NA, q = 0, type = "mle", ...)
 }
 \arguments{
 \item{xs}{the time series}
 
-\item{p}{the ar order (defaults to 0)}
+\item{p}{the AR order}
+
+\item{q}{the MA order (defaults to 0)}
 
 \item{type}{the method of estimation, defaults to maximum likelihood}
+
+\item{...}{Additional arguments to the tswge::est.arma.wge function}
 }
 \value{
 a list of estimates
