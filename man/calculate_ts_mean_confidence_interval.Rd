@@ -8,6 +8,8 @@ calculate_ts_mean_confidence_interval(x, alpha = 0.05)
 }
 \arguments{
 \item{x}{time series realization}
+
+\item{alpha}{alpha value to be used for calculating the Confidence Interval}
 }
 \value{
 Confidence Interval of the Mean of a Time Series

@@ -2,12 +2,15 @@
 % Please edit documentation in R/lag.R
 \name{hush}
 \alias{hush}
-\title{Hush: make tswge shut the hell up!}
+\title{Prevents inter 'cat' statememt from printing}
 \usage{
 hush(f)
 }
+\arguments{
+\item{f}{Function to silence}
+}
 \description{
-Hush: make tswge shut the hell up!
+Prevents inter 'cat' statememt from printing
 }
 \examples{
 hush(ljung_box(1:100, 2,4))

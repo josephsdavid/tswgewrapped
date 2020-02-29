@@ -6,6 +6,11 @@
 \usage{
 model_mlr(df, formula)
 }
+\arguments{
+\item{df}{The dataframe containing the time series data}
+
+\item{formula}{Formula to be used for model creation}
+}
 \description{
 Model as MLR model
 }

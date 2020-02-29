@@ -2,12 +2,19 @@
 % Please edit documentation in R/lag.R
 \name{lag_dfr}
 \alias{lag_dfr}
-\title{lag_dfr: Lag  columns of a data frame}
+\title{lag_dfr: Lag columns of a data frame}
 \usage{
-lag_dfr(df, vars, lags)
+lag_dfr(df, col_name, lags)
+}
+\arguments{
+\item{df}{The dataframe containing the time series data}
+
+\item{col_name}{The column name (single) to be used to create the lagged variables}
+
+\item{lags}{Number of lags to create for the column}
 }
 \description{
-lag_dfr: Lag  columns of a data frame
+lag_dfr: Lag columns of a data frame
 }
 \examples{
 x  <-  c(2,3,5,7,9,9,5,3)

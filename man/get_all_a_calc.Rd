@@ -14,8 +14,6 @@ get_all_a_calc(x, phi, theta)
 \item{phi}{phi values of the time series}
 
 \item{theta}{theta values of the time series}
-
-\item{index}{time value till which the white noise estimates are needed}
 }
 \value{
 All white noise estimates, variance and standard deviation of these estimates

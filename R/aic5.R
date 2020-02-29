@@ -5,6 +5,7 @@ expand <- function(v1,v2){
 rewrite <- function(v1, v2){
   rep(v1, length(v2))
 }
+
 getpq <- function(x, p=8,q=5, type = "aic", silent = TRUE){
   if (silent == FALSE){
     cat("Calculating ",type," for ARMA(",p,", ", q," )\n", sep = "")
@@ -21,10 +22,11 @@ getpq <- function(x, p=8,q=5, type = "aic", silent = TRUE){
 #' aic5: slightly faster model estimations
 #' todo: rewrite backcast and aic.wge for real speed gains
 #' returns the top 5 aic
-#' @param vec the vector (time series object) to operate on
+#' @param x Time series realization
 #' @param p integer vector of the ar order
 #' @param q integer vector of the ma order
-#' @param silent whether or not to return output
+#' @param type metric to be used to compute top 5 models (aic, aicc, or bic)
+#' @param silent whether or not to return output 
 #' @return a data frame of top 5 models
 #' @export
 #' @examples
@@ -36,6 +38,6 @@ aic5 <- function(x, p = 0:8, q = 0:5, type= "aic", silent = TRUE){
   out <- mapply(function(v1,v2) getpq(x, v1, v2, type, silent), ip, iq)
   out <- (as.data.frame(t(out)))
   colnames(out) <- c("p","q",type)
-  head(out[order(out[, 3], decreasing = F),], 5)
+  utils::head(out[order(out[, 3], decreasing = F),], 5)
 
 }

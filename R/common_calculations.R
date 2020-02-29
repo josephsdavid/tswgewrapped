@@ -38,6 +38,7 @@ calculate_ts_var_of_mean = function(x){
 
 #' Computes the Confidence Interval of the Mean of a Time Series
 #' @param x time series realization
+#' @param alpha alpha value to be used for calculating the Confidence Interval
 #' @return Confidence Interval of the Mean of a Time Series
 #' @export
 calculate_ts_mean_confidence_interval = function(x, alpha = 0.05){
@@ -163,7 +164,6 @@ compute_stda = function(all_a){
 #' @param x time series realization
 #' @param phi phi values of the time series
 #' @param theta theta values of the time series
-#' @param index time value till which the white noise estimates are needed
 #' @return All white noise estimates, variance and standard deviation of these estimates
 #' @export
 get_all_a_calc = function(x, phi, theta){

@@ -1,5 +1,5 @@
 test_that("check_stationarity", {
-  expect_true(check_stationarity(x=c(1,2,3,4,5,6,7)))
+  expect_true(check_stationarity(data=c(1,2,3,4,5,6,7)))
 })
 
 
@@ -95,16 +95,21 @@ test_that("White Noise Estimates", {
   expect_equal(info$all_a[2], 0)
   expect_equal(info$all_a[3], 0)
   expect_equal(info$all_a[4], 0)
-  expect_equal(round(info$all_a[5],3), -1.326)
-  expect_equal(round(info$all_a[6],4), -1.6572)
-  expect_equal(round(info$all_a[7],5), -2.47804)
-  expect_equal(round(info$all_a[8],6), -1.042128)
-  expect_equal(round(info$all_a[9],7), 0.5358104)
-  expect_equal(round(info$all_a[10],7), 2.4050773)
+  expect_equal(info$all_a[5], -1.326)
+  expect_equal(info$all_a[6], -1.6572)
+  expect_equal(info$all_a[7], -2.47804)
+  expect_equal(info$all_a[8], -1.042128)
+  expect_equal(info$all_a[9], 0.5358104)
+  expect_equal(info$all_a[10], 2.4050773)
   
   expect_equal(round(info$vara,6), 2.967132)
   expect_equal(round(info$stda,6), 1.722536)
 })
 
+
+test_that("White Noise Estimates", {
+  factor.wge.season(12)
+  factor.wge.season(4)
+})
 
 
