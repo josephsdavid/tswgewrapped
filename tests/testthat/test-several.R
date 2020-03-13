@@ -262,4 +262,90 @@ test_that("Sliding Window", {
 
 
 
+test_that("ModelCompareUnivariate", {
+  library(tswge)
+  data("airlog")
+   
+  # Woodward Gray Airline Model
+  phi_wg = c(-0.36, -0.05, -0.14, -0.11, 0.04, 0.09, -0.02, 0.02, 0.17, 0.03, -0.10, -0.38)
+  d_wg = 1
+  s_wg = 12
+  
+  # Parzen Model
+  phi_pz = c(0.74, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.38, -0.2812)
+  s_pz = 12
+  
+  # Box Model
+  d_bx = 1
+  s_bx = 12  
+  theta_bx =  c(0.40, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.60, -0.24)
+  
+  models = list("Woodward Gray Model A" = list(phi = phi_wg, d = d_wg, s = s_wg, sliding_ase = FALSE),
+                "Woodward Gray Model B" = list(phi = phi_wg, d = d_wg, s = s_wg, sliding_ase = TRUE),
+                "Parzen Model A" = list(phi = phi_pz, s = s_pz, sliding_ase = FALSE),
+                "Parzen Model B" = list(phi = phi_pz, s = s_pz, sliding_ase = TRUE),
+                "Box Model A" = list(theta = theta_bx, d = d_bx, s = s_bx, sliding_ase = FALSE),
+                "Box Model B" = list(theta = theta_bx, d = d_bx, s = s_bx, sliding_ase = TRUE)
+                )
+                
+  mdl_compare = ModelCompareUnivariate$new(x = airlog, mdl_list = models,
+                                           n.ahead = 36, batch_size = 72)
+  
+  mdl_compare$plot_histogram_ases()
+  
+ 
+  mdl_compare$plot_forecasts(only_sliding = TRUE)
+  
+  mdl_compare$statistical_compare()  
+  
+  ASEs = mdl_compare$get_tabular_metrics(ases = TRUE)
+  
+  ASE_wg_single_batch = round(ASEs %>% filter(Model == "Woodward Gray Model A") %>% select(ASE) %>%  purrr::pluck(1), 9)
+  ASE_pz_single_batch = round(ASEs %>% filter(Model == "Parzen Model A") %>% select(ASE) %>%  purrr::pluck(1), 9)
+  ASE_bx_single_batch = round(ASEs %>% filter(Model == "Box Model A") %>% select(ASE) %>%  purrr::pluck(1), 9)
+  
+  expect_equal(ASE_wg_single_batch, 0.004185726)
+  expect_equal(ASE_pz_single_batch, 0.012526356)
+  expect_equal(ASE_bx_single_batch, 0.006903242)
+  
+  forecasts = mdl_compare$get_tabular_metrics(ases = FALSE)
+  
+  summary = forecasts %>% 
+    group_by(Model) %>% 
+    summarise(MeanForecast = mean(f, na.rm = TRUE),
+              MeanLL = mean(ll, na.rm = TRUE),
+              MeanUL = mean(ul, na.rm = TRUE)
+    )
+  
+
+  meanForecast_wg_modelB = round(summary %>% filter(Model == "Woodward Gray Model B") %>% select(MeanForecast) %>%  purrr::pluck(1), 6)
+  meanLL_wg_modelB = round(summary %>% filter(Model == "Woodward Gray Model B") %>% select(MeanLL) %>%  purrr::pluck(1), 6)
+  meanUL_wg_modelB = round(summary %>% filter(Model == "Woodward Gray Model B") %>% select(MeanUL) %>%  purrr::pluck(1), 6)
+  
+  meanForecast_pz_modelB = round(summary %>% filter(Model == "Parzen Model B") %>% select(MeanForecast) %>%  purrr::pluck(1), 6)
+  meanLL_pz_modelB = round(summary %>% filter(Model == "Parzen Model B") %>% select(MeanLL) %>%  purrr::pluck(1), 6)
+  meanUL_pz_modelB = round(summary %>% filter(Model == "Parzen Model B") %>% select(MeanUL) %>%  purrr::pluck(1), 6)
+  
+  meanForecast_bx_modelB = round(summary %>% filter(Model == "Box Model B") %>% select(MeanForecast) %>%  purrr::pluck(1), 6)
+  meanLL_bx_modelB = round(summary %>% filter(Model == "Box Model B") %>% select(MeanLL) %>%  purrr::pluck(1), 6)
+  meanUL_bx_modelB = round(summary %>% filter(Model == "Box Model B") %>% select(MeanUL) %>%  purrr::pluck(1), 6)
+  
+  expect_equal(meanForecast_wg_modelB, 5.767088)
+  expect_equal(meanForecast_pz_modelB, 5.588596)
+  expect_equal(meanForecast_bx_modelB, 5.736360)
+  
+  expect_equal(meanLL_wg_modelB, 5.477559)
+  expect_equal(meanLL_pz_modelB, 5.348760)
+  expect_equal(meanLL_bx_modelB, 5.502834)
+  
+  expect_equal(meanUL_wg_modelB, 6.056617)
+  expect_equal(meanUL_pz_modelB, 5.828432)
+  expect_equal(meanUL_bx_modelB, 5.969887)
+  
+  
+})
+
+
+
+
 

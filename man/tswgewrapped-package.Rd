@@ -8,4 +8,13 @@
 \description{
 This package provides several helpful wrappers for the already useful tswge package. In the future, this package intends to move away from the tswge backend, to be faster, with more readable source code.
 }
+\author{
+\strong{Maintainer}: David Josephs \email{josephsd@smu.edu}
+
+Authors:
+\itemize{
+  \item Nikhil Gupta \email{guptan@smu.edu}
+}
+
+}
 \keyword{internal}

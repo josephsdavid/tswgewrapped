@@ -1,19 +1,21 @@
 Package: tswgewrapped
 Title: Helpful wrappers for tswge
-Version: 1.6.1
-Author: David Josephs
-Maintainer: David Josephs <josephsd@smu.edu>
-Contributor: Nikhil Gupta <guptan@smu.edu>
+Version: 1.7.0
+Authors@R: c(person("David", "Josephs", email = "josephsd@smu.edu", role = c("aut", "cre")),
+             person("Nikhil", "Gupta", email = "guptan@smu.edu", role = c("aut")))
 Description: This package provides several helpful wrappers for the already useful tswge package. In the future, this package intends to move away from the tswge backend, to be faster, with more readable source code.
 License: AGPL-3
 Encoding: UTF-8
 LazyData: true
 Imports: 
+    dplyr,
     ggfortify,
     ggplot2,
+    magrittr,
     rlang,
     pander,
     patchwork,
+    R6,
     tswge
 RoxygenNote: 7.0.1
 Suggests: 
