@@ -95,7 +95,7 @@ calculate_ar1_varx = function(phi, vara=1){
 calculate_arp_varx = function(phi, pt, vara = 1){
   # Computes SigmaX^2 = vara/(1-phi1*rho1 - phi2*rho2 - ...)
   sum = 0
-  for (i in 1:length(phi)){
+  for (i in seq_along(phi)){
     sum = sum + phi[i] * pt$aut1[i+1]
   }
   
