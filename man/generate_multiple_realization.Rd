@@ -5,9 +5,19 @@
 \title{Generate Multiple Realizations of a model
 Useful for checking model appropriateness}
 \usage{
-generate_multiple_realization(x, phi = 0, theta = 0, d = 0, s = 0,
-  vara = NA, n.realizations = 4, lag.max = 25, seed = NA,
-  model_name = "Custom Model", return = "all")
+generate_multiple_realization(
+  x,
+  phi = 0,
+  theta = 0,
+  d = 0,
+  s = 0,
+  vara = NA,
+  n.realizations = 4,
+  lag.max = 25,
+  seed = NA,
+  model_name = "Custom Model",
+  return = "all"
+)
 }
 \arguments{
 \item{x}{The actual time series realization}

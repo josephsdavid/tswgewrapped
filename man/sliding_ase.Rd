@@ -5,9 +5,19 @@
 \title{Function to calculate the sliding window ASE for a model
 Supports ARMA, ARIMA, ARUMA (seasonal ARIMA) and Signal Plus Noise Models}
 \usage{
-sliding_ase(x, phi = 0, theta = 0, d = 0, s = 0, linear = NA,
-  freq = NA, n.ahead = NA, batch_size = NA, step_n.ahead = TRUE,
-  ...)
+sliding_ase(
+  x,
+  phi = 0,
+  theta = 0,
+  d = 0,
+  s = 0,
+  linear = NA,
+  freq = NA,
+  n.ahead = NA,
+  batch_size = NA,
+  step_n.ahead = TRUE,
+  ...
+)
 }
 \arguments{
 \item{x}{time series realization}

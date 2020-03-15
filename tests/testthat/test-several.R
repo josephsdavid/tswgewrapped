@@ -292,16 +292,16 @@ test_that("ModelCompareUnivariate", {
   mdl_compare = ModelCompareUnivariate$new(x = airlog, mdl_list = models,
                                            n.ahead = 36, batch_size = 72)
   
-  mdl_compare$plot_multiple_realizations(n.realizations = 4, seed = 100)
+  mdl_compare$plot_multiple_realizations(n.realizations = 4, seed = 100, scales = 'free_y')
   mdl_compare$plot_histogram_ases()
   mdl_compare$plot_forecasts(only_sliding = TRUE)
   mdl_compare$statistical_compare()  
   
   ASEs = mdl_compare$get_tabular_metrics(ases = TRUE)
   
-  ASE_wg_single_batch = round(ASEs %>% filter(Model == "Woodward Gray Model A") %>% select(ASE) %>%  purrr::pluck(1), 9)
-  ASE_pz_single_batch = round(ASEs %>% filter(Model == "Parzen Model A") %>% select(ASE) %>%  purrr::pluck(1), 9)
-  ASE_bx_single_batch = round(ASEs %>% filter(Model == "Box Model A") %>% select(ASE) %>%  purrr::pluck(1), 9)
+  ASE_wg_single_batch = round(ASEs %>% dplyr::filter(Model == "Woodward Gray Model A") %>% dplyr::select(ASE) %>%  purrr::pluck(1), 9)
+  ASE_pz_single_batch = round(ASEs %>% dplyr::filter(Model == "Parzen Model A") %>% dplyr::select(ASE) %>%  purrr::pluck(1), 9)
+  ASE_bx_single_batch = round(ASEs %>% dplyr::filter(Model == "Box Model A") %>% dplyr::select(ASE) %>%  purrr::pluck(1), 9)
   
   expect_equal(ASE_wg_single_batch, 0.004185726)
   expect_equal(ASE_pz_single_batch, 0.012526356)
@@ -310,24 +310,24 @@ test_that("ModelCompareUnivariate", {
   forecasts = mdl_compare$get_tabular_metrics(ases = FALSE)
   
   summary = forecasts %>% 
-    group_by(Model) %>% 
-    summarise(MeanForecast = mean(f, na.rm = TRUE),
+    dplyr::group_by(Model) %>% 
+    dplyr::summarise(MeanForecast = mean(f, na.rm = TRUE),
               MeanLL = mean(ll, na.rm = TRUE),
               MeanUL = mean(ul, na.rm = TRUE)
     )
   
 
-  meanForecast_wg_modelB = round(summary %>% filter(Model == "Woodward Gray Model B") %>% select(MeanForecast) %>%  purrr::pluck(1), 6)
-  meanLL_wg_modelB = round(summary %>% filter(Model == "Woodward Gray Model B") %>% select(MeanLL) %>%  purrr::pluck(1), 6)
-  meanUL_wg_modelB = round(summary %>% filter(Model == "Woodward Gray Model B") %>% select(MeanUL) %>%  purrr::pluck(1), 6)
+  meanForecast_wg_modelB = round(summary %>% dplyr::filter(Model == "Woodward Gray Model B") %>% dplyr::select(MeanForecast) %>%  purrr::pluck(1), 6)
+  meanLL_wg_modelB = round(summary %>% dplyr::filter(Model == "Woodward Gray Model B") %>% dplyr::select(MeanLL) %>%  purrr::pluck(1), 6)
+  meanUL_wg_modelB = round(summary %>% dplyr::filter(Model == "Woodward Gray Model B") %>% dplyr::select(MeanUL) %>%  purrr::pluck(1), 6)
   
-  meanForecast_pz_modelB = round(summary %>% filter(Model == "Parzen Model B") %>% select(MeanForecast) %>%  purrr::pluck(1), 6)
-  meanLL_pz_modelB = round(summary %>% filter(Model == "Parzen Model B") %>% select(MeanLL) %>%  purrr::pluck(1), 6)
-  meanUL_pz_modelB = round(summary %>% filter(Model == "Parzen Model B") %>% select(MeanUL) %>%  purrr::pluck(1), 6)
+  meanForecast_pz_modelB = round(summary %>% dplyr::filter(Model == "Parzen Model B") %>% dplyr::select(MeanForecast) %>%  purrr::pluck(1), 6)
+  meanLL_pz_modelB = round(summary %>% dplyr::filter(Model == "Parzen Model B") %>% dplyr::select(MeanLL) %>%  purrr::pluck(1), 6)
+  meanUL_pz_modelB = round(summary %>% dplyr::filter(Model == "Parzen Model B") %>% dplyr::select(MeanUL) %>%  purrr::pluck(1), 6)
   
-  meanForecast_bx_modelB = round(summary %>% filter(Model == "Box Model B") %>% select(MeanForecast) %>%  purrr::pluck(1), 6)
-  meanLL_bx_modelB = round(summary %>% filter(Model == "Box Model B") %>% select(MeanLL) %>%  purrr::pluck(1), 6)
-  meanUL_bx_modelB = round(summary %>% filter(Model == "Box Model B") %>% select(MeanUL) %>%  purrr::pluck(1), 6)
+  meanForecast_bx_modelB = round(summary %>% dplyr::filter(Model == "Box Model B") %>% dplyr::select(MeanForecast) %>%  purrr::pluck(1), 6)
+  meanLL_bx_modelB = round(summary %>% dplyr::filter(Model == "Box Model B") %>% dplyr::select(MeanLL) %>%  purrr::pluck(1), 6)
+  meanUL_bx_modelB = round(summary %>% dplyr::filter(Model == "Box Model B") %>% dplyr::select(MeanUL) %>%  purrr::pluck(1), 6)
   
   expect_equal(meanForecast_wg_modelB, 5.767088)
   expect_equal(meanForecast_pz_modelB, 5.588596)
@@ -351,24 +351,24 @@ test_that("ModelCompareUnivariate", {
   forecasts = mdl_compare$get_tabular_metrics(ases = FALSE)
 
   summary = forecasts %>%
-    group_by(Model) %>%
-    summarise(MeanForecast = mean(f, na.rm = TRUE),
+    dplyr::group_by(Model) %>%
+    dplyr::summarise(MeanForecast = mean(f, na.rm = TRUE),
               MeanLL = mean(ll, na.rm = TRUE),
               MeanUL = mean(ul, na.rm = TRUE)
     )
 
 
-  meanForecast_wg_modelB = round(summary %>% filter(Model == "Woodward Gray Model B") %>% select(MeanForecast) %>%  purrr::pluck(1), 6)
-  meanLL_wg_modelB = round(summary %>% filter(Model == "Woodward Gray Model B") %>% select(MeanLL) %>%  purrr::pluck(1), 6)
-  meanUL_wg_modelB = round(summary %>% filter(Model == "Woodward Gray Model B") %>% select(MeanUL) %>%  purrr::pluck(1), 6)
+  meanForecast_wg_modelB = round(summary %>% dplyr::filter(Model == "Woodward Gray Model B") %>% dplyr::select(MeanForecast) %>%  purrr::pluck(1), 6)
+  meanLL_wg_modelB = round(summary %>% dplyr::filter(Model == "Woodward Gray Model B") %>% dplyr::select(MeanLL) %>%  purrr::pluck(1), 6)
+  meanUL_wg_modelB = round(summary %>% dplyr::filter(Model == "Woodward Gray Model B") %>% dplyr::select(MeanUL) %>%  purrr::pluck(1), 6)
 
-  meanForecast_pz_modelB = round(summary %>% filter(Model == "Parzen Model B") %>% select(MeanForecast) %>%  purrr::pluck(1), 6)
-  meanLL_pz_modelB = round(summary %>% filter(Model == "Parzen Model B") %>% select(MeanLL) %>%  purrr::pluck(1), 6)
-  meanUL_pz_modelB = round(summary %>% filter(Model == "Parzen Model B") %>% select(MeanUL) %>%  purrr::pluck(1), 6)
+  meanForecast_pz_modelB = round(summary %>% dplyr::filter(Model == "Parzen Model B") %>% dplyr::select(MeanForecast) %>%  purrr::pluck(1), 6)
+  meanLL_pz_modelB = round(summary %>% dplyr::filter(Model == "Parzen Model B") %>% dplyr::select(MeanLL) %>%  purrr::pluck(1), 6)
+  meanUL_pz_modelB = round(summary %>% dplyr::filter(Model == "Parzen Model B") %>% dplyr::select(MeanUL) %>%  purrr::pluck(1), 6)
 
-  meanForecast_bx_modelB = round(summary %>% filter(Model == "Box Model B") %>% select(MeanForecast) %>%  purrr::pluck(1), 6)
-  meanLL_bx_modelB = round(summary %>% filter(Model == "Box Model B") %>% select(MeanLL) %>%  purrr::pluck(1), 6)
-  meanUL_bx_modelB = round(summary %>% filter(Model == "Box Model B") %>% select(MeanUL) %>%  purrr::pluck(1), 6)
+  meanForecast_bx_modelB = round(summary %>% dplyr::filter(Model == "Box Model B") %>% dplyr::select(MeanForecast) %>%  purrr::pluck(1), 6)
+  meanLL_bx_modelB = round(summary %>% dplyr::filter(Model == "Box Model B") %>% dplyr::select(MeanLL) %>%  purrr::pluck(1), 6)
+  meanUL_bx_modelB = round(summary %>% dplyr::filter(Model == "Box Model B") %>% dplyr::select(MeanUL) %>%  purrr::pluck(1), 6)
 
   expect_equal(meanForecast_wg_modelB, 5.75461)
   expect_equal(meanForecast_pz_modelB, 5.697653)
@@ -393,9 +393,9 @@ test_that("Compare Multiple Realizations", {
   r = generate_multiple_realization(x = sunspot.classic, phi = est$phi, theta = est$theta, vara = est$avar, seed = 11) 
   plot_multiple_realizations(data = r$data, results = r$results)
   
-  data.sum = r$data %>% summarise_if(is.numeric, sum)
-  results.acf.sum = r$results %>% dplyr::filter(Characteristic == "ACF") %>%  summarise_if(is.numeric, sum)
-  results.spectrum.sum = r$results %>% dplyr::filter(Characteristic == "Spectrum") %>%  summarise_if(is.numeric, sum)
+  data.sum = r$data %>% dplyr::summarise_if(is.numeric, sum)
+  results.acf.sum = r$results %>% dplyr::filter(Characteristic == "ACF") %>%  dplyr::summarise_if(is.numeric, sum)
+  results.spectrum.sum = r$results %>% dplyr::filter(Characteristic == "Spectrum") %>%  dplyr::summarise_if(is.numeric, sum)
   
   expect_equal(round(data.sum$Data), 36833)
   expect_equal(data.sum$Index, 77880)
@@ -409,20 +409,20 @@ test_that("Compare Multiple Realizations", {
 
 
 test_that("White Noise Eval - White Noise Eval", {
-  library(tswge)
+  # library(tswge)
   
   # Generated White Noise 
   wn = gen.arma.wge(n = 200, sn = 101)
   table = white_noise_eval(wn)
   
-  k24 = ljung.wge(wn, K = 24)
-  k48 = ljung.wge(wn, K = 48)
+  k24 = tswge::ljung.wge(wn, K = 24)
+  k48 = tswge::ljung.wge(wn, K = 48)
   
   # have to pluck 2 times since the 1st time, it returns a list with 1 element.
-  expect_equal(table %>% filter(K == 24) %>% select(pval) %>% purrr::pluck(1) %>% purrr::pluck(1), k24$pval)
-  expect_equal(table %>% filter(K == 48) %>% select(pval) %>% purrr::pluck(1) %>% purrr::pluck(1), k48$pval)
-  expect_equal(table %>% filter(K == 24) %>% select(Decision) %>% purrr::pluck(1) %>% purrr::pluck(1), "FTR NULL")
-  expect_equal(table %>% filter(K == 48) %>% select(Decision) %>% purrr::pluck(1) %>% purrr::pluck(1), "FTR NULL")
+  expect_equal(table %>% dplyr::filter(K == 24) %>% dplyr::select(pval) %>% purrr::pluck(1) %>% purrr::pluck(1), k24$pval)
+  expect_equal(table %>% dplyr::filter(K == 48) %>% dplyr::select(pval) %>% purrr::pluck(1) %>% purrr::pluck(1), k48$pval)
+  expect_equal(table %>% dplyr::filter(K == 24) %>% dplyr::select(Decision) %>% purrr::pluck(1) %>% purrr::pluck(1), "FTR NULL")
+  expect_equal(table %>% dplyr::filter(K == 48) %>% dplyr::select(Decision) %>% purrr::pluck(1) %>% purrr::pluck(1), "FTR NULL")
   
   # Not White Noise
   data(hadley) 
@@ -432,10 +432,10 @@ test_that("White Noise Eval - White Noise Eval", {
   k48 = ljung.wge(hadley, K = 48)
   
   # have to pluck 2 times since the 1st time, it returns a list with 1 element.
-  expect_equal(table %>% filter(K == 24) %>% select(pval) %>% purrr::pluck(1) %>% purrr::pluck(1), k24$pval)
-  expect_equal(table %>% filter(K == 48) %>% select(pval) %>% purrr::pluck(1) %>% purrr::pluck(1), k48$pval)
-  expect_equal(table %>% filter(K == 24) %>% select(Decision) %>% purrr::pluck(1) %>% purrr::pluck(1), "REJECT NULL")
-  expect_equal(table %>% filter(K == 48) %>% select(Decision) %>% purrr::pluck(1) %>% purrr::pluck(1), "REJECT NULL")
+  expect_equal(table %>% dplyr::filter(K == 24) %>% dplyr::select(pval) %>% purrr::pluck(1) %>% purrr::pluck(1), k24$pval)
+  expect_equal(table %>% dplyr::filter(K == 48) %>% dplyr::select(pval) %>% purrr::pluck(1) %>% purrr::pluck(1), k48$pval)
+  expect_equal(table %>% dplyr::filter(K == 24) %>% dplyr::select(Decision) %>% purrr::pluck(1) %>% purrr::pluck(1), "REJECT NULL")
+  expect_equal(table %>% dplyr::filter(K == 48) %>% dplyr::select(Decision) %>% purrr::pluck(1) %>% purrr::pluck(1), "REJECT NULL")
 
 })
 
@@ -465,10 +465,10 @@ test_that("AICBIC", {
   colnames.aic = c("p", "q", "aic")
   colnames.bic = c("p", "q", "bic")
   
-  s.aicbic.aic.sum = g.aicbic[[1]] %>% summarise_all(sum)
-  s.aicbic.bic.sum = g.aicbic[[2]] %>% summarise_all(sum)
-  s.aic.sum = g.aic %>% summarise_all(sum) 
-  s.bic.sum = g.bic %>% summarise_all(sum)
+  s.aicbic.aic.sum = g.aicbic[[1]] %>% dplyr::summarise_all(sum)
+  s.aicbic.bic.sum = g.aicbic[[2]] %>% dplyr::summarise_all(sum)
+  s.aic.sum = g.aic %>% dplyr::summarise_all(sum) 
+  s.bic.sum = g.bic %>% dplyr::summarise_all(sum)
   
   colnames(s.aic.sum) = colnames.aic
   colnames(s.bic.sum) = colnames.bic
@@ -521,10 +521,10 @@ test_that("AICBIC", {
 #   colnames.aic = c("p", "q", "aic")
 #   colnames.bic = c("p", "q", "bic")
 #   
-#   s.aicbic.aic.sum = g.aicbic[[1]] %>% summarise_all(sum)
-#   s.aicbic.bic.sum = g.aicbic[[2]] %>% summarise_all(sum)
-#   s.aic.sum = g.aic %>% summarise_all(sum) 
-#   s.bic.sum = g.bic %>% summarise_all(sum)
+#   s.aicbic.aic.sum = g.aicbic[[1]] %>% dplyr::summarise_all(sum)
+#   s.aicbic.bic.sum = g.aicbic[[2]] %>% dplyr::summarise_all(sum)
+#   s.aic.sum = g.aic %>% dplyr::summarise_all(sum) 
+#   s.bic.sum = g.bic %>% dplyr::summarise_all(sum)
 #   
 #   colnames(s.aic.sum) = colnames.aic
 #   colnames(s.bic.sum) = colnames.bic

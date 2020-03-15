@@ -5,13 +5,16 @@
 \title{Plot multiple realizations of a model
 Useful for checking model appropriateness}
 \usage{
-plot_multiple_realizations(data, results, scales = "free_y")
+plot_multiple_realizations(data, results, plot = c("all"), scales = "free_y")
 }
 \arguments{
 \item{data}{The actual and the hypothetical realizations in tidy data format}
 
 \item{results}{The ACF and Spectral Density values for the 
 actual and hypothetical realizations in tidy data format}
+
+\item{plot}{A vector of options to plot (Default = c("all"))
+Other options: 'realization', 'acf', 'spectrum'}
 
 \item{scales}{The scales argument to be passed to ggplot facet_wrap layer
 (Default = 'free_y') Other appropriate options: 'fixed'}

@@ -22,7 +22,7 @@ aics <- list(
 #' aicbic(xs)
 aicbic <- function(vec, p = 0:8, q = 0:5, parallel = FALSE, cl = NULL, silent = FALSE, merge = FALSE, sort_by = "aic"){
   
-  requireNamespace("magrittr")
+  # requireNamespace("magrittr")
   
   if(parallel == TRUE){
     rvGrid = parallel::parLapply(cl, aics, function(f) f(vec, p, q, silent = TRUE))
