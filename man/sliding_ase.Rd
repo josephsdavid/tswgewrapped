@@ -6,8 +6,8 @@
 Supports ARMA, ARIMA, ARUMA (seasonal ARIMA) and Signal Plus Noise Models}
 \usage{
 sliding_ase(x, phi = 0, theta = 0, d = 0, s = 0, linear = NA,
-  freq = NA, n.ahead = NA, batch_size = NA,
-  time_index = "test_start", ...)
+  freq = NA, n.ahead = NA, batch_size = NA, step_n.ahead = TRUE,
+  ...)
 }
 \arguments{
 \item{x}{time series realization}
@@ -28,12 +28,20 @@ sliding_ase(x, phi = 0, theta = 0, d = 0, s = 0, linear = NA,
 
 \item{batch_size}{Window Size used}
 
-\item{time_index}{What time index to return for each ASE. Options are data_start, data_end, test_start and test_end (Defaults to test_start)}
+\item{step_n.ahead}{Whether to step each batch by n.ahead values (Default = FALSE)}
 
 \item{...}{any additional arguments to be passed to the forecast functions (e.g. max.p for sigplusnoise model, lambda for ARUMA models)}
 }
 \value{
-Named list ('ASEs' - ASE values and 'Time' - Corresponding Time stamps based on time_index argument)
+Named list 
+        'ASEs' - ASE values
+        'time_test_start' - Time Index indicating start of test time corresponding to the ASE values
+        'time_test_end' - Time Index indicating end of test time corresponding to the ASE values
+        'batch_num' - Indicates the batch number for each ASE value
+        'f' - Forecasts for each batch
+        'll' - Lower Forecast Limit for each batch
+        'ul' - Upper Forecast Limit for each batch
+        'time.forecasts' - Time Corresponding to each forecast, upper and lower limit values
 }
 \description{
 Function to calculate the sliding window ASE for a model

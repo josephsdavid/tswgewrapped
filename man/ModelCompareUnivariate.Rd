@@ -18,6 +18,9 @@ ModelCompareUnivariate$new(x = airlog, mdl_list = models,
 
 \item{batch_size}{If any of the models used sliding ase method,
 then this number indicates the batch size to use}
+
+\item{step_n.ahead}{If using sliding window, should batches be incremented by n.ahead
+(Default = TRUE)}
 }
 \value{
 A new `ModelCompareUnivariate` object.

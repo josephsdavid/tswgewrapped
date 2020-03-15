@@ -1,0 +1,96 @@
+---
+title: "ModelCompareUnivariate"
+author: "Nikhil Gupta"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{ModelCompareUnivariate}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+**The objective of this vignette is to show how to use the ModelCompareUnivariate object to compare multiple potential models.**
+
+# Setup Libraries
+```{r setup}
+library(tswgewrapped)
+library(tswge)
+```
+
+# Load Data
+```{r}
+data("airlog")
+```
+ 
+# Setup Models tpo be compared 
+```{r} 
+# Woodward Gray Airline Model
+phi_wg = c(-0.36, -0.05, -0.14, -0.11, 0.04, 0.09, -0.02, 0.02, 0.17, 0.03, -0.10, -0.38)
+d_wg = 1
+s_wg = 12
+
+# Parzen Model
+phi_pz = c(0.74, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.38, -0.2812)
+s_pz = 12
+
+# Box Model
+d_bx = 1
+s_bx = 12  
+theta_bx =  c(0.40, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.60, -0.24)
+
+models = list("Woodward Gray Model A" = list(phi = phi_wg, d = d_wg, s = s_wg, vara = 0.001357009, sliding_ase = FALSE),
+              "Woodward Gray Model B" = list(phi = phi_wg, d = d_wg, s = s_wg, vara = 0.001357009, sliding_ase = TRUE),
+              "Parzen Model A" = list(phi = phi_pz, s = s_pz, vara = 0.002933592, sliding_ase = FALSE),
+              "Parzen Model B" = list(phi = phi_pz, s = s_pz, vara = 0.002933592, sliding_ase = TRUE),
+              "Box Model A" = list(theta = theta_bx, d = d_bx, s = s_bx, vara = 0.001391604, sliding_ase = FALSE),
+              "Box Model B" = list(theta = theta_bx, d = d_bx, s = s_bx, vara = 0.001391604, sliding_ase = TRUE)
+              )
+```
+
+# Initialize the ModelCompareUnivariate object
+```{r}
+#### With n_step.ahead = TRUE (Default)              
+mdl_compare = ModelCompareUnivariate$new(x = airlog, mdl_list = models,
+                                         n.ahead = 36, batch_size = 72)
+
+```
+
+# Compare the models
+
+## Plot Multiple realizations
+```{r}
+mdl_compare$plot_multiple_realizations(n.realizations = 4, seed = 100)
+```
+
+## Compare Histogram of ASE values
+```{r}
+mdl_compare$plot_histogram_ases()
+```
+
+## Statistically Compare the models
+```{r}
+mdl_compare$statistical_compare()  
+```
+
+## Plot and compare the forecasrs per batch
+```{r}
+mdl_compare$plot_forecasts(only_sliding = TRUE)
+```
+
+## Raw Data and Metrics
+```{r}
+ASEs = mdl_compare$get_tabular_metrics(ases = TRUE)
+print(ASEs)
+```
+
+```{r}
+forecasts = mdl_compare$get_tabular_metrics(ases = FALSE)
+print(forecasts)
+```

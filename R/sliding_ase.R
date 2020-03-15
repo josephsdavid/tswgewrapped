@@ -9,15 +9,24 @@
 #' @param freq If using a sinusoidal signal, what is the frequency of the signal?
 #' @param batch_size Window Size used 
 #' @param n.ahead last n.ahead data points in each batch will be used for prediction and ASE calculations
-#' @param time_index What time index to return for each ASE. Options are data_start, data_end, test_start and test_end (Defaults to test_start)
+#' @param step_n.ahead Whether to step each batch by n.ahead values (Default = FALSE)
 #' @param ... any additional arguments to be passed to the forecast functions (e.g. max.p for sigplusnoise model, lambda for ARUMA models)
-#' @return Named list ('ASEs' - ASE values and 'Time' - Corresponding Time stamps based on time_index argument) 
+#' @return Named list 
+#'         'ASEs' - ASE values
+#'         'time_test_start' - Time Index indicating start of test time corresponding to the ASE values
+#'         'time_test_end' - Time Index indicating end of test time corresponding to the ASE values
+#'         'batch_num' - Indicates the batch number for each ASE value
+#'         'f' - Forecasts for each batch
+#'         'll' - Lower Forecast Limit for each batch
+#'         'ul' - Upper Forecast Limit for each batch
+#'         'time.forecasts' - Time Corresponding to each forecast, upper and lower limit values
 #' @export
+
 sliding_ase = function(x,
                        phi = 0, theta = 0, d = 0, s = 0, # ARUMA arguments
                        linear = NA, freq = NA,           # Signal + Noise arguments
                        n.ahead = NA, batch_size = NA,    # Forecasting specific arguments
-                       time_index = 'test_start',        # Time Index to return ("<test|data>_<start|end>") 
+                       step_n.ahead = TRUE,
                        ...)                              # max.p (sigplusnoise), lambda (ARUMA)      
 {
   # Sliding CV ... batches are mutually exclusive
@@ -48,34 +57,48 @@ sliding_ase = function(x,
     # Signal + Noise model
   }
   
+  forecasts.f = rep(NA, n)
+  forecasts.ul = rep(NA, n)
+  forecasts.ll = rep(NA, n)
+  time.forecasts = seq(1, n, 1)
+  
   start = 1
-  num_batches = n-batch_size+1
+  
+  if (step_n.ahead == FALSE){
+    # Step Size = 1
+    step_size = 1
+    num_batches = n-batch_size+1  
+  }
+  else{
+    # Step by n.ahead each time
+    step_size = n.ahead
+    num_batches = floor((n-batch_size)/n.ahead)  + 1
+  }
+  
+  cat(paste("Number of batches expected: ", num_batches, "\n"))
+  
   ASEs = numeric(num_batches)
-  time = numeric(num_batches)
+  time_test_start = numeric(num_batches)
+  time_test_end = numeric(num_batches)
+  batch_num = numeric(num_batches)
   
   for (i in 0:(num_batches-1))
   {
     # Define the batch
-    subset = x[start:(batch_size+i)]
+    subset = x[start:(batch_size+i*step_size)]
     # Take last n.ahead observations from the batch and use that to compare with the forecast
     
-    if (time_index == 'test_start'){
-      time[i+1] = batch_size+i-n.ahead+1
-    }
-    else if (time_index == 'test_end'){
-      time[i+1] = batch_size+i
-    }
-    else if (time_index == 'data_start'){
-      time[i+1] = start
-    }
-    else if (time_index == 'data_end'){
-      time[i+1] = batch_size+i-n.ahead
-    }
-    else{
-      stop("You have not provided the correct time_index. Options are <data|test>_<start_end>")
-    }
+    test_start = i*step_size + batch_size - n.ahead + 1
+    test_end = i*step_size + batch_size
+    data_start = start
+    data_end = i*step_size + batch_size
     
-    test_data = x[(batch_size+i-n.ahead+1):(batch_size+i)]
+    time_test_start[i+1] = test_start
+    time_test_end[i+1] = test_end
+    batch_num[i+1] = i+1
+    
+    
+    test_data = x[test_start:test_end]
     
     if (aruma){
       forecasts = tswge::fore.aruma.wge(x = subset, phi = phi, theta = theta, d = d, s = s,
@@ -87,8 +110,20 @@ sliding_ase = function(x,
     }
     
     ASEs[i+1] = mean((test_data - forecasts$f)^2)
-    start = start+1
+    start = start + step_size
+    
+    forecasts.f[test_start: test_end] = forecasts$f 
+    forecasts.ll[test_start: test_end] = forecasts$ll
+    forecasts.ul[test_start: test_end] = forecasts$ul
+    time.forecasts[test_start: test_end] = seq(test_start, test_end, 1)
   }
   
-  return(list(ASEs = ASEs, time = time))
+  return(list(ASEs = ASEs,
+              time_test_start = time_test_start,
+              time_test_end = time_test_end,
+              batch_num = batch_num,
+              f = forecasts.f,
+              ll = forecasts.ll,
+              ul = forecasts.ul,
+              time.forecasts = time.forecasts ))
 }

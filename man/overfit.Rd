@@ -5,12 +5,12 @@
 \title{overfit function
 produces an overfit table}
 \usage{
-overfit(xs, p, type = "burg")
+overfit(xs, p = 24, type = "burg")
 }
 \arguments{
 \item{xs}{a time series}
 
-\item{p}{the order of overfitting}
+\item{p}{the order of overfitting (Default = 24)}
 
 \item{type}{the type of estimate to make, defaults to burg}
 }
