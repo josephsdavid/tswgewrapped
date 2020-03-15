@@ -18,7 +18,7 @@
 #'
 #' @export
 ljung_box <- function(x, p = 0, q = 0, k_val = c(24,48), alpha = 0.05) {
-  library("magrittr")
+  # library("magrittr")
   
   ljung <- function(k) {
     hush(tswge::ljung.wge(x = x, p = p, q = q, K = k))

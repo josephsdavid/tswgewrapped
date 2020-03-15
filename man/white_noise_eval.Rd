@@ -4,8 +4,14 @@
 \alias{white_noise_eval}
 \title{Evaluate if the dats is consistent with white noise}
 \usage{
-white_noise_eval(x, p = 0, q = 0, k_val = c(24, 48), alpha = 0.05,
-  lag.max = 50)
+white_noise_eval(
+  x,
+  p = 0,
+  q = 0,
+  k_val = c(24, 48),
+  alpha = 0.05,
+  lag.max = 50
+)
 }
 \arguments{
 \item{x}{the time series}

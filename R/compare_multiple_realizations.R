@@ -34,7 +34,7 @@ generate_multiple_realization = function(x, phi = 0, theta = 0, d = 0, s = 0, va
                                          n.realizations = 4, lag.max = 25, seed = NA,
                                          model_name = "Custom Model", return = 'all'){
   
-  library(magrittr)
+  # library(magrittr)
   
   if (all(is.na(vara))){
     stop("You have not specified the white noise variance estimate for your model. Please specify to proceed.")
@@ -135,6 +135,8 @@ generate_multiple_realization = function(x, phi = 0, theta = 0, d = 0, s = 0, va
 #' @param data The actual and the hypothetical realizations in tidy data format
 #' @param results The ACF and Spectral Density values for the 
 #'                actual and hypothetical realizations in tidy data format 
+#' @param plot A vector of options to plot (Default = c("all"))
+#'             Other options: 'realization', 'acf', 'spectrum' 
 #' @param scales The scales argument to be passed to ggplot facet_wrap layer
 #'               (Default = 'free_y') Other appropriate options: 'fixed'
 #' @examples 
@@ -148,79 +150,79 @@ generate_multiple_realization = function(x, phi = 0, theta = 0, d = 0, s = 0, va
 #' plot_multiple_realizations(data = r$data, results = r$results)
 #' @export
 #'
-plot_multiple_realizations = function(data, results, scales = 'free_y'){
+plot_multiple_realizations = function(data, results, plot = c("all"), scales = 'free_y'){
   
-  library(magrittr)
+  # library(magrittr)
   requireNamespace("ggfortify")
   requireNamespace("patchwork")
   
   n.realizations = length(unique(results$Realization)) - 1
+  plot = tolower(plot)
   
-  for (name in unique(data$Model)){
+  
+  if (('realization' %in% plot) | ('all' %in% plot)){
     data_hypothetical = data %>% 
-      dplyr::filter(.$Model == name) %>% 
       dplyr::filter(.$Realization != 'Actual')
-    
+      
     data_actual = data %>% 
-      dplyr::filter(.$Model == name) %>% 
       dplyr::filter(.$Realization == 'Actual')
-    
+      
     g1 = ggplot2::ggplot() +   
       ggplot2::geom_line(data = data_actual, mapping = ggplot2::aes_string(x = 'Index', y = 'Data', color = 'Realization'), size = 2) +
       ggplot2::scale_color_manual(values=c('blue')) +
       ggplot2::xlab("Time") + ggplot2::ylab("Actual Realization") + 
       ggplot2::theme(legend.position="none")
-    
+      
     g2 = ggplot2::ggplot() +   
       ggplot2::geom_line(data = data_hypothetical, mapping = ggplot2::aes_string(x = 'Index', y = 'Data', color = 'Realization')) +
-      ggplot2::facet_wrap( ~ Model + Realization, ncol=2, scales = scales) +
+      ggplot2::facet_grid(Realization ~ Model, scales = scales) +
       ggplot2::scale_color_manual(values=c(rep("black", n.realizations))) +
       ggplot2::ggtitle("Realization Comparison") + ggplot2::xlab("Time") + ggplot2::ylab("Hypothetical Realizations") +
       ggplot2::theme(legend.position="none")
-    
+      
     print(g1 / g2)
   }
+
   
   
+  if (('acf' %in% plot) | ('all' %in% plot)){
+    acf_data_hypothetical = results %>% 
+      dplyr::filter(.$Realization != 'Actual') %>% 
+      dplyr::filter(.$Characteristic == 'ACF')
+    
+    acf_data_actual = results %>% 
+      dplyr::filter(.$Realization == 'Actual') %>% 
+      dplyr::filter(.$Characteristic == 'ACF')
+    
+    g3 = ggplot2::ggplot() + 
+      ggplot2::facet_wrap(~Model, ncol = 2, scales = scales) +
+      ggplot2::geom_line(data = acf_data_actual, mapping = ggplot2::aes_string(x = 'Index', y = 'Value', color = 'Realization'), size = 2) +
+      ggplot2::geom_line(data = acf_data_hypothetical, mapping = ggplot2::aes_string(x = 'Index', y = 'Value', color = 'Realization')) +
+      ggplot2::scale_color_manual(values=c(rep("black", n.realizations), 'blue')) +
+      ggplot2::ggtitle("ACF Comparison") + ggplot2::xlab("Lag") + ggplot2::ylab("ACF")
+    
+    print(g3)
+  }
   
-  
-  acf_data_hypothetical = results %>% 
-    dplyr::filter(.$Realization != 'Actual') %>% 
-    dplyr::filter(.$Characteristic == 'ACF')
-  
-  acf_data_actual = results %>% 
-    dplyr::filter(.$Realization == 'Actual') %>% 
-    dplyr::filter(.$Characteristic == 'ACF')
-  
-  g3 = ggplot2::ggplot() + 
-    ggplot2::facet_wrap(~Model, ncol = 2, scales = scales) +
-    ggplot2::geom_line(data = acf_data_actual, mapping = ggplot2::aes_string(x = 'Index', y = 'Value', color = 'Realization'), size = 2) +
-    ggplot2::geom_line(data = acf_data_hypothetical, mapping = ggplot2::aes_string(x = 'Index', y = 'Value', color = 'Realization')) +
-    ggplot2::scale_color_manual(values=c(rep("black", n.realizations), 'blue')) +
-    ggplot2::ggtitle("ACF Comparison") + ggplot2::xlab("Lag") + ggplot2::ylab("ACF")
-  
-  print(g3)
-  
-  
-  spectrum_data_hypothetical = results %>% 
-    dplyr::filter(.$Realization != 'Actual') %>% 
-    dplyr::filter(.$Characteristic == 'Spectrum')
-  
-  spectrum_data_actual = results %>% 
-    dplyr::filter(.$Realization == 'Actual') %>% 
-    dplyr::filter(.$Characteristic == 'Spectrum')
-  
-  g4 = ggplot2::ggplot() +   
-    ggplot2::facet_wrap(~Model, ncol = 2, scales = scales) +
-    ggplot2::geom_line(data = spectrum_data_actual, mapping = ggplot2::aes_string(x = 'Index', y = 'Value', color = 'Realization'), size = 2) +
-    ggplot2::geom_line(data = spectrum_data_hypothetical, mapping = ggplot2::aes_string(x = 'Index', y = 'Value', color = 'Realization')) +
-    ggplot2::scale_color_manual(values=c(rep("black", n.realizations), 'blue')) +
-    ggplot2::ggtitle("Spectral Density Comparison") + ggplot2::xlab("Frequency") + ggplot2::ylab("Spectral Density (dB)")
-  
-  print(g4)
-  
-  
-  
+  if (('spectrum' %in% plot) | ('all' %in% plot)){
+    spectrum_data_hypothetical = results %>% 
+      dplyr::filter(.$Realization != 'Actual') %>% 
+      dplyr::filter(.$Characteristic == 'Spectrum')
+    
+    spectrum_data_actual = results %>% 
+      dplyr::filter(.$Realization == 'Actual') %>% 
+      dplyr::filter(.$Characteristic == 'Spectrum')
+    
+    g4 = ggplot2::ggplot() +   
+      ggplot2::facet_wrap(~Model, ncol = 2, scales = scales) +
+      ggplot2::geom_line(data = spectrum_data_actual, mapping = ggplot2::aes_string(x = 'Index', y = 'Value', color = 'Realization'), size = 2) +
+      ggplot2::geom_line(data = spectrum_data_hypothetical, mapping = ggplot2::aes_string(x = 'Index', y = 'Value', color = 'Realization')) +
+      ggplot2::scale_color_manual(values=c(rep("black", n.realizations), 'blue')) +
+      ggplot2::ggtitle("Spectral Density Comparison") + ggplot2::xlab("Frequency") + ggplot2::ylab("Spectral Density (dB)")
+    
+    print(g4)
+  }
+
 }
 
 

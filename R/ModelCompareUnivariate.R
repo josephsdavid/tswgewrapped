@@ -90,7 +90,7 @@ ModelCompareUnivariate = R6::R6Class(
       # Add checks here
       if (all(is.na(x))){ stop("You have not provided the time series data. Please provide to continue.") }
       
-      self$set_x(x = x)
+      private$set_x(x = x)
       self$add_models(mdl_list)
       private$set_n.ahead(n.ahead)
       private$set_batch_size(batch_size)
@@ -101,10 +101,6 @@ ModelCompareUnivariate = R6::R6Class(
     #### Getters and Setters ----
     
     get_x = function(){return(self$x)},
-    set_x = function(x){self$x = x},
-    get_len_x = function(){
-      return(length(self$get_x()))
-    },
     
     get_batch_size = function(){return(self$batch_size)},
     get_n.ahead = function(){return(self$n.ahead)},
@@ -132,28 +128,24 @@ ModelCompareUnivariate = R6::R6Class(
     },
     
     remove_models = function(x){
-      
-    },
-    
-    get_models = function(){
-      return(self$models)
+      stop("This has not been implemented yet.")  
     },
     
     #### General Public Methods ----
     
     compute_metrics = function(step_n.ahead = TRUE){
-      for (name in names(self$get_models())){
+      for (name in names(private$get_models())){
         
         if (self$models[[name]][['metric_has_been_computed']] == FALSE){
           cat(paste("\n\n\nComputing metrics for: ", name, "\n"))
           
           res = sliding_ase(x = self$get_x(),
-                            phi = self$get_models()[[name]][['phi']],
-                            theta = self$get_models()[[name]][['theta']],
-                            d = self$get_models()[[name]][['d']],
-                            s = self$get_models()[[name]][['s']],
+                            phi = private$get_models()[[name]][['phi']],
+                            theta = private$get_models()[[name]][['theta']],
+                            d = private$get_models()[[name]][['d']],
+                            s = private$get_models()[[name]][['s']],
                             n.ahead = self$get_n.ahead(),
-                            batch_size = self$get_models()[[name]][['batch_size']],
+                            batch_size = private$get_models()[[name]][['batch_size']],
                             step_n.ahead = step_n.ahead)
           
           ## Inplace
@@ -190,7 +182,7 @@ ModelCompareUnivariate = R6::R6Class(
       
       model_subset = c("Realization")
       if (only_sliding){
-        for (name in names(self$get_models())){
+        for (name in names(private$get_models())){
           if (self$models[[name]][['sliding_ase']] == TRUE){
             model_subset = c(model_subset, name)
           }
@@ -198,25 +190,25 @@ ModelCompareUnivariate = R6::R6Class(
       }
       else{
         # Add all models
-        for (name in names(self$get_models())){
+        for (name in names(private$get_models())){
           model_subset = c(model_subset, name)
         }
       }
       
-      library(magrittr)
-      library(dplyr)
+      # library(magrittr)
+      # library(dplyr)
       
       results.forecasts = results.forecasts %>% 
-        filter(Model %in% model_subset)
+        dplyr::filter(Model %in% model_subset)
       
       # https://stackoverflow.com/questions/9968975/make-the-background-of-a-graph-different-colours-in-different-regions
       
       # Get Batch Boundaries
       results.ases = self$get_tabular_metrics(ases = TRUE)
-      for (name in names(self$get_models())){
+      for (name in names(private$get_models())){
         if (self$models[[name]][['sliding_ase']] == TRUE){
           results.batches = results.ases %>% 
-            filter(Model == name)
+            dplyr::filter(Model == name)
           break()
         }
       }
@@ -245,14 +237,50 @@ ModelCompareUnivariate = R6::R6Class(
     },
     
     plot_simple_forecasts = function(){
-      #TODO: Plots future forecasts for all models for easy comparison
+      results = dplyr::tribble(~Model, ~Time, ~f, ~ll, ~ul)
+      from = private$get_len_x() + 1
+      to = private$get_len_x() + self$get_n.ahead()
+
+      for (name in names(private$get_models())){
+        f = tswge::fore.aruma.wge(x = self$get_x(),
+                                  phi = private$get_models()[[name]][['phi']],
+                                  theta = private$get_models()[[name]][['theta']],
+                                  d = private$get_models()[[name]][['d']],
+                                  s = private$get_models()[[name]][['s']], 
+                                  n.ahead = self$get_n.ahead(),
+                                  lastn = FALSE, plot = FALSE)
+
+
+        results = results %>%  dplyr::add_row(Model = name,
+                                              Time = from:to,
+                                              f = f$f,
+                                              ll = f$ll,
+                                              ul = f$ul
+                                              )
+
+      }
+
+      results = results %>%  dplyr::add_row(Model = "Actual",
+                                            Time = seq_along(self$get_x()),
+                                            f = self$get_x(),
+                                            ll = self$get_x(),
+                                            ul = self$get_x()
+      )
+
+      p = ggplot2::ggplot() +
+        ggplot2::geom_line(results, mapping = ggplot2::aes(x=Time, y=f, color = Model)) +
+        # ggplot2::geom_line(results, mapping = ggplot2::aes(x=Time, y=ul, color = Model)) +
+        ggplot2::ylab("Simple Forecasts")
+
+      print(p)
+      
     },
     
-    plot_multiple_realizations = function(n.realizations = 4, lag.max = 25, seed = NA, scales = 'free_y'){
+    plot_multiple_realizations = function(n.realizations = 4, lag.max = 25, seed = NA, plot = c("all"), scales = 'free_y'){
       final.data = NA
       final.results = NA
       
-      for (name in names(self$get_models())){
+      for (name in names(private$get_models())){
         r = generate_multiple_realization(x = self$get_x(),
                                           phi = self$models[[name]][['phi']],
                                           theta = self$models[[name]][['theta']],
@@ -279,7 +307,7 @@ ModelCompareUnivariate = R6::R6Class(
        
       }
       
-      plot_multiple_realizations(data = final.data, results = final.results, scales = scales)
+      plot_multiple_realizations(data = final.data, results = final.results, plot = plot, scales = scales)
       
     },
     
@@ -311,7 +339,7 @@ ModelCompareUnivariate = R6::R6Class(
       
       model_names = c()
       
-      for (name in names(self$get_models())){
+      for (name in names(private$get_models())){
         if (self$models[[name]][['metric_has_been_computed']] == TRUE){
           if(only_sliding == TRUE){
             if (self$models[[name]][['sliding_ase']] == TRUE){
@@ -327,7 +355,7 @@ ModelCompareUnivariate = R6::R6Class(
         }
       }
       
-      library(magrittr)
+      # library(magrittr)
       
       for (name in model_names){    
         if (ases == TRUE){
@@ -351,7 +379,7 @@ ModelCompareUnivariate = R6::R6Class(
       if (ases == FALSE){
         # Add the realization as well
         results = results %>% dplyr::add_row(Model = "Realization",
-                                             Time = seq(1, self$get_len_x(), 1),
+                                             Time = seq(1, private$get_len_x(), 1),
                                              f = self$get_x(),
                                              ll = self$get_x(),
                                              ul = self$get_x())
@@ -366,6 +394,16 @@ ModelCompareUnivariate = R6::R6Class(
   
   #### Private Methods ----
   private = list(
+    set_x = function(x){self$x = x},
+    
+    get_len_x = function(){
+      return(length(self$get_x()))
+    },
+    
+    get_models = function(){
+      return(self$models)
+    },
+    
     clean_model_input = function(mdl_list){
       # If the inputs are missing p, d, q, or s values, this will add 0s to make it consistent
       for (name in names(mdl_list)){
@@ -393,8 +431,8 @@ ModelCompareUnivariate = R6::R6Class(
     },
     
     any_sliding_ase = function(){
-      for (name in names(self$get_models())){
-        if (self$get_models()[[name]][['sliding_ase']]){
+      for (name in names(private$get_models())){
+        if (private$get_models()[[name]][['sliding_ase']]){
           return(TRUE)
         }
       }
@@ -406,8 +444,8 @@ ModelCompareUnivariate = R6::R6Class(
     },
     
     set_batch_per_model = function(){
-      for (name in names(self$get_models())){
-        if (self$get_models()[[name]][['sliding_ase']]){
+      for (name in names(private$get_models())){
+        if (private$get_models()[[name]][['sliding_ase']]){
           self$models[[name]][['batch_size']] = self$get_batch_size()  ## Inplace, hence not using get_models
         }
         else{
