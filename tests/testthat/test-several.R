@@ -292,6 +292,7 @@ test_that("ModelCompareUnivariate", {
   mdl_compare = ModelCompareUnivariate$new(x = airlog, mdl_list = models,
                                            n.ahead = 36, batch_size = 72)
   
+  mdl_compare$plot_simple_forecasts()
   mdl_compare$plot_multiple_realizations(n.realizations = 4, seed = 100, scales = 'free_y')
   mdl_compare$plot_histogram_ases()
   mdl_compare$plot_forecasts(only_sliding = TRUE)

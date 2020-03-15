@@ -242,20 +242,19 @@ ModelCompareUnivariate = R6::R6Class(
       to = private$get_len_x() + self$get_n.ahead()
 
       for (name in names(private$get_models())){
-        f = tswge::fore.aruma.wge(x = self$get_x(),
+        forecast = tswge::fore.aruma.wge(x = self$get_x(),
                                   phi = private$get_models()[[name]][['phi']],
                                   theta = private$get_models()[[name]][['theta']],
                                   d = private$get_models()[[name]][['d']],
                                   s = private$get_models()[[name]][['s']], 
                                   n.ahead = self$get_n.ahead(),
                                   lastn = FALSE, plot = FALSE)
-
-
+        
         results = results %>%  dplyr::add_row(Model = name,
-                                              Time = from:to,
-                                              f = f$f,
-                                              ll = f$ll,
-                                              ul = f$ul
+                                              Time = (from:to),
+                                              f = forecast$f,
+                                              ll = forecast$ll,
+                                              ul = forecast$ul
                                               )
 
       }
@@ -269,7 +268,6 @@ ModelCompareUnivariate = R6::R6Class(
 
       p = ggplot2::ggplot() +
         ggplot2::geom_line(results, mapping = ggplot2::aes(x=Time, y=f, color = Model)) +
-        # ggplot2::geom_line(results, mapping = ggplot2::aes(x=Time, y=ul, color = Model)) +
         ggplot2::ylab("Simple Forecasts")
 
       print(p)
