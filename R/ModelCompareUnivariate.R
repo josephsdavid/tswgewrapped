@@ -6,6 +6,8 @@
 #' @param n.ahead The number of observations used to calculate ASE or forecast ahead
 #' @param batch_size If any of the models used sliding ase method,
 #'                   then this number indicates the batch size to use
+#' @param step_n.ahead If using sliding window, should batches be incremented by n.ahead
+#'                     (Default = TRUE)
 #' @usage ModelCompareUnivariate$new(x = airlog, mdl_list = models,
 #'                            n.ahead = 36, batch_size = 72)
 #' @return A new `ModelCompareUnivariate` object.
@@ -80,10 +82,10 @@ ModelCompareUnivariate = R6::R6Class(
     models = NA,
     n.ahead = NA,
     batch_size = NA,
-    
+
     #### Constructor ----
     
-    initialize = function(x = NA, mdl_list, n.ahead = NA, batch_size = NA)
+    initialize = function(x = NA, mdl_list, n.ahead = NA, batch_size = NA, step_n.ahead = TRUE)
     {
       # Add checks here
       if (all(is.na(x))){ stop("You have not provided the time series data. Please provide to continue.") }
@@ -92,7 +94,7 @@ ModelCompareUnivariate = R6::R6Class(
       self$add_models(mdl_list)
       private$set_n.ahead(n.ahead)
       private$set_batch_size(batch_size)
-      self$compute_metrics(step_n.ahead = TRUE)
+      self$compute_metrics(step_n.ahead = step_n.ahead)
       
     },
     
@@ -139,21 +141,20 @@ ModelCompareUnivariate = R6::R6Class(
     
     #### General Public Methods ----
     
-    compute_metrics = function(step_n.ahead = FALSE){
+    compute_metrics = function(step_n.ahead = TRUE){
       for (name in names(self$get_models())){
         
         if (self$models[[name]][['metric_has_been_computed']] == FALSE){
           cat(paste("\n\n\nComputing metrics for: ", name, "\n"))
           
-          res = private$sliding_ase(x = self$get_x(),
-                                    phi = self$get_models()[[name]][['phi']],
-                                    theta = self$get_models()[[name]][['theta']],
-                                    d = self$get_models()[[name]][['d']],
-                                    s = self$get_models()[[name]][['s']],
-                                    n.ahead = self$get_n.ahead(),
-                                    batch_size = self$get_models()[[name]][['batch_size']],
-                                    step_n.ahead = step_n.ahead)
-          
+          res = sliding_ase(x = self$get_x(),
+                            phi = self$get_models()[[name]][['phi']],
+                            theta = self$get_models()[[name]][['theta']],
+                            d = self$get_models()[[name]][['d']],
+                            s = self$get_models()[[name]][['s']],
+                            n.ahead = self$get_n.ahead(),
+                            batch_size = self$get_models()[[name]][['batch_size']],
+                            step_n.ahead = step_n.ahead)
           
           ## Inplace
           self$models[[name]][['ASEs']] = res$ASEs  
@@ -204,6 +205,7 @@ ModelCompareUnivariate = R6::R6Class(
       
       library(magrittr)
       library(dplyr)
+      
       results.forecasts = results.forecasts %>% 
         filter(Model %in% model_subset)
       
@@ -239,6 +241,45 @@ ModelCompareUnivariate = R6::R6Class(
         ggplot2::ylab("Upper and Lower Forecast Limits (95%)")
       
       print(p)
+      
+    },
+    
+    plot_simple_forecasts = function(){
+      #TODO: Plots future forecasts for all models for easy comparison
+    },
+    
+    plot_multiple_realizations = function(n.realizations = 4, lag.max = 25, seed = NA, scales = 'free_y'){
+      final.data = NA
+      final.results = NA
+      
+      for (name in names(self$get_models())){
+        r = generate_multiple_realization(x = self$get_x(),
+                                          phi = self$models[[name]][['phi']],
+                                          theta = self$models[[name]][['theta']],
+                                          d = self$models[[name]][['d']],
+                                          s = self$models[[name]][['s']],
+                                          vara = self$models[[name]][['vara']],
+                                          n.realizations = n.realizations, lag.max = lag.max, seed = seed,
+                                          model_name = name, return = 'all')
+      
+        if (all(is.na(final.data))){
+          final.data = r$data
+        }
+        else{
+          final.data = rbind(final.data, r$data)
+        }
+        
+        if (all(is.na(final.results))){
+          final.results = r$results
+        }
+        else{
+          final.results = rbind(final.results, r$results)
+        }
+          
+       
+      }
+      
+      plot_multiple_realizations(data = final.data, results = final.results, scales = scales)
       
     },
     
@@ -381,118 +422,7 @@ ModelCompareUnivariate = R6::R6Class(
       }
       self$batch_size = batch_size
       private$set_batch_per_model()
-    },
-    
-    sliding_ase = function(x,
-                           phi = 0, theta = 0, d = 0, s = 0, # ARUMA arguments
-                           linear = NA, freq = NA,           # Signal + Noise arguments
-                           n.ahead = NA, batch_size = NA,    # Forecasting specific arguments
-                           step_n.ahead = FALSE,
-                           ...)                              # max.p (sigplusnoise), lambda (ARUMA)      
-    {
-      # Sliding CV ... batches are mutually exclusive
-      
-      n = length(x)
-      
-      if (is.na(batch_size)){
-        warning("Batch Size has not been specified. Will assume a single batch")
-        cat("\n")
-        batch_size = n
-      }
-      
-      if (is.na(n.ahead)){
-        stop("Number of points to be used for forecasting has not been specified. Please specify n.ahead")
-      }
-      
-      if (all(phi == 0) & all(theta == 0) & d == 0 & s == 0){
-        if (is.na(linear) & is.na(freq)){
-          stop("You have specified the arguments for neither an ARMA/ARUMA model or a Signal + Noise Model. Please specify at least one of these to continue")
-        }
-      }
-      
-      aruma = FALSE
-      if (!(all(phi == 0) & all(theta == 0) & d == 0 & s == 0)){
-        aruma = TRUE
-      }
-      else{
-        # Signal + Noise model
-      }
-      
-      forecasts.f = rep(NA, n)
-      forecasts.ul = rep(NA, n)
-      forecasts.ll = rep(NA, n)
-      time.forecasts = seq(1, n, 1)
-      
-      start = 1
-      
-      if (step_n.ahead == FALSE){
-        # Step Size = 1
-        step_size = 1
-        num_batches = n-batch_size+1  
-      }
-      else{
-        # Step by n.ahead each time
-        step_size = n.ahead
-        num_batches = floor((n-batch_size)/n.ahead)  + 1
-      }
-      
-      cat(paste("Number of batches expected: ", num_batches, "\n"))
-      
-      ASEs = numeric(num_batches)
-      time_test_start = numeric(num_batches)
-      time_test_end = numeric(num_batches)
-      batch_num = numeric(num_batches)
-      
-      for (i in 0:(num_batches-1))
-      {
-        # Define the batch
-        subset = x[start:(batch_size+i*step_size)]
-        # Take last n.ahead observations from the batch and use that to compare with the forecast
-        
-        test_start = i*step_size + batch_size - n.ahead + 1
-        test_end = i*step_size + batch_size
-        data_start = start
-        data_end = i*step_size + batch_size
-        
-        time_test_start[i+1] = test_start
-        time_test_end[i+1] = test_end
-        batch_num[i+1] = i+1
-        
-        
-        test_data = x[test_start:test_end]
-        
-        if (aruma){
-          forecasts = tswge::fore.aruma.wge(x = subset, phi = phi, theta = theta, d = d, s = s,
-                                            n.ahead = n.ahead, lastn = TRUE, plot = FALSE, ...)
-        }
-        else{
-          forecasts = tswge::fore.sigplusnoise.wge(x = subset, linear = linear, freq = freq,
-                                                   n.ahead = n.ahead, lastn = TRUE, plot = FALSE, ...)
-        }
-        
-        ASEs[i+1] = mean((test_data - forecasts$f)^2)
-        start = start + step_size
-        
-        forecasts.f[test_start: test_end] = forecasts$f 
-        forecasts.ll[test_start: test_end] = forecasts$ll
-        forecasts.ul[test_start: test_end] = forecasts$ul
-        time.forecasts[test_start: test_end] = seq(test_start, test_end, 1)
-      }
-      
-      # print("sliding_ase.4: forecasts")
-      # print(forecasts.f)
-      
-      return(list(ASEs = ASEs,
-                  time_test_start = time_test_start,
-                  time_test_end = time_test_end,
-                  batch_num = batch_num,
-                  f = forecasts.f,
-                  ll = forecasts.ll,
-                  ul = forecasts.ul,
-                  time.forecasts = time.forecasts ))
     }
-    
-    
     
   )
   

@@ -6,7 +6,7 @@
 returns the top 5 aic and bic values for an ARMA time series}
 \usage{
 aicbic(vec, p = 0:8, q = 0:5, parallel = FALSE, cl = NULL,
-  silent = FALSE)
+  silent = FALSE, merge = FALSE, sort_by = "aic")
 }
 \arguments{
 \item{vec}{the vector (time series object) to operate on}
@@ -20,6 +20,12 @@ aicbic(vec, p = 0:8, q = 0:5, parallel = FALSE, cl = NULL,
 \item{cl}{the cluster in which to run on}
 
 \item{silent}{whether or not to run silently}
+
+\item{merge}{If TRUE, the AIC and BIC grids are merged so that it is 
+easier to see which models are common between the two}
+
+\item{sort_by}{If merge = TRUE, then this is used to sort the merged dataframe
+valid options are 'aic' or 'bic'}
 }
 \value{
 a list of data frames of top 5 aic and bic

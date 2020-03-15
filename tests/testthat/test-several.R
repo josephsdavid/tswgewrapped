@@ -280,22 +280,21 @@ test_that("ModelCompareUnivariate", {
   s_bx = 12  
   theta_bx =  c(0.40, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.60, -0.24)
   
-  models = list("Woodward Gray Model A" = list(phi = phi_wg, d = d_wg, s = s_wg, sliding_ase = FALSE),
-                "Woodward Gray Model B" = list(phi = phi_wg, d = d_wg, s = s_wg, sliding_ase = TRUE),
-                "Parzen Model A" = list(phi = phi_pz, s = s_pz, sliding_ase = FALSE),
-                "Parzen Model B" = list(phi = phi_pz, s = s_pz, sliding_ase = TRUE),
-                "Box Model A" = list(theta = theta_bx, d = d_bx, s = s_bx, sliding_ase = FALSE),
-                "Box Model B" = list(theta = theta_bx, d = d_bx, s = s_bx, sliding_ase = TRUE)
+  models = list("Woodward Gray Model A" = list(phi = phi_wg, d = d_wg, s = s_wg, vara = 0.001357009, sliding_ase = FALSE),
+                "Woodward Gray Model B" = list(phi = phi_wg, d = d_wg, s = s_wg, vara = 0.001357009, sliding_ase = TRUE),
+                "Parzen Model A" = list(phi = phi_pz, s = s_pz, vara = 0.002933592, sliding_ase = FALSE),
+                "Parzen Model B" = list(phi = phi_pz, s = s_pz, vara = 0.002933592, sliding_ase = TRUE),
+                "Box Model A" = list(theta = theta_bx, d = d_bx, s = s_bx, vara = 0.001391604, sliding_ase = FALSE),
+                "Box Model B" = list(theta = theta_bx, d = d_bx, s = s_bx, vara = 0.001391604, sliding_ase = TRUE)
                 )
-                
+  
+  #### With n_step.ahead = TRUE (Default)              
   mdl_compare = ModelCompareUnivariate$new(x = airlog, mdl_list = models,
                                            n.ahead = 36, batch_size = 72)
   
+  mdl_compare$plot_multiple_realizations(n.realizations = 4, seed = 100)
   mdl_compare$plot_histogram_ases()
-  
- 
   mdl_compare$plot_forecasts(only_sliding = TRUE)
-  
   mdl_compare$statistical_compare()  
   
   ASEs = mdl_compare$get_tabular_metrics(ases = TRUE)
@@ -343,9 +342,201 @@ test_that("ModelCompareUnivariate", {
   expect_equal(meanUL_bx_modelB, 5.969887)
   
   
+  #### With n_step.ahead = FALSE
+  
+  mdl_compare = ModelCompareUnivariate$new(x = airlog, mdl_list = models,
+                                           n.ahead = 36, batch_size = 72, step_n.ahead = FALSE)
+
+
+  forecasts = mdl_compare$get_tabular_metrics(ases = FALSE)
+
+  summary = forecasts %>%
+    group_by(Model) %>%
+    summarise(MeanForecast = mean(f, na.rm = TRUE),
+              MeanLL = mean(ll, na.rm = TRUE),
+              MeanUL = mean(ul, na.rm = TRUE)
+    )
+
+
+  meanForecast_wg_modelB = round(summary %>% filter(Model == "Woodward Gray Model B") %>% select(MeanForecast) %>%  purrr::pluck(1), 6)
+  meanLL_wg_modelB = round(summary %>% filter(Model == "Woodward Gray Model B") %>% select(MeanLL) %>%  purrr::pluck(1), 6)
+  meanUL_wg_modelB = round(summary %>% filter(Model == "Woodward Gray Model B") %>% select(MeanUL) %>%  purrr::pluck(1), 6)
+
+  meanForecast_pz_modelB = round(summary %>% filter(Model == "Parzen Model B") %>% select(MeanForecast) %>%  purrr::pluck(1), 6)
+  meanLL_pz_modelB = round(summary %>% filter(Model == "Parzen Model B") %>% select(MeanLL) %>%  purrr::pluck(1), 6)
+  meanUL_pz_modelB = round(summary %>% filter(Model == "Parzen Model B") %>% select(MeanUL) %>%  purrr::pluck(1), 6)
+
+  meanForecast_bx_modelB = round(summary %>% filter(Model == "Box Model B") %>% select(MeanForecast) %>%  purrr::pluck(1), 6)
+  meanLL_bx_modelB = round(summary %>% filter(Model == "Box Model B") %>% select(MeanLL) %>%  purrr::pluck(1), 6)
+  meanUL_bx_modelB = round(summary %>% filter(Model == "Box Model B") %>% select(MeanUL) %>%  purrr::pluck(1), 6)
+
+  expect_equal(meanForecast_wg_modelB, 5.75461)
+  expect_equal(meanForecast_pz_modelB, 5.697653)
+  expect_equal(meanForecast_bx_modelB, 5.764886)
+
+  expect_equal(meanLL_wg_modelB, 5.627753)
+  expect_equal(meanLL_pz_modelB, 5.573369)
+  expect_equal(meanLL_bx_modelB, 5.653335)
+
+  expect_equal(meanUL_wg_modelB, 5.881467)
+  expect_equal(meanUL_pz_modelB, 5.821938)
+  expect_equal(meanUL_bx_modelB, 5.876438)
+  
+  
+})
+
+test_that("Compare Multiple Realizations", {
+  library(tswge)
+  data("sunspot.classic")
+  est = tswge::est.arma.wge(sunspot.classic,p=8)
+  
+  r = generate_multiple_realization(x = sunspot.classic, phi = est$phi, theta = est$theta, vara = est$avar, seed = 11) 
+  plot_multiple_realizations(data = r$data, results = r$results)
+  
+  data.sum = r$data %>% summarise_if(is.numeric, sum)
+  results.acf.sum = r$results %>% dplyr::filter(Characteristic == "ACF") %>%  summarise_if(is.numeric, sum)
+  results.spectrum.sum = r$results %>% dplyr::filter(Characteristic == "Spectrum") %>%  summarise_if(is.numeric, sum)
+  
+  expect_equal(round(data.sum$Data), 36833)
+  expect_equal(data.sum$Index, 77880)
+  expect_equal(round(results.acf.sum$Value, 1), 10.8)
+  expect_equal(results.acf.sum$Index, 1625)
+  expect_equal(round(results.spectrum.sum$Value), -3078)
+  expect_equal(round(results.spectrum.sum$Index), 111)
+  
 })
 
 
 
+test_that("White Noise Eval - White Noise Eval", {
+  library(tswge)
+  
+  # Generated White Noise 
+  wn = gen.arma.wge(n = 200, sn = 101)
+  table = white_noise_eval(wn)
+  
+  k24 = ljung.wge(wn, K = 24)
+  k48 = ljung.wge(wn, K = 48)
+  
+  # have to pluck 2 times since the 1st time, it returns a list with 1 element.
+  expect_equal(table %>% filter(K == 24) %>% select(pval) %>% purrr::pluck(1) %>% purrr::pluck(1), k24$pval)
+  expect_equal(table %>% filter(K == 48) %>% select(pval) %>% purrr::pluck(1) %>% purrr::pluck(1), k48$pval)
+  expect_equal(table %>% filter(K == 24) %>% select(Decision) %>% purrr::pluck(1) %>% purrr::pluck(1), "FTR NULL")
+  expect_equal(table %>% filter(K == 48) %>% select(Decision) %>% purrr::pluck(1) %>% purrr::pluck(1), "FTR NULL")
+  
+  # Not White Noise
+  data(hadley) 
+  table = white_noise_eval(hadley)
+  
+  k24 = ljung.wge(hadley, K = 24)
+  k48 = ljung.wge(hadley, K = 48)
+  
+  # have to pluck 2 times since the 1st time, it returns a list with 1 element.
+  expect_equal(table %>% filter(K == 24) %>% select(pval) %>% purrr::pluck(1) %>% purrr::pluck(1), k24$pval)
+  expect_equal(table %>% filter(K == 48) %>% select(pval) %>% purrr::pluck(1) %>% purrr::pluck(1), k48$pval)
+  expect_equal(table %>% filter(K == 24) %>% select(Decision) %>% purrr::pluck(1) %>% purrr::pluck(1), "REJECT NULL")
+  expect_equal(table %>% filter(K == 48) %>% select(Decision) %>% purrr::pluck(1) %>% purrr::pluck(1), "REJECT NULL")
+
+})
+
+test_that("Overfit", {
+  library(tswge)
+  
+  # Generated White Noise 
+  arima2.1.0.12 = gen.aruma.wge(n = 200, phi = c(-0.5, -0.55), d = 1, s = 12, sn = 101)
+  over_wrapped = overfit(arima2.1.0.12, p = 24, type = 'burg')
+  over_tswge = est.ar.wge(arima2.1.0.12, p = 24, type = 'burg')
+  
+  expect_equal(sum(over_wrapped$phi), sum(over_tswge$phi))
+  
+})
+
+test_that("AICBIC", {
+  library(tswge)
+  
+  # Generated White Noise 
+  arma.2.1 = gen.arma.wge(n = 200, phi = c(-0.5, -0.55), theta = 0.8, sn = 101)
+  
+  g.aicbic = aicbic(arma.2.1, p = 0:5, q = 0:2)
+    
+  g.aic = aic5.wge(arma.2.1)
+  g.bic = aic5.wge(arma.2.1, type = 'bic')
+  
+  colnames.aic = c("p", "q", "aic")
+  colnames.bic = c("p", "q", "bic")
+  
+  s.aicbic.aic.sum = g.aicbic[[1]] %>% summarise_all(sum)
+  s.aicbic.bic.sum = g.aicbic[[2]] %>% summarise_all(sum)
+  s.aic.sum = g.aic %>% summarise_all(sum) 
+  s.bic.sum = g.bic %>% summarise_all(sum)
+  
+  colnames(s.aic.sum) = colnames.aic
+  colnames(s.bic.sum) = colnames.bic
+  
+  expect_equal(s.aicbic.aic.sum$p, s.aic.sum$p)
+  expect_equal(s.aicbic.aic.sum$q, s.aic.sum$q)
+  expect_equal(s.aicbic.aic.sum$aic, s.aic.sum$aic)
+  
+  expect_equal(s.aicbic.bic.sum$p, s.bic.sum$p)
+  expect_equal(s.aicbic.bic.sum$q, s.bic.sum$q)
+  expect_equal(s.aicbic.bic.sum$bic, s.bic.sum$bic)
+  
+})
+
+
+
+
+
+# ## TODO: Parallel is not working. Fix it
+# test_that("AICBIC Parallel", {
+#   
+#   library(tswge)
+#   library("parallel")
+#   # Generated White Noise 
+#   arma.2.1 = gen.arma.wge(n = 200, phi = c(-0.5, -0.55), theta = 0.8, sn = 101)
+#   
+#   
+#   cores = detectCores()
+#   if (cores > 4){
+#     use_cores = 4
+#   }
+#   else (cores > 2){
+#     use_cores = 2
+#   }
+#   else{
+#     use_cores = 1
+#   }
+#   
+#   
+#   cl <- makeCluster(use_cores)
+#   #registerDoParallel(cl)
+#   
+#   g.aicbic = aicbic(arma.2.1, p = 0:5, q = 0:2, parallel = TRUE, cl = cl)
+#   
+#   #registerDoSEQ()
+#   
+#   g.aic = aic5.wge(arma.2.1)
+#   g.bic = aic5.wge(arma.2.1, type = 'bic')
+#   
+#   colnames.aic = c("p", "q", "aic")
+#   colnames.bic = c("p", "q", "bic")
+#   
+#   s.aicbic.aic.sum = g.aicbic[[1]] %>% summarise_all(sum)
+#   s.aicbic.bic.sum = g.aicbic[[2]] %>% summarise_all(sum)
+#   s.aic.sum = g.aic %>% summarise_all(sum) 
+#   s.bic.sum = g.bic %>% summarise_all(sum)
+#   
+#   colnames(s.aic.sum) = colnames.aic
+#   colnames(s.bic.sum) = colnames.bic
+#   
+#   expect_equal(s.aicbic.aic.sum$p, s.aic.sum$p)
+#   expect_equal(s.aicbic.aic.sum$q, s.aic.sum$q)
+#   expect_equal(s.aicbic.aic.sum$aic, s.aic.sum$aic)
+# 
+#   expect_equal(s.aicbic.bic.sum$p, s.bic.sum$p)
+#   expect_equal(s.aicbic.bic.sum$q, s.bic.sum$q)
+#   expect_equal(s.aicbic.bic.sum$bic, s.bic.sum$bic)
+#   
+# })
 
 
