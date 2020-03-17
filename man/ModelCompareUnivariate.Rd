@@ -3,15 +3,10 @@
 \name{ModelCompareUnivariate}
 \alias{ModelCompareUnivariate}
 \title{R6 class ModelCompareUnivariate}
-\usage{
-ModelCompareUnivariate$new(x = airlog, mdl_list = models,
-                           n.ahead = 36, batch_size = 72)
-}
-\value{
-A new `ModelCompareUnivariate` object.
-}
 \description{
-Initialize an object to compare several Univatiate Time Series Models
+R6 class ModelCompareUnivariate
+
+R6 class ModelCompareUnivariate
 }
 \examples{
 library(tswge)
@@ -79,12 +74,12 @@ print(forecasts)
 \item \href{#method-get_batch_size}{\code{ModelCompareUnivariate$get_batch_size()}}
 \item \href{#method-get_n.ahead}{\code{ModelCompareUnivariate$get_n.ahead()}}
 \item \href{#method-add_models}{\code{ModelCompareUnivariate$add_models()}}
-\item \href{#method-remove_models}{\code{ModelCompareUnivariate$remove_models()}}
 \item \href{#method-compute_metrics}{\code{ModelCompareUnivariate$compute_metrics()}}
 \item \href{#method-plot_histogram_ases}{\code{ModelCompareUnivariate$plot_histogram_ases()}}
 \item \href{#method-plot_forecasts}{\code{ModelCompareUnivariate$plot_forecasts()}}
 \item \href{#method-plot_simple_forecasts}{\code{ModelCompareUnivariate$plot_simple_forecasts()}}
 \item \href{#method-plot_multiple_realizations}{\code{ModelCompareUnivariate$plot_multiple_realizations()}}
+\item \href{#method-evaluate_residuals}{\code{ModelCompareUnivariate$evaluate_residuals()}}
 \item \href{#method-statistical_compare}{\code{ModelCompareUnivariate$statistical_compare()}}
 \item \href{#method-get_tabular_metrics}{\code{ModelCompareUnivariate$get_tabular_metrics()}}
 \item \href{#method-clone}{\code{ModelCompareUnivariate$clone()}}
@@ -94,6 +89,7 @@ print(forecasts)
 \if{html}{\out{<a id="method-new"></a>}}
 \if{latex}{\out{\hypertarget{method-new}{}}}
 \subsection{Method \code{new()}}{
+Initialize an object to compare several Univatiate Time Series Models
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{ModelCompareUnivariate$new(
   x = NA,
@@ -121,38 +117,54 @@ then this number indicates the batch size to use}
 }
 \if{html}{\out{</div>}}
 }
+\subsection{Returns}{
+A new `ModelCompareUnivariate` object.
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-get_x"></a>}}
 \if{latex}{\out{\hypertarget{method-get_x}{}}}
 \subsection{Method \code{get_x()}}{
+Returns the time series realization
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{ModelCompareUnivariate$get_x()}\if{html}{\out{</div>}}
 }
 
+\subsection{Returns}{
+The Time Series Realization
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-get_batch_size"></a>}}
 \if{latex}{\out{\hypertarget{method-get_batch_size}{}}}
 \subsection{Method \code{get_batch_size()}}{
+Returns the batch size value
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{ModelCompareUnivariate$get_batch_size()}\if{html}{\out{</div>}}
 }
 
+\subsection{Returns}{
+The Batch Size Value
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-get_n.ahead"></a>}}
 \if{latex}{\out{\hypertarget{method-get_n.ahead}{}}}
 \subsection{Method \code{get_n.ahead()}}{
+Returns the n.ahead value
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{ModelCompareUnivariate$get_n.ahead()}\if{html}{\out{</div>}}
 }
 
+\subsection{Returns}{
+The n.ahead value
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-add_models"></a>}}
 \if{latex}{\out{\hypertarget{method-add_models}{}}}
 \subsection{Method \code{add_models()}}{
+Add models to the existing object
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{ModelCompareUnivariate$add_models(mdl_list)}\if{html}{\out{</div>}}
 }
@@ -160,23 +172,7 @@ then this number indicates the batch size to use}
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{mdl_list}}{A names list of all models (see format below)}
-}
-\if{html}{\out{</div>}}
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-remove_models"></a>}}
-\if{latex}{\out{\hypertarget{method-remove_models}{}}}
-\subsection{Method \code{remove_models()}}{
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{ModelCompareUnivariate$remove_models(x)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{x}}{Time Series Realization}
+\item{\code{mdl_list}}{The list of new models to add}
 }
 \if{html}{\out{</div>}}
 }
@@ -185,6 +181,7 @@ then this number indicates the batch size to use}
 \if{html}{\out{<a id="method-compute_metrics"></a>}}
 \if{latex}{\out{\hypertarget{method-compute_metrics}{}}}
 \subsection{Method \code{compute_metrics()}}{
+Computes the Metrics for the models
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{ModelCompareUnivariate$compute_metrics(step_n.ahead = TRUE)}\if{html}{\out{</div>}}
 }
@@ -192,8 +189,8 @@ then this number indicates the batch size to use}
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{step_n.ahead}}{If using sliding window, should batches be incremented by n.ahead
-(Default = TRUE)}
+\item{\code{step_n.ahead}}{If TRUE, for rolling window calculations, the step size 
+will be equal to n.ahead, else it will be equal to 1}
 }
 \if{html}{\out{</div>}}
 }
@@ -202,6 +199,7 @@ then this number indicates the batch size to use}
 \if{html}{\out{<a id="method-plot_histogram_ases"></a>}}
 \if{latex}{\out{\hypertarget{method-plot_histogram_ases}{}}}
 \subsection{Method \code{plot_histogram_ases()}}{
+Plots the histogram of the ASE values for the models
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{ModelCompareUnivariate$plot_histogram_ases()}\if{html}{\out{</div>}}
 }
@@ -211,24 +209,44 @@ then this number indicates the batch size to use}
 \if{html}{\out{<a id="method-plot_forecasts"></a>}}
 \if{latex}{\out{\hypertarget{method-plot_forecasts}{}}}
 \subsection{Method \code{plot_forecasts()}}{
+Plots the forecasts per batch for all models
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{ModelCompareUnivariate$plot_forecasts(only_sliding = TRUE)}\if{html}{\out{</div>}}
 }
 
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{only_sliding}}{If TRUE, this will only plot the batch forecasts 
+for the models that used window ASE calculations}
+}
+\if{html}{\out{</div>}}
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-plot_simple_forecasts"></a>}}
 \if{latex}{\out{\hypertarget{method-plot_simple_forecasts}{}}}
 \subsection{Method \code{plot_simple_forecasts()}}{
+Plots the simple forecast for each model
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{ModelCompareUnivariate$plot_simple_forecasts()}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{ModelCompareUnivariate$plot_simple_forecasts(lastn = FALSE, limits = FALSE)}\if{html}{\out{</div>}}
 }
 
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{lastn}}{If TRUE, this will plot the forecasts forthe last n.ahead values of the realization (Default: FALSE)}
+
+\item{\code{limits}}{If TRUE, this will also plot the lower and upper limits of the forecasts (Default: FALSE)}
+}
+\if{html}{\out{</div>}}
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-plot_multiple_realizations"></a>}}
 \if{latex}{\out{\hypertarget{method-plot_multiple_realizations}{}}}
 \subsection{Method \code{plot_multiple_realizations()}}{
+Creates multiple realization of each model. Useful to check model appropriateness.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{ModelCompareUnivariate$plot_multiple_realizations(
   n.realizations = 4,
@@ -239,24 +257,89 @@ then this number indicates the batch size to use}
 )}\if{html}{\out{</div>}}
 }
 
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{n.realizations}}{Number of realization to create (Default: 4)}
+
+\item{\code{lag.max}}{lag.max to plot for ACF (Default: 25)}
+
+\item{\code{seed}}{The seed to use for generating realizations}
+
+\item{\code{plot}}{A vector of options to plot (Default = c("all"))
+Other options: 'realization', 'acf', 'spectrum'}
+
+\item{\code{scales}}{The scales argument to be passed to ggplot facet_wrap layer
+(Default = 'free_y') Other appropriate options: 'fixed'}
+}
+\if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-evaluate_residuals"></a>}}
+\if{latex}{\out{\hypertarget{method-evaluate_residuals}{}}}
+\subsection{Method \code{evaluate_residuals()}}{
+For the models for which the residuals have been provided,
+this method will check whetehr the residuals are white noise or not.
+(1) Plots the residuals and the ACF values
+(2) Performs the Ljung-Box test for K = 24 and K = 48
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{ModelCompareUnivariate$evaluate_residuals(lag.max = 50)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{lag.max}}{The maximum lag to plot for the ACF}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+A dataframe containing the results of the 2 Ljung-Box tests
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-statistical_compare"></a>}}
 \if{latex}{\out{\hypertarget{method-statistical_compare}{}}}
 \subsection{Method \code{statistical_compare()}}{
+Statistically compares the ASE values of the models using 
+ANOVA and Tukey Adjustment for multiple comparison
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{ModelCompareUnivariate$statistical_compare()}\if{html}{\out{</div>}}
 }
 
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{only_sliding}}{If TRUE, this will only include models that use a sliding ASE calculation method,
+i.e. those models that have multiple ASE values (Default: TRUE)}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+The results of the ANOVA test
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-get_tabular_metrics"></a>}}
 \if{latex}{\out{\hypertarget{method-get_tabular_metrics}{}}}
 \subsection{Method \code{get_tabular_metrics()}}{
+Gets the metrics and results in tabular format
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{ModelCompareUnivariate$get_tabular_metrics(only_sliding = FALSE, ases = TRUE)}\if{html}{\out{</div>}}
 }
 
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{only_sliding}}{If TRUE, this will only get results for models that use a 
+sliding ASE calculation method. (Default: FALSE)}
+
+\item{\code{ases}}{If TRUE returns the ASE values for each batch. If FALSE returns the 
+forecasts, and the lower and upper limits asscoiated with the forecasts}
+}
+\if{html}{\out{</div>}}
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-clone"></a>}}

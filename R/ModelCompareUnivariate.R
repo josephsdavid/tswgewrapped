@@ -1,16 +1,5 @@
-#' R6 class ModelCompareUnivariate
-#' @description 
-#' Initialize an object to compare several Univatiate Time Series Models
-#' @param x Time Series Realization
-#' @param mdl_list A names list of all models (see format below)
-#' @param n.ahead The number of observations used to calculate ASE or forecast ahead
-#' @param batch_size If any of the models used sliding ase method,
-#'                   then this number indicates the batch size to use
-#' @param step_n.ahead If using sliding window, should batches be incremented by n.ahead
-#'                     (Default = TRUE)
-#' @usage ModelCompareUnivariate$new(x = airlog, mdl_list = models,
-#'                            n.ahead = 36, batch_size = 72)
-#' @return A new `ModelCompareUnivariate` object.
+#' @title R6 class ModelCompareUnivariate
+#' 
 #' @examples 
 #' library(tswge)
 #' data("airlog")
@@ -77,14 +66,18 @@ ModelCompareUnivariate = R6::R6Class(
   
   #### Public Methods ----
   public=list(
-    x = NA,
-    #num_models = NA,
-    models = NA,
-    n.ahead = NA,
-    batch_size = NA,
-
     #### Constructor ----
     
+    #' @description 
+    #' Initialize an object to compare several Univatiate Time Series Models
+    #' @param x Time Series Realization
+    #' @param mdl_list A names list of all models (see format below)
+    #' @param n.ahead The number of observations used to calculate ASE or forecast ahead
+    #' @param batch_size If any of the models used sliding ase method,
+    #'                   then this number indicates the batch size to use
+    #' @param step_n.ahead If using sliding window, should batches be incremented by n.ahead
+    #'                     (Default = TRUE)
+    #' @return A new `ModelCompareUnivariate` object.
     initialize = function(x = NA, mdl_list, n.ahead = NA, batch_size = NA, step_n.ahead = TRUE)
     {
       # Add checks here
@@ -100,18 +93,26 @@ ModelCompareUnivariate = R6::R6Class(
     
     #### Getters and Setters ----
     
-    get_x = function(){return(self$x)},
+    #' @description Returns the time series realization
+    #' @return The Time Series Realization
+    get_x = function(){return(private$x)},
     
-    get_batch_size = function(){return(self$batch_size)},
-    get_n.ahead = function(){return(self$n.ahead)},
+    #' @description Returns the batch size value
+    #' @return The Batch Size Value
+    get_batch_size = function(){return(private$batch_size)},
     
+    #' @description Returns the n.ahead value
+    #' @return The n.ahead value
+    get_n.ahead = function(){return(private$n.ahead)},
     
+    #' @description Add models to the existing object
+    #' @param mdl_list The list of new models to add
     add_models = function(mdl_list){
       if (length(unique(names(mdl_list))) != length(names(mdl_list))){
         stop("The model names in the provided list contain duplicates. Please fix and rerun.")
       }
       
-      existing = names(self$models)
+      existing = names(private$models)
       if (any(names(mdl_list) %in% existing)){
         print(names(mdl_list)[names(mdl_list) %in% existing])
         stop("The model names above already exist in this comparison object. Please provide unique names.")
@@ -119,24 +120,23 @@ ModelCompareUnivariate = R6::R6Class(
       
       mdl_list = private$clean_model_input(mdl_list)
       
-      if (all(is.na(self$models))){
-        self$models = mdl_list
+      if (all(is.na(private$models))){
+        private$models = mdl_list
       }
       else{
-        self$models = c(self$models, mdl_list)
+        private$models = c(private$models, mdl_list)
       }
-    },
-    
-    remove_models = function(x){
-      stop("This has not been implemented yet.")  
     },
     
     #### General Public Methods ----
     
+    #' @description Computes the Metrics for the models
+    #' @param step_n.ahead If TRUE, for rolling window calculations, the step size 
+    #'                     will be equal to n.ahead, else it will be equal to 1
     compute_metrics = function(step_n.ahead = TRUE){
       for (name in names(private$get_models())){
         
-        if (self$models[[name]][['metric_has_been_computed']] == FALSE){
+        if (private$models[[name]][['metric_has_been_computed']] == FALSE){
           cat(paste("\n\n\nComputing metrics for: ", name, "\n"))
           
           res = sliding_ase(x = self$get_x(),
@@ -149,17 +149,17 @@ ModelCompareUnivariate = R6::R6Class(
                             step_n.ahead = step_n.ahead)
           
           ## Inplace
-          self$models[[name]][['ASEs']] = res$ASEs  
-          self$models[[name]][['time_test_start']] = res$time_test_start
-          self$models[[name]][['time_test_end']] = res$time_test_end
-          self$models[[name]][['batch_num']] = res$batch_num
-          self$models[[name]][['f']] = res$f
-          self$models[[name]][['ll']] = res$ll
-          self$models[[name]][['ul']] = res$ul
-          self$models[[name]][['time.forecasts']] = res$time.forecasts
+          private$models[[name]][['ASEs']] = res$ASEs  
+          private$models[[name]][['time_test_start']] = res$time_test_start
+          private$models[[name]][['time_test_end']] = res$time_test_end
+          private$models[[name]][['batch_num']] = res$batch_num
+          private$models[[name]][['f']] = res$f
+          private$models[[name]][['ll']] = res$ll
+          private$models[[name]][['ul']] = res$ul
+          private$models[[name]][['time.forecasts']] = res$time.forecasts
           
           
-          self$models[[name]][['metric_has_been_computed']] = TRUE
+          private$models[[name]][['metric_has_been_computed']] = TRUE
           
         }
         else{
@@ -168,7 +168,7 @@ ModelCompareUnivariate = R6::R6Class(
       }
     },
     
-    
+    #' @description Plots the histogram of the ASE values for the models
     plot_histogram_ases = function(){
       results = self$get_tabular_metrics()
       p = ggplot2::ggplot(results, ggplot2::aes(x = Model, y = ASE, color = Model)) + 
@@ -177,13 +177,16 @@ ModelCompareUnivariate = R6::R6Class(
       print(p)
     },
     
+    #' @description Plots the forecasts per batch for all models
+    #' @param only_sliding If TRUE, this will only plot the batch forecasts 
+    #'                     for the models that used window ASE calculations
     plot_forecasts = function(only_sliding = TRUE){
       results.forecasts = self$get_tabular_metrics(ases = FALSE)
       
       model_subset = c("Realization")
       if (only_sliding){
         for (name in names(private$get_models())){
-          if (self$models[[name]][['sliding_ase']] == TRUE){
+          if (private$models[[name]][['sliding_ase']] == TRUE){
             model_subset = c(model_subset, name)
           }
         }
@@ -195,9 +198,6 @@ ModelCompareUnivariate = R6::R6Class(
         }
       }
       
-      # library(magrittr)
-      # library(dplyr)
-      
       results.forecasts = results.forecasts %>% 
         dplyr::filter(Model %in% model_subset)
       
@@ -206,7 +206,7 @@ ModelCompareUnivariate = R6::R6Class(
       # Get Batch Boundaries
       results.ases = self$get_tabular_metrics(ases = TRUE)
       for (name in names(private$get_models())){
-        if (self$models[[name]][['sliding_ase']] == TRUE){
+        if (private$models[[name]][['sliding_ase']] == TRUE){
           results.batches = results.ases %>% 
             dplyr::filter(Model == name)
           break()
@@ -236,10 +236,20 @@ ModelCompareUnivariate = R6::R6Class(
       
     },
     
-    plot_simple_forecasts = function(){
+    #' @description Plots the simple forecast for each model
+    #' @param lastn If TRUE, this will plot the forecasts forthe last n.ahead values of the realization (Default: FALSE)
+    #' @param limits If TRUE, this will also plot the lower and upper limits of the forecasts (Default: FALSE)
+    plot_simple_forecasts = function(lastn = FALSE, limits = FALSE){
       results = dplyr::tribble(~Model, ~Time, ~f, ~ll, ~ul)
-      from = private$get_len_x() + 1
-      to = private$get_len_x() + self$get_n.ahead()
+      
+      if (lastn == FALSE){
+        from = private$get_len_x() + 1
+        to = private$get_len_x() + self$get_n.ahead()
+      }
+      else{
+        from = private$get_len_x() - self$get_n.ahead() + 1
+        to = private$get_len_x()
+      }
 
       for (name in names(private$get_models())){
         forecast = tswge::fore.aruma.wge(x = self$get_x(),
@@ -248,7 +258,7 @@ ModelCompareUnivariate = R6::R6Class(
                                   d = private$get_models()[[name]][['d']],
                                   s = private$get_models()[[name]][['s']], 
                                   n.ahead = self$get_n.ahead(),
-                                  lastn = FALSE, plot = FALSE)
+                                  lastn = lastn, plot = FALSE)
         
         results = results %>%  dplyr::add_row(Model = name,
                                               Time = (from:to),
@@ -267,24 +277,38 @@ ModelCompareUnivariate = R6::R6Class(
       )
 
       p = ggplot2::ggplot() +
-        ggplot2::geom_line(results, mapping = ggplot2::aes(x=Time, y=f, color = Model)) +
+        ggplot2::geom_line(results, mapping = ggplot2::aes(x=Time, y=f, color = Model), size = 0.4) +
         ggplot2::ylab("Simple Forecasts")
+      
+      if (limits == TRUE){
+        p = p + 
+          ggplot2::geom_line(results, mapping = ggplot2::aes(x=Time, y=ll, color = Model), linetype = "dashed", size = 0.2) +
+          ggplot2::geom_line(results, mapping = ggplot2::aes(x=Time, y=ul, color = Model), linetype = "dashed", size = 0.2)
+      }
 
       print(p)
       
     },
     
+    #' @description Creates multiple realization of each model. Useful to check model appropriateness.
+    #' @param n.realizations Number of realization to create (Default: 4)
+    #' @param lag.max lag.max to plot for ACF (Default: 25)
+    #' @param seed The seed to use for generating realizations
+    #' @param plot A vector of options to plot (Default = c("all"))
+    #'             Other options: 'realization', 'acf', 'spectrum' 
+    #' @param scales The scales argument to be passed to ggplot facet_wrap layer
+    #'               (Default = 'free_y') Other appropriate options: 'fixed'
     plot_multiple_realizations = function(n.realizations = 4, lag.max = 25, seed = NA, plot = c("all"), scales = 'free_y'){
       final.data = NA
       final.results = NA
       
       for (name in names(private$get_models())){
         r = generate_multiple_realization(x = self$get_x(),
-                                          phi = self$models[[name]][['phi']],
-                                          theta = self$models[[name]][['theta']],
-                                          d = self$models[[name]][['d']],
-                                          s = self$models[[name]][['s']],
-                                          vara = self$models[[name]][['vara']],
+                                          phi = private$models[[name]][['phi']],
+                                          theta = private$models[[name]][['theta']],
+                                          d = private$models[[name]][['d']],
+                                          s = private$models[[name]][['s']],
+                                          vara = private$models[[name]][['vara']],
                                           n.realizations = n.realizations, lag.max = lag.max, seed = seed,
                                           model_name = name, return = 'all')
       
@@ -309,6 +333,67 @@ ModelCompareUnivariate = R6::R6Class(
       
     },
     
+    #' @description For the models for which the residuals have been provided,
+    #' this method will check whetehr the residuals are white noise or not.
+    #' (1) Plots the residuals and the ACF values
+    #' (2) Performs the Ljung-Box test for K = 24 and K = 48
+    #' @param lag.max The maximum lag to plot for the ACF
+    #' @return A dataframe containing the results of the 2 Ljung-Box tests
+    evaluate_residuals = function(lag.max = 50){
+      final.results = NA
+      any_present = 0
+      
+      for (name in names(private$get_models())){
+        if (!is.null(private$models[[name]][['res']])){
+          any_present = 1
+          cat(paste("\n\nEvaluating residuals for model: '", name, "' \n", sep = ""))
+          
+          if (length(private$models[[name]][['phi']]) == 1){
+            if (private$models[[name]][['phi']] == 0){
+              p = 0  
+            }
+            else{
+              p = length(private$models[[name]][['phi']])
+            }
+          }
+          else{
+            p = length(private$models[[name]][['phi']])
+          }
+          
+          if (length(private$models[[name]][['theta']]) == 1){
+            if (private$models[[name]][['theta']] == 0){
+              q = 0  
+            }
+            else{
+              q = length(private$models[[name]][['theta']])
+            }
+          }
+          else{
+            q = length(private$models[[name]][['theta']])
+          }
+          
+          table = white_noise_eval(private$models[[name]][['res']], p = p, q = q, model_name = name, lag.max = lag.max)
+        
+          if (all(is.na(final.results))){
+            final.results = table
+          }
+          else
+            final.results = rbind(final.results, table)
+        }
+      }
+      
+      if (any_present == 0){
+        cat("\n\nNone of the model that you supplied had any residuals provided. Hence the residuals can not be evaluated")
+      }
+      
+      return(final.results)
+    },
+    
+    #' @description Statistically compares the ASE values of the models using 
+    #' ANOVA and Tukey Adjustment for multiple comparison
+    #' @param only_sliding If TRUE, this will only include models that use a sliding ASE calculation method,
+    #'                     i.e. those models that have multiple ASE values (Default: TRUE)
+    #' @return The results of the ANOVA test
     statistical_compare = function(){
       results = self$get_tabular_metrics(only_sliding = TRUE)
       
@@ -324,9 +409,13 @@ ModelCompareUnivariate = R6::R6Class(
       
     },
     
+    #' @description Gets the metrics and results in tabular format
+    #' @param only_sliding If TRUE, this will only get results for models that use a 
+    #'                     sliding ASE calculation method. (Default: FALSE)
+    #' @param ases If TRUE returns the ASE values for each batch. If FALSE returns the 
+    #'             forecasts, and the lower and upper limits asscoiated with the forecasts
     get_tabular_metrics = function(only_sliding = FALSE, ases = TRUE){
-      # ases = TRUE returns the ASE values for each batch
-      # ases = FALSE returns the forecasts, and the lower limits and upper limits asscoiated with the forecasts
+      # 
       
       if (ases == TRUE){
         results = dplyr::tribble(~Model, ~ASE, ~Time_Test_Start, ~Time_Test_End, ~Batch) 
@@ -338,9 +427,9 @@ ModelCompareUnivariate = R6::R6Class(
       model_names = c()
       
       for (name in names(private$get_models())){
-        if (self$models[[name]][['metric_has_been_computed']] == TRUE){
+        if (private$models[[name]][['metric_has_been_computed']] == TRUE){
           if(only_sliding == TRUE){
-            if (self$models[[name]][['sliding_ase']] == TRUE){
+            if (private$models[[name]][['sliding_ase']] == TRUE){
               model_names = c(model_names, name)
             }
           }
@@ -353,23 +442,21 @@ ModelCompareUnivariate = R6::R6Class(
         }
       }
       
-      # library(magrittr)
-      
       for (name in model_names){    
         if (ases == TRUE){
           results = results %>% dplyr::add_row(Model = name,
-                                               ASE = self$models[[name]][['ASEs']],
-                                               Time_Test_Start = self$models[[name]][['time_test_start']],
-                                               Time_Test_End = self$models[[name]][['time_test_end']],
-                                               Batch = self$models[[name]][['batch_num']])
+                                               ASE = private$models[[name]][['ASEs']],
+                                               Time_Test_Start = private$models[[name]][['time_test_start']],
+                                               Time_Test_End = private$models[[name]][['time_test_end']],
+                                               Batch = private$models[[name]][['batch_num']])
         }
         
         else{
           results = results %>% dplyr::add_row(Model = name,
-                                               Time = self$models[[name]][['time.forecasts']],
-                                               f = self$models[[name]][['f']],
-                                               ll = self$models[[name]][['ll']],
-                                               ul = self$models[[name]][['ul']])
+                                               Time = private$models[[name]][['time.forecasts']],
+                                               f = private$models[[name]][['f']],
+                                               ll = private$models[[name]][['ll']],
+                                               ul = private$models[[name]][['ul']])
           
         }
       }
@@ -392,14 +479,19 @@ ModelCompareUnivariate = R6::R6Class(
   
   #### Private Methods ----
   private = list(
-    set_x = function(x){self$x = x},
+    x = NA,
+    models = NA,
+    n.ahead = NA,
+    batch_size = NA,
+    
+    set_x = function(x){private$x = x},
     
     get_len_x = function(){
       return(length(self$get_x()))
     },
     
     get_models = function(){
-      return(self$models)
+      return(private$models)
     },
     
     clean_model_input = function(mdl_list){
@@ -438,16 +530,16 @@ ModelCompareUnivariate = R6::R6Class(
     },
     
     set_n.ahead = function(n.ahead){
-      self$n.ahead = n.ahead
+      private$n.ahead = n.ahead
     },
     
     set_batch_per_model = function(){
       for (name in names(private$get_models())){
         if (private$get_models()[[name]][['sliding_ase']]){
-          self$models[[name]][['batch_size']] = self$get_batch_size()  ## Inplace, hence not using get_models
+          private$models[[name]][['batch_size']] = self$get_batch_size()  ## Inplace, hence not using get_models
         }
         else{
-          self$models[[name]][['batch_size']] = NA  ## Inplace, hence not using get_models
+          private$models[[name]][['batch_size']] = NA  ## Inplace, hence not using get_models
         }
       }
     },
@@ -456,7 +548,7 @@ ModelCompareUnivariate = R6::R6Class(
       if (private$any_sliding_ase() & is.na(batch_size)){
         stop("You have provided models that require sliding ASE calculations, but the batch size has been set to NA. Please provide an appropriate value to proceed.")
       }
-      self$batch_size = batch_size
+      private$batch_size = batch_size
       private$set_batch_per_model()
     }
     

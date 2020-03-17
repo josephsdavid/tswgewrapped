@@ -4,7 +4,14 @@
 \alias{ljung_box}
 \title{ljung box test for white noise}
 \usage{
-ljung_box(x, p = 0, q = 0, k_val = c(24, 48), alpha = 0.05)
+ljung_box(
+  x,
+  p = 0,
+  q = 0,
+  k_val = c(24, 48),
+  model_name = "My Model",
+  alpha = 0.05
+)
 }
 \arguments{
 \item{x}{the time series}
@@ -14,6 +21,8 @@ ljung_box(x, p = 0, q = 0, k_val = c(24, 48), alpha = 0.05)
 \item{q}{the ma order (Default = 0)}
 
 \item{k_val}{a vector of k values}
+
+\item{model_name}{Model name or identifier (Default: "My Model")}
 
 \item{alpha}{Significance level to be used for ljung_box tests}
 }
