@@ -384,6 +384,23 @@ test_that("ModelCompareUnivariate", {
   expect_equal(meanUL_bx_modelB, 5.876438)
   
   
+  # Generated White Noise 
+  wn = tswge::gen.arma.wge(n = 200, sn = 101, plot = FALSE)
+  
+  # Using p = 1 since I need to pass that to the ModelCompareUnivariate to make it work
+  k24 = tswge::ljung.wge(wn, K = 24, p = 1)  
+  k48 = tswge::ljung.wge(wn, K = 48, p = 1)
+  
+  models = list("Model 1" = list(phi = 0.5, res = wn, sliding_ase = FALSE))  # Hypothetical Model
+  
+  mdl_compare = ModelCompareUnivariate$new(x = wn, mdl_list = models, n.ahead = 10)
+  table = mdl_compare$evaluate_residuals()
+  
+  expect_equal(table %>% dplyr::filter(K == 24) %>% dplyr::select(pval) %>% purrr::pluck(1), k24$pval)
+  expect_equal(table %>% dplyr::filter(K == 48) %>% dplyr::select(pval) %>% purrr::pluck(1), k48$pval)
+  expect_equal(table %>% dplyr::filter(K == 24) %>% dplyr::select(Decision) %>% purrr::pluck(1), "FTR NULL")
+  expect_equal(table %>% dplyr::filter(K == 48) %>% dplyr::select(Decision) %>% purrr::pluck(1), "FTR NULL")
+  
 })
 
 test_that("Compare Multiple Realizations", {
@@ -413,17 +430,16 @@ test_that("White Noise Eval - White Noise Eval", {
   # library(tswge)
   
   # Generated White Noise 
-  wn = gen.arma.wge(n = 200, sn = 101)
+  wn = tswge::gen.arma.wge(n = 200, sn = 101, plot = FALSE)
   table = white_noise_eval(wn)
   
   k24 = tswge::ljung.wge(wn, K = 24)
   k48 = tswge::ljung.wge(wn, K = 48)
   
-  # have to pluck 2 times since the 1st time, it returns a list with 1 element.
-  expect_equal(table %>% dplyr::filter(K == 24) %>% dplyr::select(pval) %>% purrr::pluck(1) %>% purrr::pluck(1), k24$pval)
-  expect_equal(table %>% dplyr::filter(K == 48) %>% dplyr::select(pval) %>% purrr::pluck(1) %>% purrr::pluck(1), k48$pval)
-  expect_equal(table %>% dplyr::filter(K == 24) %>% dplyr::select(Decision) %>% purrr::pluck(1) %>% purrr::pluck(1), "FTR NULL")
-  expect_equal(table %>% dplyr::filter(K == 48) %>% dplyr::select(Decision) %>% purrr::pluck(1) %>% purrr::pluck(1), "FTR NULL")
+  expect_equal(table %>% dplyr::filter(K == 24) %>% dplyr::select(pval) %>% purrr::pluck(1), k24$pval)
+  expect_equal(table %>% dplyr::filter(K == 48) %>% dplyr::select(pval) %>% purrr::pluck(1), k48$pval)
+  expect_equal(table %>% dplyr::filter(K == 24) %>% dplyr::select(Decision) %>% purrr::pluck(1), "FTR NULL")
+  expect_equal(table %>% dplyr::filter(K == 48) %>% dplyr::select(Decision) %>% purrr::pluck(1), "FTR NULL")
   
   # Not White Noise
   data(hadley) 
@@ -433,10 +449,10 @@ test_that("White Noise Eval - White Noise Eval", {
   k48 = ljung.wge(hadley, K = 48)
   
   # have to pluck 2 times since the 1st time, it returns a list with 1 element.
-  expect_equal(table %>% dplyr::filter(K == 24) %>% dplyr::select(pval) %>% purrr::pluck(1) %>% purrr::pluck(1), k24$pval)
-  expect_equal(table %>% dplyr::filter(K == 48) %>% dplyr::select(pval) %>% purrr::pluck(1) %>% purrr::pluck(1), k48$pval)
-  expect_equal(table %>% dplyr::filter(K == 24) %>% dplyr::select(Decision) %>% purrr::pluck(1) %>% purrr::pluck(1), "REJECT NULL")
-  expect_equal(table %>% dplyr::filter(K == 48) %>% dplyr::select(Decision) %>% purrr::pluck(1) %>% purrr::pluck(1), "REJECT NULL")
+  expect_equal(table %>% dplyr::filter(K == 24) %>% dplyr::select(pval) %>% purrr::pluck(1), k24$pval)
+  expect_equal(table %>% dplyr::filter(K == 48) %>% dplyr::select(pval) %>% purrr::pluck(1), k48$pval)
+  expect_equal(table %>% dplyr::filter(K == 24) %>% dplyr::select(Decision) %>% purrr::pluck(1), "REJECT NULL")
+  expect_equal(table %>% dplyr::filter(K == 48) %>% dplyr::select(Decision) %>% purrr::pluck(1), "REJECT NULL")
 
 })
 

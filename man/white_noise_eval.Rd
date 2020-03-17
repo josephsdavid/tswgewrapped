@@ -10,7 +10,8 @@ white_noise_eval(
   q = 0,
   k_val = c(24, 48),
   alpha = 0.05,
-  lag.max = 50
+  lag.max = 50,
+  model_name = "My Model"
 )
 }
 \arguments{
@@ -25,6 +26,8 @@ white_noise_eval(
 \item{alpha}{Significance level to be used for ljung_box tests}
 
 \item{lag.max}{Value of lags to plot for the ACF (Default: 50)}
+
+\item{model_name}{Model name or identifier (Default: "My Model")}
 }
 \value{
 the results of the tests, in tidy data format

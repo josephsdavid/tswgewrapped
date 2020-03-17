@@ -180,7 +180,7 @@ plot_multiple_realizations = function(data, results, plot = c("all"), scales = '
       ggplot2::ggtitle("Realization Comparison") + ggplot2::xlab("Time") + ggplot2::ylab("Hypothetical Realizations") +
       ggplot2::theme(legend.position="none")
       
-    print(g1 / g2)
+    print(g1 / g2 + patchwork::plot_layout(height = c(1.5, n.realizations)))
   }
 
   
