@@ -1,8 +1,10 @@
+
+#### Check Stationarity ####
 test_that("check_stationarity", {
   expect_true(check_stationarity(data=c(1,2,3,4,5,6,7)))
 })
 
-
+#### Manual Calculations ####
 test_that("calculate_ar1_varx, calculate_arp_varx", {
   p_0.9  = tswge::plotts.true.wge(n = 200, phi = 0.9)
   p_0.9m = tswge::plotts.true.wge(n = 200, phi = -0.9)
@@ -62,7 +64,28 @@ test_that("calculate_ts gamma, rho", {
   expect_equal(calculate_ts_gamma(x, 5), acv$acf[6])
 })
 
+test_that("White Noise Estimates", {
+  x = c(40, 30.5, 49.8, 38.3, 29.3, 48.7, 39.2, 31.7, 46.1, 42.4)
+  phi = c(-1.1, -1.78, -0.88, -0.64)
+  theta = c(0.2, -0.9)
+  info = get_all_a_calc(x, phi, theta)
+  
+  expect_equal(info$all_a[1], 0)
+  expect_equal(info$all_a[2], 0)
+  expect_equal(info$all_a[3], 0)
+  expect_equal(info$all_a[4], 0)
+  expect_equal(info$all_a[5], -1.326)
+  expect_equal(info$all_a[6], -1.6572)
+  expect_equal(info$all_a[7], -2.47804)
+  expect_equal(info$all_a[8], -1.042128)
+  expect_equal(info$all_a[9], 0.5358104)
+  expect_equal(info$all_a[10], 2.4050773)
+  
+  expect_equal(round(info$vara,6), 2.967132)
+  expect_equal(round(info$stda,6), 1.722536)
+})
 
+#### Faster AIC5 ####
 test_that("faster aic", {
   x = rnorm(1000)
   
@@ -87,6 +110,107 @@ test_that("faster aic", {
   #expect_gt(time1['elapsed'], time2['elapsed'])
 })
 
+
+#### AICBIC ####
+test_that("AICBIC", {
+  library(tswge)
+  
+  # Generated White Noise 
+  arma.2.1 = gen.arma.wge(n = 200, phi = c(-0.5, -0.55), theta = 0.8, sn = 101)
+  
+  g.aicbic = aicbic(arma.2.1, p = 0:5, q = 0:2)
+  
+  g.aic = aic5.wge(arma.2.1)
+  g.bic = aic5.wge(arma.2.1, type = 'bic')
+  
+  colnames.aic = c("p", "q", "aic")
+  colnames.bic = c("p", "q", "bic")
+  
+  s.aicbic.aic.sum = g.aicbic[[1]] %>% dplyr::summarise_all(sum)
+  s.aicbic.bic.sum = g.aicbic[[2]] %>% dplyr::summarise_all(sum)
+  s.aic.sum = g.aic %>% dplyr::summarise_all(sum) 
+  s.bic.sum = g.bic %>% dplyr::summarise_all(sum)
+  
+  colnames(s.aic.sum) = colnames.aic
+  colnames(s.bic.sum) = colnames.bic
+  
+  expect_equal(s.aicbic.aic.sum$p, s.aic.sum$p)
+  expect_equal(s.aicbic.aic.sum$q, s.aic.sum$q)
+  expect_equal(s.aicbic.aic.sum$aic, s.aic.sum$aic)
+  
+  expect_equal(s.aicbic.bic.sum$p, s.bic.sum$p)
+  expect_equal(s.aicbic.bic.sum$q, s.bic.sum$q)
+  expect_equal(s.aicbic.bic.sum$bic, s.bic.sum$bic)
+  
+  ## Merge
+  g.aicbic = aicbic(arma.2.1, p = 0:5, q = 0:2, merge = TRUE)
+  s.aicbic.sum = g.aicbic %>% dplyr::summarise_all(sum)
+  expect_equal(s.aicbic.sum$p, s.aic.sum$p)
+  expect_equal(s.aicbic.sum$q, s.aic.sum$q)
+  expect_equal(s.aicbic.sum$aic, s.aic.sum$aic)
+  expect_equal(s.aicbic.sum$bic, s.bic.sum$bic)
+  
+  
+})
+
+
+#### Parallel AICBIC ####
+# ## TODO: Parallel is not working. Fix it
+# test_that("AICBIC Parallel", {
+#   
+#   library(tswge)
+#   library("parallel")
+#   # Generated White Noise 
+#   arma.2.1 = gen.arma.wge(n = 200, phi = c(-0.5, -0.55), theta = 0.8, sn = 101)
+#   
+#   
+#   cores = detectCores()
+#   if (cores > 4){
+#     use_cores = 4
+#   }
+#   else (cores > 2){
+#     use_cores = 2
+#   }
+#   else{
+#     use_cores = 1
+#   }
+#   
+#   
+#   cl <- makeCluster(use_cores)
+#   #registerDoParallel(cl)
+#   
+#   g.aicbic = aicbic(arma.2.1, p = 0:5, q = 0:2, parallel = TRUE, cl = cl)
+#   
+#   #registerDoSEQ()
+#   
+#   g.aic = aic5.wge(arma.2.1)
+#   g.bic = aic5.wge(arma.2.1, type = 'bic')
+#   
+#   colnames.aic = c("p", "q", "aic")
+#   colnames.bic = c("p", "q", "bic")
+#   
+#   s.aicbic.aic.sum = g.aicbic[[1]] %>% dplyr::summarise_all(sum)
+#   s.aicbic.bic.sum = g.aicbic[[2]] %>% dplyr::summarise_all(sum)
+#   s.aic.sum = g.aic %>% dplyr::summarise_all(sum) 
+#   s.bic.sum = g.bic %>% dplyr::summarise_all(sum)
+#   
+#   colnames(s.aic.sum) = colnames.aic
+#   colnames(s.bic.sum) = colnames.bic
+#   
+#   expect_equal(s.aicbic.aic.sum$p, s.aic.sum$p)
+#   expect_equal(s.aicbic.aic.sum$q, s.aic.sum$q)
+#   expect_equal(s.aicbic.aic.sum$aic, s.aic.sum$aic)
+# 
+#   expect_equal(s.aicbic.bic.sum$p, s.bic.sum$p)
+#   expect_equal(s.aicbic.bic.sum$q, s.bic.sum$q)
+#   expect_equal(s.aicbic.bic.sum$bic, s.bic.sum$bic)
+#   
+# })
+
+
+
+
+#### Differencing - ARIMA ####
 test_that("Differencing - ARIMA", {
   # ARIMA(2,2,1)
   x = tswge::gen.arima.wge(n = 200, phi = c(1.5,-0.8), d = 2, theta = -0.8)
@@ -98,6 +222,7 @@ test_that("Differencing - ARIMA", {
   
 })
 
+#### Differencing - Seasonal ARIMA ####
 test_that("Differencing - Seasonality", {
   # Quarterly
   x = tswge::gen.aruma.wge(n = 80, s = 4, sn = 81) #tswge function to generate ARIMA and Seasonal Models
@@ -115,33 +240,46 @@ test_that("Differencing - Seasonality", {
 })
 
 
-test_that("White Noise Estimates", {
-  x = c(40, 30.5, 49.8, 38.3, 29.3, 48.7, 39.2, 31.7, 46.1, 42.4)
-  phi = c(-1.1, -1.78, -0.88, -0.64)
-  theta = c(0.2, -0.9)
-  info = get_all_a_calc(x, phi, theta)
-
-  expect_equal(info$all_a[1], 0)
-  expect_equal(info$all_a[2], 0)
-  expect_equal(info$all_a[3], 0)
-  expect_equal(info$all_a[4], 0)
-  expect_equal(info$all_a[5], -1.326)
-  expect_equal(info$all_a[6], -1.6572)
-  expect_equal(info$all_a[7], -2.47804)
-  expect_equal(info$all_a[8], -1.042128)
-  expect_equal(info$all_a[9], 0.5358104)
-  expect_equal(info$all_a[10], 2.4050773)
-  
-  expect_equal(round(info$vara,6), 2.967132)
-  expect_equal(round(info$stda,6), 1.722536)
-})
-
-
+#### Seasonal Factors ####
 test_that("Seasonal Factors", {
   factor.wge.season(12)
   factor.wge.season(4)
 })
 
+#### Estimate ####
+test_that("Estimate", {
+  library(tswge)
+  phi = 0.6
+  theta = 0.2
+  
+  x.ar = gen.arma.wge(n = 200, phi = phi, plot = FALSE, sn = 101)
+  x.arma = gen.arma.wge(n = 200, phi = phi, theta = theta, plot = FALSE, sn = 101)
+  
+  est.ar.tswge.mle = est.ar.wge(x.ar, p = 1, type = 'mle')
+  est.ar.tswge.burg = est.ar.wge(x.ar, p = 1, type = 'burg')
+  est.arma.tswge = est.arma.wge(x.arma, p = 1, q = 1)
+  
+  est.ar.wrapped.mle = estimate(xs = x.ar, p = 1, type = 'mle')
+  est.ar.wrapped.burg = estimate(xs = x.ar, p = 1, type = 'burg')
+  est.arma.wrapped = estimate(xs = x.arma, p = 1, q = 1)
+  
+  expect_equal(est.ar.tswge.mle$phi, est.ar.wrapped.mle$phi)
+  expect_equal(round(est.ar.tswge.mle$avar,3), round(est.ar.wrapped.mle$avar, 3))
+  expect_equal(sum(est.ar.tswge.mle$res), sum(est.ar.wrapped.mle$res))
+  
+  expect_equal(est.ar.tswge.burg$phi, est.ar.wrapped.burg$phi)
+  expect_equal(round(est.ar.tswge.burg$avar, 3), round(est.ar.wrapped.burg$avar,3))
+  expect_equal(sum(est.ar.tswge.burg$res), sum(est.ar.wrapped.burg$res))
+  
+  expect_equal(est.arma.tswge$phi, est.arma.tswge$phi)
+  expect_equal(est.arma.tswge$theta, est.arma.tswge$theta)
+  expect_equal(round(est.arma.tswge$avar,3), round(est.arma.wrapped$avar,3))
+  expect_equal(sum(est.arma.tswge$res), sum(est.arma.wrapped$res))
+  
+  
+})
+
+#### Forecast Wrapper ####
 test_that("Forecast Function Wrapper", {
   phi = 0.6
   theta = 0.2
@@ -165,6 +303,7 @@ test_that("Forecast Function Wrapper", {
   
 })
 
+#### ASE Calculations ####
 test_that("ASE Function", {
   phi = 0.6
   theta = 0.2
@@ -186,6 +325,7 @@ test_that("ASE Function", {
   
 })
 
+#### Access Function ####
 test_that("Assess Function", {
   phi = 0.6
   theta = 0.2
@@ -206,7 +346,7 @@ test_that("Assess Function", {
 })
 
 
-
+#### Sliding Window ASE Calculations ####
 test_that("Sliding Window", {
   data("AirPassengers")
   x = AirPassengers
@@ -220,7 +360,7 @@ test_that("Sliding Window", {
   d = 1
   s = 12
   
-  #### ARMA Model ####
+  ## ARMA Model ##
   
   f = tswge::fore.arma.wge(x, phi=phi, theta = theta,
                            n.ahead = n.ahead, limits=FALSE, lastn = TRUE)
@@ -244,7 +384,7 @@ test_that("Sliding Window", {
   expect_equal(ase1, ASEs)
   expect_equal(ase2, ASEs)
   
-  #### ARIMA Model with Seasonality ####
+  ## ARIMA Model with Seasonality ##
   
   f = tswge::fore.aruma.wge(x, phi=phi, theta = theta, d = d, s = s,
                             n.ahead = n.ahead, limits=FALSE, lastn = TRUE)
@@ -261,7 +401,7 @@ test_that("Sliding Window", {
 })
 
 
-
+#### Model Compare Univariate Class ####
 test_that("ModelCompareUnivariate", {
   library(tswge)
   data("airlog")
@@ -293,10 +433,15 @@ test_that("ModelCompareUnivariate", {
                                            n.ahead = 36, batch_size = 72)
   
   mdl_compare$plot_simple_forecasts()
-  mdl_compare$plot_multiple_realizations(n.realizations = 4, seed = 100, scales = 'free_y')
+  
+  mdl_compare$plot_batch_forecasts(only_sliding = TRUE)
+  mdl_compare$plot_batch_forecasts(only_sliding = FALSE)
+  mdl_compare$plot_batch_ases(only_sliding = TRUE)
+  mdl_compare$plot_batch_ases(only_sliding = FALSE)
   mdl_compare$plot_histogram_ases()
-  mdl_compare$plot_forecasts(only_sliding = TRUE)
-  mdl_compare$statistical_compare()  
+  mdl_compare$statistical_compare()
+  
+  mdl_compare$plot_multiple_realizations(n.realizations = 4, seed = 100, scales = 'free_y')
   
   ASEs = mdl_compare$get_tabular_metrics(ases = TRUE)
   
@@ -309,6 +454,7 @@ test_that("ModelCompareUnivariate", {
   expect_equal(ASE_bx_single_batch, 0.006903242)
   
   forecasts = mdl_compare$get_tabular_metrics(ases = FALSE)
+  
   
   summary = forecasts %>% 
     dplyr::group_by(Model) %>% 
@@ -403,6 +549,9 @@ test_that("ModelCompareUnivariate", {
   
 })
 
+
+
+#### Compare Multiple Realizations of a model with Actual ####
 test_that("Compare Multiple Realizations", {
   library(tswge)
   data("sunspot.classic")
@@ -424,8 +573,7 @@ test_that("Compare Multiple Realizations", {
   
 })
 
-
-
+#### Evaluate Residuals ####
 test_that("White Noise Eval - White Noise Eval", {
   # library(tswge)
   
@@ -456,6 +604,7 @@ test_that("White Noise Eval - White Noise Eval", {
 
 })
 
+#### Overfit Tables - Model ID ####
 test_that("Overfit", {
   library(tswge)
   
@@ -468,92 +617,6 @@ test_that("Overfit", {
   
 })
 
-test_that("AICBIC", {
-  library(tswge)
-  
-  # Generated White Noise 
-  arma.2.1 = gen.arma.wge(n = 200, phi = c(-0.5, -0.55), theta = 0.8, sn = 101)
-  
-  g.aicbic = aicbic(arma.2.1, p = 0:5, q = 0:2)
-    
-  g.aic = aic5.wge(arma.2.1)
-  g.bic = aic5.wge(arma.2.1, type = 'bic')
-  
-  colnames.aic = c("p", "q", "aic")
-  colnames.bic = c("p", "q", "bic")
-  
-  s.aicbic.aic.sum = g.aicbic[[1]] %>% dplyr::summarise_all(sum)
-  s.aicbic.bic.sum = g.aicbic[[2]] %>% dplyr::summarise_all(sum)
-  s.aic.sum = g.aic %>% dplyr::summarise_all(sum) 
-  s.bic.sum = g.bic %>% dplyr::summarise_all(sum)
-  
-  colnames(s.aic.sum) = colnames.aic
-  colnames(s.bic.sum) = colnames.bic
-  
-  expect_equal(s.aicbic.aic.sum$p, s.aic.sum$p)
-  expect_equal(s.aicbic.aic.sum$q, s.aic.sum$q)
-  expect_equal(s.aicbic.aic.sum$aic, s.aic.sum$aic)
-  
-  expect_equal(s.aicbic.bic.sum$p, s.bic.sum$p)
-  expect_equal(s.aicbic.bic.sum$q, s.bic.sum$q)
-  expect_equal(s.aicbic.bic.sum$bic, s.bic.sum$bic)
-  
-})
 
-
-
-
-
-# ## TODO: Parallel is not working. Fix it
-# test_that("AICBIC Parallel", {
-#   
-#   library(tswge)
-#   library("parallel")
-#   # Generated White Noise 
-#   arma.2.1 = gen.arma.wge(n = 200, phi = c(-0.5, -0.55), theta = 0.8, sn = 101)
-#   
-#   
-#   cores = detectCores()
-#   if (cores > 4){
-#     use_cores = 4
-#   }
-#   else (cores > 2){
-#     use_cores = 2
-#   }
-#   else{
-#     use_cores = 1
-#   }
-#   
-#   
-#   cl <- makeCluster(use_cores)
-#   #registerDoParallel(cl)
-#   
-#   g.aicbic = aicbic(arma.2.1, p = 0:5, q = 0:2, parallel = TRUE, cl = cl)
-#   
-#   #registerDoSEQ()
-#   
-#   g.aic = aic5.wge(arma.2.1)
-#   g.bic = aic5.wge(arma.2.1, type = 'bic')
-#   
-#   colnames.aic = c("p", "q", "aic")
-#   colnames.bic = c("p", "q", "bic")
-#   
-#   s.aicbic.aic.sum = g.aicbic[[1]] %>% dplyr::summarise_all(sum)
-#   s.aicbic.bic.sum = g.aicbic[[2]] %>% dplyr::summarise_all(sum)
-#   s.aic.sum = g.aic %>% dplyr::summarise_all(sum) 
-#   s.bic.sum = g.bic %>% dplyr::summarise_all(sum)
-#   
-#   colnames(s.aic.sum) = colnames.aic
-#   colnames(s.bic.sum) = colnames.bic
-#   
-#   expect_equal(s.aicbic.aic.sum$p, s.aic.sum$p)
-#   expect_equal(s.aicbic.aic.sum$q, s.aic.sum$q)
-#   expect_equal(s.aicbic.aic.sum$aic, s.aic.sum$aic)
-# 
-#   expect_equal(s.aicbic.bic.sum$p, s.bic.sum$p)
-#   expect_equal(s.aicbic.bic.sum$q, s.bic.sum$q)
-#   expect_equal(s.aicbic.bic.sum$bic, s.bic.sum$bic)
-#   
-# })
 
 
