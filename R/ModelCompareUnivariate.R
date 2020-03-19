@@ -37,7 +37,7 @@
 #' # (2) Plots the upper and lower limits for each model along with the realization.
 #' # In both cases, this marks each batch using a background color for ease of comparison.
 #' # only_sliding = TRUE will only plot forecsts for models using sliding ASE  calculations.
-#' mdl_compare$plot_forecasts(only_sliding = TRUE)
+#' mdl_compare$plot_batch_forecasts(only_sliding = TRUE)
 #' 
 #' # This method statistically compares all the models that use a sliding window ASE calculation
 #' mdl_compare$statistical_compare()  
@@ -168,19 +168,64 @@ ModelCompareUnivariate = R6::R6Class(
       }
     },
     
-    #' @description Plots the histogram of the ASE values for the models
-    plot_histogram_ases = function(){
-      results = self$get_tabular_metrics()
-      p = ggplot2::ggplot(results, ggplot2::aes(x = Model, y = ASE, color = Model)) + 
-        ggplot2::geom_boxplot() + 
-        ggplot2::coord_flip()
+    #' @description Plots the simple forecast for each model
+    #' @param lastn If TRUE, this will plot the forecasts forthe last n.ahead values of the realization (Default: FALSE)
+    #' @param limits If TRUE, this will also plot the lower and upper limits of the forecasts (Default: FALSE)
+    plot_simple_forecasts = function(lastn = FALSE, limits = FALSE){
+      results = dplyr::tribble(~Model, ~Time, ~f, ~ll, ~ul)
+      
+      if (lastn == FALSE){
+        from = private$get_len_x() + 1
+        to = private$get_len_x() + self$get_n.ahead()
+      }
+      else{
+        from = private$get_len_x() - self$get_n.ahead() + 1
+        to = private$get_len_x()
+      }
+      
+      for (name in names(private$get_models())){
+        forecast = tswge::fore.aruma.wge(x = self$get_x(),
+                                         phi = private$get_models()[[name]][['phi']],
+                                         theta = private$get_models()[[name]][['theta']],
+                                         d = private$get_models()[[name]][['d']],
+                                         s = private$get_models()[[name]][['s']], 
+                                         n.ahead = self$get_n.ahead(),
+                                         lastn = lastn, plot = FALSE)
+        
+        results = results %>%  dplyr::add_row(Model = name,
+                                              Time = (from:to),
+                                              f = forecast$f,
+                                              ll = forecast$ll,
+                                              ul = forecast$ul
+        )
+        
+      }
+      
+      results = results %>%  dplyr::add_row(Model = "Actual",
+                                            Time = seq_along(self$get_x()),
+                                            f = self$get_x(),
+                                            ll = self$get_x(),
+                                            ul = self$get_x()
+      )
+      
+      p = ggplot2::ggplot() +
+        ggplot2::geom_line(results, mapping = ggplot2::aes(x=Time, y=f, color = Model), size = 0.4) +
+        ggplot2::ylab("Simple Forecasts")
+      
+      if (limits == TRUE){
+        p = p + 
+          ggplot2::geom_line(results, mapping = ggplot2::aes(x=Time, y=ll, color = Model), linetype = "dashed", size = 0.2) +
+          ggplot2::geom_line(results, mapping = ggplot2::aes(x=Time, y=ul, color = Model), linetype = "dashed", size = 0.2)
+      }
+      
       print(p)
+      
     },
     
     #' @description Plots the forecasts per batch for all models
     #' @param only_sliding If TRUE, this will only plot the batch forecasts 
     #'                     for the models that used window ASE calculations
-    plot_forecasts = function(only_sliding = TRUE){
+    plot_batch_forecasts = function(only_sliding = TRUE){
       results.forecasts = self$get_tabular_metrics(ases = FALSE)
       
       model_subset = c("Realization")
@@ -236,58 +281,73 @@ ModelCompareUnivariate = R6::R6Class(
       
     },
     
-    #' @description Plots the simple forecast for each model
-    #' @param lastn If TRUE, this will plot the forecasts forthe last n.ahead values of the realization (Default: FALSE)
-    #' @param limits If TRUE, this will also plot the lower and upper limits of the forecasts (Default: FALSE)
-    plot_simple_forecasts = function(lastn = FALSE, limits = FALSE){
-      results = dplyr::tribble(~Model, ~Time, ~f, ~ll, ~ul)
+    #' @description Plots the ASEs per batch for all models
+    #' @param only_sliding If TRUE, this will only plot the ASEs for
+    #'                     the models that used window ASE calculations
+    plot_batch_ases = function(only_sliding = TRUE){
       
-      if (lastn == FALSE){
-        from = private$get_len_x() + 1
-        to = private$get_len_x() + self$get_n.ahead()
+      requireNamespace("patchwork")
+      
+      model_subset = c()
+      
+      if (only_sliding){
+        for (name in names(private$get_models())){
+          if (private$models[[name]][['sliding_ase']] == TRUE){
+            model_subset = c(model_subset, name)
+          }
+        }
       }
       else{
-        from = private$get_len_x() - self$get_n.ahead() + 1
-        to = private$get_len_x()
+        # Add all models
+        for (name in names(private$get_models())){
+          model_subset = c(model_subset, name)
+        }
       }
-
-      for (name in names(private$get_models())){
-        forecast = tswge::fore.aruma.wge(x = self$get_x(),
-                                  phi = private$get_models()[[name]][['phi']],
-                                  theta = private$get_models()[[name]][['theta']],
-                                  d = private$get_models()[[name]][['d']],
-                                  s = private$get_models()[[name]][['s']], 
-                                  n.ahead = self$get_n.ahead(),
-                                  lastn = lastn, plot = FALSE)
+      
+      ASEs = self$get_tabular_metrics(ases = TRUE) %>% 
+        dplyr::filter(Model %in% model_subset) %>%  
+        tidyr::gather("Index", "Time", -Model, -ASE, -Batch) 
+      
+      all_time = NA
+      
+      for (name in model_subset){
+        if (all(is.na(all_time))){
+          all_time = data.frame(Time = seq(1, private$get_len_x()),
+                                Model = rep(name, private$get_len_x()),
+                                ASE = 0)
+        }
+        else{
+          all_time = rbind(all_time, data.frame(Time = seq(1, private$get_len_x()),
+                                                Model = rep(name, private$get_len_x()),
+                                                ASE = 0))
+        }
         
-        results = results %>%  dplyr::add_row(Model = name,
-                                              Time = (from:to),
-                                              f = forecast$f,
-                                              ll = forecast$ll,
-                                              ul = forecast$ul
-                                              )
-
+        all_time = all_time %>%
+          dplyr::mutate_if(is.factor, as.character)
       }
-
-      results = results %>%  dplyr::add_row(Model = "Actual",
-                                            Time = seq_along(self$get_x()),
-                                            f = self$get_x(),
-                                            ll = self$get_x(),
-                                            ul = self$get_x()
-      )
-
-      p = ggplot2::ggplot() +
-        ggplot2::geom_line(results, mapping = ggplot2::aes(x=Time, y=f, color = Model), size = 0.4) +
-        ggplot2::ylab("Simple Forecasts")
       
-      if (limits == TRUE){
-        p = p + 
-          ggplot2::geom_line(results, mapping = ggplot2::aes(x=Time, y=ll, color = Model), linetype = "dashed", size = 0.2) +
-          ggplot2::geom_line(results, mapping = ggplot2::aes(x=Time, y=ul, color = Model), linetype = "dashed", size = 0.2)
-      }
-
+      results = dplyr::left_join(all_time, ASEs, by = c("Time", "Model")) %>%
+        dplyr::mutate(ASE = ASE.x + ASE.y) %>% 
+        tidyr::fill(.data$ASE, .direction = "down")
+      
+      data = data.frame(Time = seq(1, private$get_len_x()), Data = self$get_x())
+      
+      g1 = ggplot2::ggplot(data, ggplot2::aes(x = Time, y = Data)) + 
+        ggplot2::geom_line()
+      
+      g2 = ggplot2::ggplot(results, ggplot2::aes(x = Time, y = ASE, color = Model)) +
+        ggplot2::geom_line()
+      
+      print(g1/g2)
+    },
+    
+    #' @description Plots the histogram of the ASE values for the models
+    plot_histogram_ases = function(){
+      results = self$get_tabular_metrics()
+      p = ggplot2::ggplot(results, ggplot2::aes(x = Model, y = ASE, color = Model)) + 
+        ggplot2::geom_boxplot() + 
+        ggplot2::coord_flip()
       print(p)
-      
     },
     
     #' @description Creates multiple realization of each model. Useful to check model appropriateness.

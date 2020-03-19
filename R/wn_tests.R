@@ -30,7 +30,7 @@ ljung_box <- function(x, p = 0, q = 0, k_val = c(24,48), model_name = "My Model"
     dplyr::as_tibble() %>% 
     tibble::remove_rownames() %>%
     dplyr::mutate(Model = model_name, 
-                  Decision = ifelse(.$pval < alpha, "REJECT NULL", "FTR NULL"))
+                  Decision = ifelse(.data$pval < alpha, "REJECT NULL", "FTR NULL"))
 
   if (any(rvData$Decision == 'REJECT NULL')){
     cat(paste("At least one of the 'ljung_box' tests rejected the null hypothesis that the data is consistent with white noise at an significance level of ", alpha, " \n"))

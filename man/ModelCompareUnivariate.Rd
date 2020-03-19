@@ -45,7 +45,7 @@ mdl_compare$plot_histogram_ases()
 # (2) Plots the upper and lower limits for each model along with the realization.
 # In both cases, this marks each batch using a background color for ease of comparison.
 # only_sliding = TRUE will only plot forecsts for models using sliding ASE  calculations.
-mdl_compare$plot_forecasts(only_sliding = TRUE)
+mdl_compare$plot_batch_forecasts(only_sliding = TRUE)
 
 # This method statistically compares all the models that use a sliding window ASE calculation
 mdl_compare$statistical_compare()  
@@ -75,9 +75,10 @@ print(forecasts)
 \item \href{#method-get_n.ahead}{\code{ModelCompareUnivariate$get_n.ahead()}}
 \item \href{#method-add_models}{\code{ModelCompareUnivariate$add_models()}}
 \item \href{#method-compute_metrics}{\code{ModelCompareUnivariate$compute_metrics()}}
-\item \href{#method-plot_histogram_ases}{\code{ModelCompareUnivariate$plot_histogram_ases()}}
-\item \href{#method-plot_forecasts}{\code{ModelCompareUnivariate$plot_forecasts()}}
 \item \href{#method-plot_simple_forecasts}{\code{ModelCompareUnivariate$plot_simple_forecasts()}}
+\item \href{#method-plot_batch_forecasts}{\code{ModelCompareUnivariate$plot_batch_forecasts()}}
+\item \href{#method-plot_batch_ases}{\code{ModelCompareUnivariate$plot_batch_ases()}}
+\item \href{#method-plot_histogram_ases}{\code{ModelCompareUnivariate$plot_histogram_ases()}}
 \item \href{#method-plot_multiple_realizations}{\code{ModelCompareUnivariate$plot_multiple_realizations()}}
 \item \href{#method-evaluate_residuals}{\code{ModelCompareUnivariate$evaluate_residuals()}}
 \item \href{#method-statistical_compare}{\code{ModelCompareUnivariate$statistical_compare()}}
@@ -196,34 +197,6 @@ will be equal to n.ahead, else it will be equal to 1}
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-plot_histogram_ases"></a>}}
-\if{latex}{\out{\hypertarget{method-plot_histogram_ases}{}}}
-\subsection{Method \code{plot_histogram_ases()}}{
-Plots the histogram of the ASE values for the models
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{ModelCompareUnivariate$plot_histogram_ases()}\if{html}{\out{</div>}}
-}
-
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-plot_forecasts"></a>}}
-\if{latex}{\out{\hypertarget{method-plot_forecasts}{}}}
-\subsection{Method \code{plot_forecasts()}}{
-Plots the forecasts per batch for all models
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{ModelCompareUnivariate$plot_forecasts(only_sliding = TRUE)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{only_sliding}}{If TRUE, this will only plot the batch forecasts 
-for the models that used window ASE calculations}
-}
-\if{html}{\out{</div>}}
-}
-}
-\if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-plot_simple_forecasts"></a>}}
 \if{latex}{\out{\hypertarget{method-plot_simple_forecasts}{}}}
 \subsection{Method \code{plot_simple_forecasts()}}{
@@ -241,6 +214,52 @@ Plots the simple forecast for each model
 }
 \if{html}{\out{</div>}}
 }
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-plot_batch_forecasts"></a>}}
+\if{latex}{\out{\hypertarget{method-plot_batch_forecasts}{}}}
+\subsection{Method \code{plot_batch_forecasts()}}{
+Plots the forecasts per batch for all models
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{ModelCompareUnivariate$plot_batch_forecasts(only_sliding = TRUE)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{only_sliding}}{If TRUE, this will only plot the batch forecasts 
+for the models that used window ASE calculations}
+}
+\if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-plot_batch_ases"></a>}}
+\if{latex}{\out{\hypertarget{method-plot_batch_ases}{}}}
+\subsection{Method \code{plot_batch_ases()}}{
+Plots the ASEs per batch for all models
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{ModelCompareUnivariate$plot_batch_ases(only_sliding = TRUE)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{only_sliding}}{If TRUE, this will only plot the ASEs for
+the models that used window ASE calculations}
+}
+\if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-plot_histogram_ases"></a>}}
+\if{latex}{\out{\hypertarget{method-plot_histogram_ases}{}}}
+\subsection{Method \code{plot_histogram_ases()}}{
+Plots the histogram of the ASE values for the models
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{ModelCompareUnivariate$plot_histogram_ases()}\if{html}{\out{</div>}}
+}
+
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-plot_multiple_realizations"></a>}}

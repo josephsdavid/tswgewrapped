@@ -29,12 +29,10 @@
 #'                                   phi = est$phi, theta = est$theta, vara = est$avar,
 #'                                   seed = 11)
 #' @export
-#' 
+#' @importFrom rlang .data
 generate_multiple_realization = function(x, phi = 0, theta = 0, d = 0, s = 0, vara = NA,
                                          n.realizations = 4, lag.max = 25, seed = NA,
                                          model_name = "Custom Model", return = 'all'){
-  
-  # library(magrittr)
   
   if (all(is.na(vara))){
     stop("You have not specified the white noise variance estimate for your model. Please specify to proceed.")
@@ -107,7 +105,7 @@ generate_multiple_realization = function(x, phi = 0, theta = 0, d = 0, s = 0, va
   }
   
   results = results %>% 
-    dplyr::mutate(Realization = as.factor(.$Realization))
+    dplyr::mutate(Realization = as.factor(.data$Realization))
   
   data = dplyr::tribble(~Model, ~Realization, ~Data, ~Index)
   
@@ -162,10 +160,10 @@ plot_multiple_realizations = function(data, results, plot = c("all"), scales = '
   
   if (('realization' %in% plot) | ('all' %in% plot)){
     data_hypothetical = data %>% 
-      dplyr::filter(.$Realization != 'Actual')
+      dplyr::filter(.data$Realization != 'Actual')
       
     data_actual = data %>% 
-      dplyr::filter(.$Realization == 'Actual')
+      dplyr::filter(.data$Realization == 'Actual')
       
     g1 = ggplot2::ggplot() +   
       ggplot2::geom_line(data = data_actual, mapping = ggplot2::aes_string(x = 'Index', y = 'Data', color = 'Realization'), size = 2) +
@@ -187,12 +185,12 @@ plot_multiple_realizations = function(data, results, plot = c("all"), scales = '
   
   if (('acf' %in% plot) | ('all' %in% plot)){
     acf_data_hypothetical = results %>% 
-      dplyr::filter(.$Realization != 'Actual') %>% 
-      dplyr::filter(.$Characteristic == 'ACF')
+      dplyr::filter(.data$Realization != 'Actual') %>% 
+      dplyr::filter(.data$Characteristic == 'ACF')
     
     acf_data_actual = results %>% 
-      dplyr::filter(.$Realization == 'Actual') %>% 
-      dplyr::filter(.$Characteristic == 'ACF')
+      dplyr::filter(.data$Realization == 'Actual') %>% 
+      dplyr::filter(.data$Characteristic == 'ACF')
     
     g3 = ggplot2::ggplot() + 
       ggplot2::facet_wrap(~Model, ncol = 2, scales = scales) +
@@ -206,12 +204,12 @@ plot_multiple_realizations = function(data, results, plot = c("all"), scales = '
   
   if (('spectrum' %in% plot) | ('all' %in% plot)){
     spectrum_data_hypothetical = results %>% 
-      dplyr::filter(.$Realization != 'Actual') %>% 
-      dplyr::filter(.$Characteristic == 'Spectrum')
+      dplyr::filter(.data$Realization != 'Actual') %>% 
+      dplyr::filter(.data$Characteristic == 'Spectrum')
     
     spectrum_data_actual = results %>% 
-      dplyr::filter(.$Realization == 'Actual') %>% 
-      dplyr::filter(.$Characteristic == 'Spectrum')
+      dplyr::filter(.data$Realization == 'Actual') %>% 
+      dplyr::filter(.data$Characteristic == 'Spectrum')
     
     g4 = ggplot2::ggplot() +   
       ggplot2::facet_wrap(~Model, ncol = 2, scales = scales) +

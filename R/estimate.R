@@ -11,9 +11,9 @@ estimate <- function(xs, p=NA, q = 0, type = 'mle', ...) {
     stop("You need to specify the AR order for the model.")
   }
   if(q > 0) {
-    return(tswge::est.arma.wge(xs, p, q,  ...))
+    return(tswge::est.arma.wge(x = xs, p = p, q = q,  ...))
   }
   else {
-    return(tswge::est.ar.wge(xs, p, type, ...))
+    return(tswge::est.ar.wge(x = xs, p = p, type = type, ...))
   }
 }

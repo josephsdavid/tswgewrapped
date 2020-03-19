@@ -81,7 +81,7 @@ mdl_compare$statistical_compare()
 
 ## Plot and compare the forecasrs per batch
 ```{r}
-mdl_compare$plot_forecasts(only_sliding = TRUE)
+mdl_compare$plot_batch_forecasts(only_sliding = TRUE)
 ```
 
 ## Raw Data and Metrics
