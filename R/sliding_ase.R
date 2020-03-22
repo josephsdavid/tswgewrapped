@@ -127,3 +127,113 @@ sliding_ase = function(x,
               ul = forecasts.ul,
               time.forecasts = time.forecasts ))
 }
+
+
+sliding_ase_var = function(data, var_interest,
+                           k, trend_type = NA,
+                           n.ahead = NA, batch_size = NA,    # Forecasting specific arguments
+                           step_n.ahead = TRUE,
+                           ...)                              # max.p (sigplusnoise), lambda (ARUMA)      
+{
+  # Sliding CV ... batches are mutually exclusive
+  
+  
+  n = nrow(data)
+  
+  if (is.na(batch_size)){
+    warning("Batch Size has not been specified. Will assume a single batch")
+    cat("\n")
+    batch_size = n
+  }
+  
+  if (is.na(n.ahead)){
+    stop("Number of points to be used for forecasting has not been specified. Please specify n.ahead")
+  }
+  
+  if (all(k == 0) & all(is.na(trend_type))){
+    stop("You have specified the arguments for building the VAR model. Please specify at least one of these to continue")
+  }
+  
+  forecasts.f = rep(NA, n)
+  forecasts.ul = rep(NA, n)
+  forecasts.ll = rep(NA, n)
+  time.forecasts = seq(1, n, 1)
+  
+  start = 1
+  
+  if (step_n.ahead == FALSE){
+    # Step Size = 1
+    step_size = 1
+    num_batches = n-batch_size+1  
+  }
+  else{
+    # Step by n.ahead each time
+    step_size = n.ahead
+    num_batches = floor((n-batch_size)/n.ahead)  + 1
+  }
+  
+  cat(paste("Number of batches expected: ", num_batches, "\n"))
+  
+  ASEs = numeric(num_batches)
+  time_test_start = numeric(num_batches)
+  time_test_end = numeric(num_batches)
+  batch_num = numeric(num_batches)
+  AICs = numeric(num_batches)
+  BICs = numeric(num_batches)
+  
+  for (i in 0:(num_batches-1))
+  {
+    # Define the batch
+    batch_start = start
+    batch_end = i*step_size + batch_size
+    
+    batch = data[batch_start:batch_end, ]
+    # Take last n.ahead observations from the batch and use that to compare with the forecast
+    
+    train_start = start
+    train_end = nrow(batch)-n.ahead
+    
+    train_data = batch[1:(nrow(batch)-n.ahead),]
+    
+    test_start = i*step_size + batch_size - n.ahead + 1
+    test_end = i*step_size + batch_size
+    
+    time_test_start[i+1] = test_start
+    time_test_end[i+1] = test_end
+    batch_num[i+1] = i+1
+    
+    test_data = data[test_start:test_end, ]
+    
+    # Fit model for the batch
+    varfit = vars::VAR(train_data, p=k, type=trend_type)
+    
+    # Forecast for the batch
+    forecasts = stats::predict(varfit, n.ahead=n.ahead)
+    forecasts = forecasts$fcst[[var_interest]] ## Get the forecasts only for the dependent variable
+    
+    ASEs[i+1] = mean((test_data[, var_interest] - forecasts[, 'fcst'])^2)
+    start = start + step_size
+    
+    forecasts.f[test_start: test_end] = forecasts[, 'fcst']  
+    forecasts.ll[test_start: test_end] = forecasts[, 'lower']
+    forecasts.ul[test_start: test_end] = forecasts[, 'upper']
+    time.forecasts[test_start: test_end] = seq(test_start, test_end, 1)
+    
+    # Batch AIC and BIC
+    AICs[i+1] = stats::AIC(varfit)
+    BICs[i+1] = stats::BIC(varfit)
+    
+  }
+  
+  return(list(ASEs = ASEs,
+              time_test_start = time_test_start,
+              time_test_end = time_test_end,
+              batch_num = batch_num,
+              AICs = AICs,
+              BICs = BICs,
+              f = forecasts.f,
+              ll = forecasts.ll,
+              ul = forecasts.ul,
+              time.forecasts = time.forecasts ))
+}
+

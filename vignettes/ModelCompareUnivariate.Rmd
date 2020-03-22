@@ -29,7 +29,7 @@ library(tswge)
 data("airlog")
 ```
  
-# Setup Models tpo be compared 
+# Setup Models to be compared 
 ```{r} 
 # Woodward Gray Airline Model
 phi_wg = c(-0.36, -0.05, -0.14, -0.11, 0.04, 0.09, -0.02, 0.02, 0.17, 0.03, -0.10, -0.38)
@@ -65,12 +65,16 @@ mdl_compare = ModelCompareUnivariate$new(x = airlog, mdl_list = models,
 # Compare the models
 
 ## Plot Multiple realizations
-```{r}
-mdl_compare$plot_multiple_realizations(n.realizations = 4, seed = 100)
+```{r fig.height=8, fig.width=10, message=FALSE, warning=FALSE}
+mdl_compare$plot_multiple_realizations(n.realizations = 4, seed = 100, plot = "realization", scales = 'fixed')
+```
+
+```{r fig.height=6, fig.width=10, message=FALSE, warning=FALSE}
+mdl_compare$plot_multiple_realizations(n.realizations = 4, seed = 100, plot = c("acf", "spectrum"), scales = 'fixed')
 ```
 
 ## Compare Histogram of ASE values
-```{r}
+```{r fig.width=10}
 mdl_compare$plot_histogram_ases()
 ```
 
@@ -79,8 +83,16 @@ mdl_compare$plot_histogram_ases()
 mdl_compare$statistical_compare()  
 ```
 
-## Plot and compare the forecasrs per batch
-```{r}
+## Simple Forecasts (with various options)
+```{r fig.width = 10}
+mdl_compare$plot_simple_forecasts(lastn = TRUE, limits = FALSE)
+mdl_compare$plot_simple_forecasts(lastn = TRUE, limits = TRUE)
+mdl_compare$plot_simple_forecasts(lastn = FALSE, limits = FALSE)
+mdl_compare$plot_simple_forecasts(lastn = FALSE, limits = TRUE)
+```
+
+## Plot and compare the forecasts per batch
+```{r fig.width=10}
 mdl_compare$plot_batch_forecasts(only_sliding = TRUE)
 ```
 

@@ -1,6 +1,6 @@
 Package: tswgewrapped
-Title: Helpful wrappers for tswge
-Version: 1.8.4
+Title: Helpful wrappers for 'tswge' and 'vars' packages
+Version: 1.8.5
 Authors@R: c(person("David", "Josephs", email = "josephsd@smu.edu", role = c("aut", "cre")),
              person("Nikhil", "Gupta", email = "guptan@smu.edu", role = c("aut")))
 Description: This package provides several helpful wrappers for the already useful tswge package. In the future, this package intends to move away from the tswge backend, to be faster, with more readable source code.
@@ -17,11 +17,14 @@ Imports:
     patchwork,
     purrr,
     R6,
+    RColorBrewer,
     tibble,
-    tswge
+    tswge,
+    vars
 RoxygenNote: 7.1.0
 Suggests: 
     testthat (>= 2.1.0),
+    tseries,
     knitr,
     rmarkdown
 VignetteBuilder: knitr
