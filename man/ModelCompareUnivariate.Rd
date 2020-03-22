@@ -327,14 +327,6 @@ ANOVA and Tukey Adjustment for multiple comparison
 \if{html}{\out{<div class="r">}}\preformatted{ModelCompareUnivariate$statistical_compare()}\if{html}{\out{</div>}}
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{only_sliding}}{If TRUE, this will only include models that use a sliding ASE calculation method,
-i.e. those models that have multiple ASE values (Default: TRUE)}
-}
-\if{html}{\out{</div>}}
-}
 \subsection{Returns}{
 The results of the ANOVA test
 }

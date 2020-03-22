@@ -1,0 +1,96 @@
+---
+title: "ModelMultivariateCompare"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{ModelMultivariateCompare}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+# Setup Libraries
+```{r setup}
+library(tswgewrapped)
+library(tseries)
+```
+
+# Load Data
+```{r}
+data("USeconomic")
+  
+data = as.data.frame(USeconomic)
+colnames(data) = c("logM1", "logGNP", "rs", "rl")
+```
+ 
+# Setup Models to be compared 
+```{r} 
+lag.max = 10
+n.ahead = 4
+batch_size = 40
+var_interest = 'logGNP'
+
+models = list("VARS AIC No Trend A" = list(type = "VAR", select = "aic", trend_type = "none", lag.max = lag.max, sliding_ase = FALSE),
+              "VARS AIC Trend A"    = list(type = "VAR", select = "aic", trend_type = "trend", lag.max = lag.max, sliding_ase = FALSE),
+              "VARS AIC Const + Trend A" = list(type = "VAR", select = "aic", trend_type = "both", lag.max = lag.max, sliding_ase = FALSE),
+              "VARS BIC No Trend A" = list(type = "VAR", select = "bic", trend_type = "none", lag.max = lag.max, sliding_ase = FALSE),
+              "VARS BIC Trend A"    = list(type = "VAR", select = "bic", trend_type = "trend", lag.max = lag.max, sliding_ase = FALSE),
+              "VARS BIC Const + Trend A" = list(type = "VAR", select = "bic", trend_type = "both", lag.max = lag.max, sliding_ase = FALSE)
+              )
+```
+
+# Initialize the ModelCompareUnivariate object
+```{r}
+#### With n_step.ahead = TRUE (Default)              
+mdl_compare = ModelCompareMultivariate$new(data = data, var_interest = var_interest,
+                                             mdl_list = models, n.ahead = n.ahead, batch_size = batch_size)
+```
+
+# Compare the models
+
+## Get AIC and BIC values (trained on the complete data)
+```{r}
+mdl_compare$get_xIC() 
+```
+
+## Compare Histogram of ASE values
+```{r fig.width=10}
+mdl_compare$plot_histogram_ases()
+```
+
+## Statistically Compare the models
+```{r}
+mdl_compare$statistical_compare()  
+```
+
+## Simple Forecasts (with various options)
+```{r fig.width = 10}
+mdl_compare$plot_simple_forecasts(lastn = TRUE, limits = FALSE)
+mdl_compare$plot_simple_forecasts(lastn = TRUE, limits = TRUE)
+mdl_compare$plot_simple_forecasts(lastn = FALSE, limits = FALSE)
+mdl_compare$plot_simple_forecasts(lastn = FALSE, limits = TRUE)
+```
+
+## Plot and compare the forecasts per batch
+```{r fig.width=10}
+mdl_compare$plot_batch_forecasts(only_sliding = FALSE)
+```
+
+## Raw Data and Metrics
+```{r}
+ASEs = mdl_compare$get_tabular_metrics(ases = TRUE)
+print(ASEs)
+```
+
+```{r}
+forecasts = mdl_compare$get_tabular_metrics(ases = FALSE)
+print(forecasts)
+```
+
+
+

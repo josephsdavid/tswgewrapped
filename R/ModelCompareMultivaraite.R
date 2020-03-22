@@ -1,65 +1,8 @@
-#' @title R6 class ModelCompareUnivariate
-#' 
-#' @examples 
-#' library(tswge)
-#' data("airlog")
-#' 
-#' # Woodward Gray Airline Model
-#' phi_wg = c(-0.36, -0.05, -0.14, -0.11, 0.04, 0.09, -0.02, 0.02, 0.17, 0.03, -0.10, -0.38)
-#' d_wg = 1
-#' s_wg = 12
-#' 
-#' # Parzen Model
-#' phi_pz = c(0.74, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.38, -0.2812)
-#' s_pz = 12
-#' 
-#' # Box Model
-#' d_bx = 1
-#' s_bx = 12  
-#' theta_bx =  c(0.40, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.60, -0.24)
-#' 
-#' models = list("Woodward Gray Model A" = list(phi = phi_wg, d = d_wg, s = s_wg, sliding_ase = FALSE),
-#'               "Woodward Gray Model B" = list(phi = phi_wg, d = d_wg, s = s_wg, sliding_ase = TRUE),
-#'               "Parzen Model A" = list(phi = phi_pz, s = s_pz, sliding_ase = FALSE),
-#'               "Parzen Model B" = list(phi = phi_pz, s = s_pz, sliding_ase = TRUE),
-#'               "Box Model A" = list(theta = theta_bx, d = d_bx, s = s_bx, sliding_ase = FALSE),
-#'               "Box Model B" = list(theta = theta_bx, d = d_bx, s = s_bx, sliding_ase = TRUE)
-#'               )
-#'               
-#' mdl_compare = ModelCompareUnivariate$new(x = airlog, mdl_list = models,
-#'                                          n.ahead = 36, batch_size = 72)
-#' # Plots the historgam of the ASE values for each model.
-#' # This is especially useful when models using a sliding window for ASE calculations. 
-#' mdl_compare$plot_histogram_ases()
-#' 
-#' # The following method gives 2 plots
-#' # (1) Plots the forecasts for each model along with the realization.
-#' # (2) Plots the upper and lower limits for each model along with the realization.
-#' # In both cases, this marks each batch using a background color for ease of comparison.
-#' # only_sliding = TRUE will only plot forecsts for models using sliding ASE  calculations.
-#' mdl_compare$plot_batch_forecasts(only_sliding = TRUE)
-#' 
-#' # This method statistically compares all the models that use a sliding window ASE calculation
-#' mdl_compare$statistical_compare()  
-#' 
-#' ASEs = mdl_compare$get_tabular_metrics(ases = TRUE)
-#' print(ASEs)
-#'
-#' # This method returns the metrics (ASE values) or forecasts for each model
-#' # 'only_sliding' If set to TRUE, only the models that use a sliding window 
-#' #                ASE calculation will be returned
-#' # 'ases' If set to TRUE, this method will return the ASE value(s) 
-#' #        Single value for models that don't use sliding ASEs and 
-#' #        Multiple values (one per batch) for models that use sliding window
-#' #        ASE calculations
-#' #        If set to FALSE, this function will return the model forecasts and 
-#' #        upper and lower confidence intervals. 
-#' forecasts = mdl_compare$get_tabular_metrics(ases = FALSE)
-#' print(forecasts)
+#' @title R6 class ModelCompareMultivariate
 #' 
 #' @export
-ModelCompareUnivariate = R6::R6Class(
-  classname = "ModelCompareUnivariate",
+ModelCompareMultivariate = R6::R6Class(
+  classname = "ModelCompareMultivariate",
   cloneable = TRUE,
   lock_objects=F,
   lock_class=F,
@@ -70,7 +13,8 @@ ModelCompareUnivariate = R6::R6Class(
     
     #' @description 
     #' Initialize an object to compare several Univatiate Time Series Models
-    #' @param x Time Series Realization
+    #' @param data The dataframe containing the time series realizations (data should not contain time index)
+    #' @param var_interest The output variable of interest (dependent variable)
     #' @param mdl_list A names list of all models (see format below)
     #' @param n.ahead The number of observations used to calculate ASE or forecast ahead
     #' @param batch_size If any of the models used sliding ase method,
@@ -78,15 +22,18 @@ ModelCompareUnivariate = R6::R6Class(
     #' @param step_n.ahead If using sliding window, should batches be incremented by n.ahead
     #'                     (Default = TRUE)
     #' @return A new `ModelCompareUnivariate` object.
-    initialize = function(x = NA, mdl_list, n.ahead = NA, batch_size = NA, step_n.ahead = TRUE)
+    initialize = function(data = NA, var_interest = NA, mdl_list, n.ahead = NA, batch_size = NA, step_n.ahead = TRUE)
     {
       # Add checks here
-      if (all(is.na(x))){ stop("You have not provided the time series data. Please provide to continue.") }
+      if (all(is.na(data))){ stop("You have not provided the time series data. Please provide to continue.") }
       
-      private$set_x(x = x)
+      private$set_data(data = data)
+      private$set_var_interest(var_interest = var_interest)
       self$add_models(mdl_list)
       private$set_n.ahead(n.ahead)
       private$set_batch_size(batch_size)
+      private$build_models()
+      private$evaluate_xIC()
       self$compute_metrics(step_n.ahead = step_n.ahead)
       
     },
@@ -95,7 +42,15 @@ ModelCompareUnivariate = R6::R6Class(
     
     #' @description Returns the time series realization
     #' @return The Time Series Realization
-    get_x = function(){return(private$x)},
+    get_data = function(){return(private$data)},
+    
+    #' @description Returns the dependent variable name
+    #' @return The dependent variable name
+    get_var_interest = function(){return(private$var_interest)},
+    
+    #' @description Returns the dependent variable data only
+    #' @return The dependent variable data only
+    get_data_var_interest = function(){return(self$get_data()[, self$get_var_interest()])},
     
     #' @description Returns the batch size value
     #' @return The Batch Size Value
@@ -139,20 +94,21 @@ ModelCompareUnivariate = R6::R6Class(
         if (private$models[[name]][['metric_has_been_computed']] == FALSE){
           cat(paste("\n\n\nComputing metrics for: ", name, "\n"))
           
-          res = sliding_ase(x = self$get_x(),
-                            phi = private$get_models()[[name]][['phi']],
-                            theta = private$get_models()[[name]][['theta']],
-                            d = private$get_models()[[name]][['d']],
-                            s = private$get_models()[[name]][['s']],
-                            n.ahead = self$get_n.ahead(),
-                            batch_size = private$get_models()[[name]][['batch_size']],
-                            step_n.ahead = step_n.ahead)
+          res = sliding_ase_var(data = self$get_data(),
+                                var_interest = self$get_var_interest(),
+                                k = private$get_models()[[name]][['k']],
+                                trend_type = private$get_models()[[name]][['trend_type']],
+                                n.ahead = self$get_n.ahead(),
+                                batch_size = private$get_models()[[name]][['batch_size']],
+                                step_n.ahead = step_n.ahead)
           
           ## Inplace
           private$models[[name]][['ASEs']] = res$ASEs  
           private$models[[name]][['time_test_start']] = res$time_test_start
           private$models[[name]][['time_test_end']] = res$time_test_end
           private$models[[name]][['batch_num']] = res$batch_num
+          private$models[[name]][['AICs']] = res$AICs
+          private$models[[name]][['BICs']] = res$BICs
           private$models[[name]][['f']] = res$f
           private$models[[name]][['ll']] = res$ll
           private$models[[name]][['ul']] = res$ul
@@ -168,6 +124,28 @@ ModelCompareUnivariate = R6::R6Class(
       }
     },
     
+    #' @description Returns the AIC and the BIC for the model using the entire dataset
+    #' @param sort_by 'AIC' or 'BIC'. Selects which column to sort the results by (Default: 'AIC')
+    #'   
+    get_xIC = function(sort_by = "AIC"){
+      results = dplyr::tribble(~Model, ~AIC, ~BIC)
+      
+      for (name in names(private$get_models())){
+        AIC = private$models[[name]][['AIC']]
+        BIC = private$models[[name]][['BIC']]
+        
+        results = results %>% 
+          dplyr::add_row(Model = name, AIC = AIC, BIC = BIC)
+        
+      }  
+      
+      results = results %>% 
+        dplyr::arrange_at(sort_by)
+      
+      return(results)
+      
+    },
+    
     #' @description Plots the simple forecast for each model
     #' @param lastn If TRUE, this will plot the forecasts forthe last n.ahead values of the realization (Default: FALSE)
     #' @param limits If TRUE, this will also plot the lower and upper limits of the forecasts (Default: FALSE)
@@ -175,37 +153,49 @@ ModelCompareUnivariate = R6::R6Class(
       results = dplyr::tribble(~Model, ~Time, ~f, ~ll, ~ul)
       
       if (lastn == FALSE){
-        from = private$get_len_x() + 1
-        to = private$get_len_x() + self$get_n.ahead()
+        data_start = 1
+        data_end = private$get_len_x()
+        train_data = self$get_data()[data_start:data_end, ]
+        
       }
       else{
-        from = private$get_len_x() - self$get_n.ahead() + 1
-        to = private$get_len_x()
+        data_start = 1
+        data_end = private$get_len_x() - self$get_n.ahead()
+        train_data = self$get_data()[data_start:data_end, ]
       }
       
+      from = data_end + 1
+      to = data_end + self$get_n.ahead()
+      
+      # Define Train Data
+      
       for (name in names(private$get_models())){
-        forecast = tswge::fore.aruma.wge(x = self$get_x(),
-                                         phi = private$get_models()[[name]][['phi']],
-                                         theta = private$get_models()[[name]][['theta']],
-                                         d = private$get_models()[[name]][['d']],
-                                         s = private$get_models()[[name]][['s']], 
-                                         n.ahead = self$get_n.ahead(),
-                                         lastn = lastn, plot = FALSE)
+        
+        var_interest = self$get_var_interest()
+        k = private$get_models()[[name]][['k']]
+        trend_type = private$get_models()[[name]][['trend_type']]
+        
+        # Fit model for the batch
+        varfit = vars::VAR(train_data, p=k, type=trend_type)
+        
+        # Forecast for the batch
+        forecasts = stats::predict(varfit, n.ahead=self$get_n.ahead())
+        forecasts = forecasts$fcst[[var_interest]] ## Get the forecasts only for the dependent variable
         
         results = results %>%  dplyr::add_row(Model = name,
                                               Time = (from:to),
-                                              f = forecast$f,
-                                              ll = forecast$ll,
-                                              ul = forecast$ul
-        )
+                                              f = forecasts[, 'fcst'],
+                                              ll = forecasts[, 'lower'],
+                                              ul = forecasts[, 'upper']
+                                             )
         
       }
       
       results = results %>%  dplyr::add_row(Model = "Actual",
-                                            Time = seq_along(self$get_x()),
-                                            f = self$get_x(),
-                                            ll = self$get_x(),
-                                            ul = self$get_x()
+                                            Time = seq_along(self$get_data_var_interest()),
+                                            f = self$get_data_var_interest(),
+                                            ll = self$get_data_var_interest(),
+                                            ul = self$get_data_var_interest()
       )
       
       p = ggplot2::ggplot() +
@@ -254,6 +244,7 @@ ModelCompareUnivariate = R6::R6Class(
         results.batches = results.ases %>% 
             dplyr::filter(Model == name)
         break()
+        
       }
       
       rects = data.frame(xstart = results.batches[['Time_Test_Start']],
@@ -326,10 +317,10 @@ ModelCompareUnivariate = R6::R6Class(
       
       results = dplyr::left_join(all_time, ASEs, by = c("Time", "Model")) %>%
         dplyr::mutate(ASE = ASE.x + ASE.y) %>% 
-        dplyr::group_by(Model) %>%  
+        dplyr::group_by(Model) %>% 
         tidyr::fill(.data$ASE, .direction = "down")
       
-      data = data.frame(Time = seq(1, private$get_len_x()), Data = self$get_x())
+      data = data.frame(Time = seq(1, private$get_len_x()), Data = self$get_data_var_interest())
       
       g1 = ggplot2::ggplot(data, ggplot2::aes(x = Time, y = Data)) + 
         ggplot2::geom_line()
@@ -338,6 +329,8 @@ ModelCompareUnivariate = R6::R6Class(
         ggplot2::geom_line()
       
       print(g1/g2)
+      
+
     },
     
     #' @description Plots the histogram of the ASE values for the models
@@ -349,104 +342,106 @@ ModelCompareUnivariate = R6::R6Class(
       print(p)
     },
     
-    #' @description Creates multiple realization of each model. Useful to check model appropriateness.
-    #' @param n.realizations Number of realization to create (Default: 4)
-    #' @param lag.max lag.max to plot for ACF (Default: 25)
-    #' @param seed The seed to use for generating realizations
-    #' @param plot A vector of options to plot (Default = c("all"))
-    #'             Other options: 'realization', 'acf', 'spectrum' 
-    #' @param scales The scales argument to be passed to ggplot facet_wrap layer
-    #'               (Default = 'free_y') Other appropriate options: 'fixed'
-    plot_multiple_realizations = function(n.realizations = 4, lag.max = 25, seed = NA, plot = c("all"), scales = 'free_y'){
-      final.data = NA
-      final.results = NA
-      
-      for (name in names(private$get_models())){
-        r = generate_multiple_realization(x = self$get_x(),
-                                          phi = private$models[[name]][['phi']],
-                                          theta = private$models[[name]][['theta']],
-                                          d = private$models[[name]][['d']],
-                                          s = private$models[[name]][['s']],
-                                          vara = private$models[[name]][['vara']],
-                                          n.realizations = n.realizations, lag.max = lag.max, seed = seed,
-                                          model_name = name, return = 'all')
-      
-        if (all(is.na(final.data))){
-          final.data = r$data
-        }
-        else{
-          final.data = rbind(final.data, r$data)
-        }
-        
-        if (all(is.na(final.results))){
-          final.results = r$results
-        }
-        else{
-          final.results = rbind(final.results, r$results)
-        }
-          
-       
-      }
-      
-      plot_multiple_realizations(data = final.data, results = final.results, plot = plot, scales = scales)
-      
-    },
+    ## TODO: Add back if applicable later on
+    # #' @description Creates multiple realization of each model. Useful to check model appropriateness.
+    # #' @param n.realizations Number of realization to create (Default: 4)
+    # #' @param lag.max lag.max to plot for ACF (Default: 25)
+    # #' @param seed The seed to use for generating realizations
+    # #' @param plot A vector of options to plot (Default = c("all"))
+    # #'             Other options: 'realization', 'acf', 'spectrum'
+    # #' @param scales The scales argument to be passed to ggplot facet_wrap layer
+    # #'               (Default = 'free_y') Other appropriate options: 'fixed'
+    # plot_multiple_realizations = function(n.realizations = 4, lag.max = 25, seed = NA, plot = c("all"), scales = 'free_y'){
+    #   final.data = NA
+    #   final.results = NA
+    # 
+    #   for (name in names(private$get_models())){
+    #     r = generate_multiple_realization(x = self$get_data(),
+    #                                       phi = private$models[[name]][['phi']],
+    #                                       theta = private$models[[name]][['theta']],
+    #                                       d = private$models[[name]][['d']],
+    #                                       s = private$models[[name]][['s']],
+    #                                       vara = private$models[[name]][['vara']],
+    #                                       n.realizations = n.realizations, lag.max = lag.max, seed = seed,
+    #                                       model_name = name, return = 'all')
+    # 
+    #     if (all(is.na(final.data))){
+    #       final.data = r$data
+    #     }
+    #     else{
+    #       final.data = rbind(final.data, r$data)
+    #     }
+    # 
+    #     if (all(is.na(final.results))){
+    #       final.results = r$results
+    #     }
+    #     else{
+    #       final.results = rbind(final.results, r$results)
+    #     }
+    # 
+    # 
+    #   }
+    # 
+    #   plot_multiple_realizations(data = final.data, results = final.results, plot = plot, scales = scales)
+    # 
+    # },
     
-    #' @description For the models for which the residuals have been provided,
-    #' this method will check whetehr the residuals are white noise or not.
-    #' (1) Plots the residuals and the ACF values
-    #' (2) Performs the Ljung-Box test for K = 24 and K = 48
-    #' @param lag.max The maximum lag to plot for the ACF
-    #' @return A dataframe containing the results of the 2 Ljung-Box tests
-    evaluate_residuals = function(lag.max = 50){
-      final.results = NA
-      any_present = 0
-      
-      for (name in names(private$get_models())){
-        if (!is.null(private$models[[name]][['res']])){
-          any_present = 1
-          cat(paste("\n\nEvaluating residuals for model: '", name, "' \n", sep = ""))
-          
-          if (length(private$models[[name]][['phi']]) == 1){
-            if (private$models[[name]][['phi']] == 0){
-              p = 0  
-            }
-            else{
-              p = length(private$models[[name]][['phi']])
-            }
-          }
-          else{
-            p = length(private$models[[name]][['phi']])
-          }
-          
-          if (length(private$models[[name]][['theta']]) == 1){
-            if (private$models[[name]][['theta']] == 0){
-              q = 0  
-            }
-            else{
-              q = length(private$models[[name]][['theta']])
-            }
-          }
-          else{
-            q = length(private$models[[name]][['theta']])
-          }
-          
-          table = white_noise_eval(private$models[[name]][['res']], p = p, q = q, model_name = name, lag.max = lag.max)
-        
-          if (all(is.na(final.results))){
-            final.results = table
-          }
-          else
-            final.results = rbind(final.results, table)
-        }
-      }
-      
-      if (any_present == 0){
-        cat("\n\nNone of the model that you supplied had any residuals provided. Hence the residuals can not be evaluated")
-      }
-      
-      return(final.results)
-    },
+    ## TODO: Add back if applicable later on
+    # #' @description For the models for which the residuals have been provided,
+    # #' this method will check whetehr the residuals are white noise or not.
+    # #' (1) Plots the residuals and the ACF values
+    # #' (2) Performs the Ljung-Box test for K = 24 and K = 48
+    # #' @param lag.max The maximum lag to plot for the ACF
+    # #' @return A dataframe containing the results of the 2 Ljung-Box tests
+    # evaluate_residuals = function(lag.max = 50){
+    #   final.results = NA
+    #   any_present = 0
+    #   
+    #   for (name in names(private$get_models())){
+    #     if (!is.null(private$models[[name]][['res']])){
+    #       any_present = 1
+    #       cat(paste("\n\nEvaluating residuals for model: '", name, "' \n", sep = ""))
+    #       
+    #       if (length(private$models[[name]][['phi']]) == 1){
+    #         if (private$models[[name]][['phi']] == 0){
+    #           p = 0  
+    #         }
+    #         else{
+    #           p = length(private$models[[name]][['phi']])
+    #         }
+    #       }
+    #       else{
+    #         p = length(private$models[[name]][['phi']])
+    #       }
+    #       
+    #       if (length(private$models[[name]][['theta']]) == 1){
+    #         if (private$models[[name]][['theta']] == 0){
+    #           q = 0  
+    #         }
+    #         else{
+    #           q = length(private$models[[name]][['theta']])
+    #         }
+    #       }
+    #       else{
+    #         q = length(private$models[[name]][['theta']])
+    #       }
+    #       
+    #       table = white_noise_eval(private$models[[name]][['res']], p = p, q = q, model_name = name, lag.max = lag.max)
+    #     
+    #       if (all(is.na(final.results))){
+    #         final.results = table
+    #       }
+    #       else
+    #         final.results = rbind(final.results, table)
+    #     }
+    #   }
+    #   
+    #   if (any_present == 0){
+    #     cat("\n\nNone of the model that you supplied had any residuals provided. Hence the residuals can not be evaluated")
+    #   }
+    #   
+    #   return(final.results)
+    # },
     
     #' @description Statistically compares the ASE values of the models using 
     #' ANOVA and Tukey Adjustment for multiple comparison
@@ -454,7 +449,7 @@ ModelCompareUnivariate = R6::R6Class(
     statistical_compare = function(){
       if (private$any_sliding_ase()){
         results = self$get_tabular_metrics(only_sliding = TRUE)
-        
+      
         # Analysis of Variance
         res.aov = aov(ASE ~ Model, data = results)
         print(summary(res.aov))
@@ -527,9 +522,9 @@ ModelCompareUnivariate = R6::R6Class(
         # Add the realization as well
         results = results %>% dplyr::add_row(Model = "Realization",
                                              Time = seq(1, private$get_len_x(), 1),
-                                             f = self$get_x(),
-                                             ll = self$get_x(),
-                                             ul = self$get_x())
+                                             f = self$get_data()[, self$get_var_interest()],
+                                             ll = self$get_data()[, self$get_var_interest()],
+                                             ul = self$get_data()[, self$get_var_interest()])
       }
       
       return(results)
@@ -541,15 +536,18 @@ ModelCompareUnivariate = R6::R6Class(
   
   #### Private Methods ----
   private = list(
-    x = NA,
+    data = NA,
+    var_interest = NA,
     models = NA,
     n.ahead = NA,
     batch_size = NA,
     
-    set_x = function(x){private$x = x},
+    set_data = function(data){private$data = data},
+    
+    set_var_interest = function(var_interest){private$var_interest = var_interest},
     
     get_len_x = function(){
-      return(length(self$get_x()))
+      return(nrow(self$get_data()))
     },
     
     get_models = function(){
@@ -559,18 +557,18 @@ ModelCompareUnivariate = R6::R6Class(
     clean_model_input = function(mdl_list){
       # If the inputs are missing p, d, q, or s values, this will add 0s to make it consistent
       for (name in names(mdl_list)){
-        if (is.null(mdl_list[[name]][['phi']])){
-          mdl_list[[name]][['phi']] = 0
-        }
-        if (is.null(mdl_list[[name]][['d']])){
-          mdl_list[[name]][['d']] = 0
-        }
-        if (is.null(mdl_list[[name]][['theta']])){
-          mdl_list[[name]][['theta']] = 0
-        }
-        if (is.null(mdl_list[[name]][['s']])){
-          mdl_list[[name]][['s']] = 0
-        }
+        # if (is.null(mdl_list[[name]][['phi']])){
+        #   mdl_list[[name]][['phi']] = 0
+        # }
+        # if (is.null(mdl_list[[name]][['d']])){
+        #   mdl_list[[name]][['d']] = 0
+        # }
+        # if (is.null(mdl_list[[name]][['theta']])){
+        #   mdl_list[[name]][['theta']] = 0
+        # }
+        # if (is.null(mdl_list[[name]][['s']])){
+        #   mdl_list[[name]][['s']] = 0
+        # }
         if (is.null(mdl_list[[name]][['sliding_ase']])){
           mdl_list[[name]][['sliding_ase']] = FALSE
         }
@@ -612,7 +610,61 @@ ModelCompareUnivariate = R6::R6Class(
       }
       private$batch_size = batch_size
       private$set_batch_per_model()
+    },
+    
+    build_models  = function(){
+      for (name in names(private$get_models())){
+        cat("\n\n\n\n\n")
+        print(paste("Model: ", name))
+        trend_type = private$get_models()[[name]][['trend_type']]
+        print(paste("trend_type: ", trend_type))
+        
+        varselect = vars::VARselect(self$get_data(), lag.max = private$get_models()[[name]][['lag.max']], type = trend_type, season = NULL, exogen = NULL)
+        print(varselect) 
+        
+        select = tolower(private$get_models()[[name]][['select']])
+        if (select == 'aic'){
+          k = varselect$selection[["AIC(n)"]] 
+        }
+        else if (select == 'bic'){
+          k = varselect$selection[["SC(n)"]]  
+        }
+        else{
+          stop("'select' argument must be with 'aic' or 'bic'")
+        }
+        print(paste("lag K to use for the VAR Model: ", k))  
+        
+        # Fit to Entire Data
+        # This might be needed in many places to computing it here.
+        varfit = vars::VAR(self$get_data(), p=k, type=trend_type)
+        
+        # a = summary(varfit)
+        # 
+        # print("build_models.1")
+        # print(a$varresult[self$get_var_interest()])  # $coefficients[,"Pr(>|t|)"]
+        
+        ## Inplace
+        private$models[[name]][['varselect_alldata']] = varselect
+        private$models[[name]][['k']] = k
+        private$models[[name]][['varfit_alldata']] = varfit
+        
+      }
+    },
+    
+    evaluate_xIC = function(){
+      for (name in names(private$get_models())){
+        
+        varfit = private$models[[name]][['varfit_alldata']]
+        
+        AIC = stats::AIC(varfit)
+        BIC = stats::BIC(varfit)
+        
+        private$models[[name]][['AIC']] = AIC
+        private$models[[name]][['BIC']] = BIC
+      }  
     }
+    
+    
     
   )
   
