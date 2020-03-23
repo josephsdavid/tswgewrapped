@@ -16,7 +16,9 @@ R6 class ModelCompareBase
 \item \href{#method-get_data_var_interest}{\code{ModelCompareBase$get_data_var_interest()}}
 \item \href{#method-get_batch_size}{\code{ModelCompareBase$get_batch_size()}}
 \item \href{#method-get_n.ahead}{\code{ModelCompareBase$get_n.ahead()}}
+\item \href{#method-set_verbose}{\code{ModelCompareBase$set_verbose()}}
 \item \href{#method-add_models}{\code{ModelCompareBase$add_models()}}
+\item \href{#method-remove_models}{\code{ModelCompareBase$remove_models()}}
 \item \href{#method-compute_metrics}{\code{ModelCompareBase$compute_metrics()}}
 \item \href{#method-plot_simple_forecasts}{\code{ModelCompareBase$plot_simple_forecasts()}}
 \item \href{#method-plot_batch_forecasts}{\code{ModelCompareBase$plot_batch_forecasts()}}
@@ -118,6 +120,25 @@ The n.ahead value
 }
 }
 \if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-set_verbose"></a>}}
+\if{latex}{\out{\hypertarget{method-set_verbose}{}}}
+\subsection{Method \code{set_verbose()}}{
+Adjust the verbosity level
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{ModelCompareBase$set_verbose(verbose = 0)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{verbose}}{0 = Minimal Printing only (usualy limited to step being performed)
+1 = Basic printing of model builds, etc.
+2 = Reserved for debugging mode. May slow down the run due to excessive printing, especially when using batches}
+}
+\if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-add_models"></a>}}
 \if{latex}{\out{\hypertarget{method-add_models}{}}}
 \subsection{Method \code{add_models()}}{
@@ -130,6 +151,23 @@ Add models to the existing object
 \if{html}{\out{<div class="arguments">}}
 \describe{
 \item{\code{mdl_list}}{The list of new models to add}
+}
+\if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-remove_models"></a>}}
+\if{latex}{\out{\hypertarget{method-remove_models}{}}}
+\subsection{Method \code{remove_models()}}{
+Remove models from the object
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{ModelCompareBase$remove_models(mdl_names)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{mdl_names}}{A vecotr of the model names to remove.}
 }
 \if{html}{\out{</div>}}
 }

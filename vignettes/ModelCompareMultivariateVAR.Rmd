@@ -35,12 +35,12 @@ n.ahead = 4
 batch_size = 40
 var_interest = 'logGNP'
 
-models = list("VARS AIC No Trend A" = list(type = "VAR", select = "aic", trend_type = "none", lag.max = lag.max, sliding_ase = FALSE),
-              "VARS AIC Trend A"    = list(type = "VAR", select = "aic", trend_type = "trend", lag.max = lag.max, sliding_ase = FALSE),
-              "VARS AIC Const + Trend A" = list(type = "VAR", select = "aic", trend_type = "both", lag.max = lag.max, sliding_ase = FALSE),
-              "VARS BIC No Trend A" = list(type = "VAR", select = "bic", trend_type = "none", lag.max = lag.max, sliding_ase = FALSE),
-              "VARS BIC Trend A"    = list(type = "VAR", select = "bic", trend_type = "trend", lag.max = lag.max, sliding_ase = FALSE),
-              "VARS BIC Const + Trend A" = list(type = "VAR", select = "bic", trend_type = "both", lag.max = lag.max, sliding_ase = FALSE)
+models = list("VARS AIC No Trend A" = list(select = "aic", trend_type = "none", lag.max = lag.max, sliding_ase = FALSE),
+              "VARS AIC Trend A"    = list(select = "aic", trend_type = "trend", lag.max = lag.max, sliding_ase = FALSE),
+              "VARS AIC Const + Trend A" = list(select = "aic", trend_type = "both", lag.max = lag.max, sliding_ase = FALSE),
+              "VARS BIC No Trend A" = list(select = "bic", trend_type = "none", lag.max = lag.max, sliding_ase = FALSE),
+              "VARS BIC Trend A"    = list(select = "bic", trend_type = "trend", lag.max = lag.max, sliding_ase = FALSE),
+              "VARS BIC Const + Trend A" = list(select = "bic", trend_type = "both", lag.max = lag.max, sliding_ase = FALSE)
               )
 ```
 

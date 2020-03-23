@@ -561,22 +561,22 @@ test_that("ModelCompareMultivariateVAR", {
   
   lag.max = 10
   
-  models = list("VARS AIC No Trend A" = list(type = "VAR", select = "aic", trend_type = "none", lag.max = lag.max, sliding_ase = FALSE),
-                "VARS AIC Trend A"    = list(type = "VAR", select = "aic", trend_type = "trend", lag.max = lag.max, sliding_ase = FALSE),
-                "VARS AIC Const + Trend A" = list(type = "VAR", select = "aic", trend_type = "both", lag.max = lag.max, sliding_ase = FALSE),
-                "VARS BIC No Trend A" = list(type = "VAR", select = "bic", trend_type = "none", lag.max = lag.max, sliding_ase = FALSE),
-                "VARS BIC Trend A"    = list(type = "VAR", select = "bic", trend_type = "trend", lag.max = lag.max, sliding_ase = FALSE),
-                "VARS BIC Const + Trend A" = list(type = "VAR", select = "bic", trend_type = "both", lag.max = lag.max, sliding_ase = FALSE)
-                # "VARS AIC No Trend B" = list(type = "VAR", select = "aic", trend_type = "none", lag.max = lag.max, sliding_ase = TRUE),
-                # "VARS AIC Trend B"    = list(type = "VAR", select = "aic", trend_type = "trend", lag.max = lag.max, sliding_ase = TRUE),
-                # "VARS AIC Const + Trend B" = list(type = "VAR", select = "aic", trend_type = "both", lag.max = lag.max, sliding_ase = TRUE),
-                # "VARS BIC No Trend B" = list(type = "VAR", select = "bic", trend_type = "none", lag.max = lag.max, sliding_ase = TRUE),
-                # "VARS BIC Trend B"    = list(type = "VAR", select = "bic", trend_type = "trend", lag.max = lag.max, sliding_ase = TRUE),
-                # "VARS BIC Const + Trend B" = list(type = "VAR", select = "bic", trend_type = "both", lag.max = lag.max, sliding_ase = TRUE)
+  models = list("VARS AIC No Trend A" = list(select = "aic", trend_type = "none", lag.max = lag.max, sliding_ase = FALSE),
+                "VARS AIC Trend A"    = list(select = "aic", trend_type = "trend", lag.max = lag.max, sliding_ase = FALSE),
+                "VARS AIC Const + Trend A" = list(select = "aic", trend_type = "both", lag.max = lag.max, sliding_ase = FALSE),
+                "VARS BIC No Trend A" = list(select = "bic", trend_type = "none", lag.max = lag.max, sliding_ase = FALSE),
+                "VARS BIC Trend A"    = list(select = "bic", trend_type = "trend", lag.max = lag.max, sliding_ase = FALSE),
+                "VARS BIC Const + Trend A" = list(select = "bic", trend_type = "both", lag.max = lag.max, sliding_ase = FALSE)
+                # "VARS AIC No Trend B" = list(select = "aic", trend_type = "none", lag.max = lag.max, sliding_ase = TRUE),
+                # "VARS AIC Trend B"    = list(select = "aic", trend_type = "trend", lag.max = lag.max, sliding_ase = TRUE),
+                # "VARS AIC Const + Trend B" = list(select = "aic", trend_type = "both", lag.max = lag.max, sliding_ase = TRUE),
+                # "VARS BIC No Trend B" = list(select = "bic", trend_type = "none", lag.max = lag.max, sliding_ase = TRUE),
+                # "VARS BIC Trend B"    = list(select = "bic", trend_type = "trend", lag.max = lag.max, sliding_ase = TRUE),
+                # "VARS BIC Const + Trend B" = list(select = "bic", trend_type = "both", lag.max = lag.max, sliding_ase = TRUE)
                 )
   
-  n.ahead = 4
-  batch_size = 40
+  n.ahead = 2
+  batch_size = 50
   var_interest = 'logGNP'
   #var_interest = 'cmort'
   
