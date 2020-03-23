@@ -21,13 +21,12 @@
 #'         'ul' - Upper Forecast Limit for each batch
 #'         'time.forecasts' - Time Corresponding to each forecast, upper and lower limit values
 #' @export
-
-sliding_ase = function(x,
-                       phi = 0, theta = 0, d = 0, s = 0, # ARUMA arguments
-                       linear = NA, freq = NA,           # Signal + Noise arguments
-                       n.ahead = NA, batch_size = NA,    # Forecasting specific arguments
-                       step_n.ahead = TRUE,
-                       ...)                              # max.p (sigplusnoise), lambda (ARUMA)      
+sliding_ase_univariate = function(x,
+                                  phi = 0, theta = 0, d = 0, s = 0, # ARUMA arguments
+                                  linear = NA, freq = NA,           # Signal + Noise arguments
+                                  n.ahead = NA, batch_size = NA,    # Forecasting specific arguments
+                                  step_n.ahead = TRUE,
+                                  ...)                              # max.p (sigplusnoise), lambda (ARUMA)      
 {
   # Sliding CV ... batches are mutually exclusive
   
@@ -128,12 +127,32 @@ sliding_ase = function(x,
               time.forecasts = time.forecasts ))
 }
 
-
+#' Function to calculate the sliding window ASE for a model
+#' Supports VAR Model from the vars package
+#' @param data The dataframe containing the time series realizations (data should not contain time index)
+#' @param var_interest The output variable of interest (dependent variable)
+#' @param k The lag value to use for the VAR model (generally determined by the VARselect function)
+#' @param trend_type The trend type to use in VARselect and the VAR model. Refer to vars::VARselect and vars::VAR for valid options.
+#' @param batch_size Window Size used 
+#' @param n.ahead last n.ahead data points in each batch will be used for prediction and ASE calculations
+#' @param step_n.ahead Whether to step each batch by n.ahead values (Default = FALSE)
+#' @return Named list 
+#'         'ASEs' - ASE values
+#'         'time_test_start' - Time Index indicating start of test time corresponding to the ASE values
+#'         'time_test_end' - Time Index indicating end of test time corresponding to the ASE values
+#'         'batch_num' - Indicates the batch number for each ASE value
+#'         'AICs' = The AIC values for the individual batches
+#'         'BICs' = The BIC values for the individual batches
+#'         'f' - Forecasts for each batch
+#'         'll' - Lower Forecast Limit for each batch
+#'         'ul' - Upper Forecast Limit for each batch
+#'         'time.forecasts' - Time Corresponding to each forecast, upper and lower limit values
+#' @export
 sliding_ase_var = function(data, var_interest,
                            k, trend_type = NA,
                            n.ahead = NA, batch_size = NA,    # Forecasting specific arguments
-                           step_n.ahead = TRUE,
-                           ...)                              # max.p (sigplusnoise), lambda (ARUMA)      
+                           step_n.ahead = TRUE
+                           )                              
 {
   # Sliding CV ... batches are mutually exclusive
   

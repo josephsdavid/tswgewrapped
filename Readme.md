@@ -149,6 +149,10 @@ Generate a random time series to test yourself with `playground(n)`
 xs <- playground(400)
 ```
 
-# Multivariate time series!
+# Univariate Time Series Model Comparison
+Check out the vignette 'ModelCompareUnivariate'
+
+# Multivariate Time Series Model (VAR) Comparison
+Check out the vignette 'ModelCompareMultivariateVAR'
 
 

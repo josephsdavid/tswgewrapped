@@ -34,7 +34,7 @@ models = list("Woodward Gray Model A" = list(phi = phi_wg, d = d_wg, s = s_wg, s
               "Box Model B" = list(theta = theta_bx, d = d_bx, s = s_bx, sliding_ase = TRUE)
               )
               
-mdl_compare = ModelCompareUnivariate$new(x = airlog, mdl_list = models,
+mdl_compare = ModelCompareUnivariate$new(data = airlog, mdl_list = models,
                                          n.ahead = 36, batch_size = 72)
 # Plots the historgam of the ASE values for each model.
 # This is especially useful when models using a sliding window for ASE calculations. 
@@ -66,25 +66,35 @@ forecasts = mdl_compare$get_tabular_metrics(ases = FALSE)
 print(forecasts)
 
 }
+\section{Super class}{
+\code{\link[tswgewrapped:ModelCompareBase]{tswgewrapped::ModelCompareBase}} -> \code{ModelCompareUnivariate}
+}
 \section{Methods}{
 \subsection{Public methods}{
 \itemize{
 \item \href{#method-new}{\code{ModelCompareUnivariate$new()}}
-\item \href{#method-get_x}{\code{ModelCompareUnivariate$get_x()}}
-\item \href{#method-get_batch_size}{\code{ModelCompareUnivariate$get_batch_size()}}
-\item \href{#method-get_n.ahead}{\code{ModelCompareUnivariate$get_n.ahead()}}
-\item \href{#method-add_models}{\code{ModelCompareUnivariate$add_models()}}
-\item \href{#method-compute_metrics}{\code{ModelCompareUnivariate$compute_metrics()}}
-\item \href{#method-plot_simple_forecasts}{\code{ModelCompareUnivariate$plot_simple_forecasts()}}
-\item \href{#method-plot_batch_forecasts}{\code{ModelCompareUnivariate$plot_batch_forecasts()}}
-\item \href{#method-plot_batch_ases}{\code{ModelCompareUnivariate$plot_batch_ases()}}
-\item \href{#method-plot_histogram_ases}{\code{ModelCompareUnivariate$plot_histogram_ases()}}
+\item \href{#method-get_data_var_interest}{\code{ModelCompareUnivariate$get_data_var_interest()}}
 \item \href{#method-plot_multiple_realizations}{\code{ModelCompareUnivariate$plot_multiple_realizations()}}
 \item \href{#method-evaluate_residuals}{\code{ModelCompareUnivariate$evaluate_residuals()}}
-\item \href{#method-statistical_compare}{\code{ModelCompareUnivariate$statistical_compare()}}
-\item \href{#method-get_tabular_metrics}{\code{ModelCompareUnivariate$get_tabular_metrics()}}
 \item \href{#method-clone}{\code{ModelCompareUnivariate$clone()}}
 }
+}
+\if{html}{
+\out{<details ><summary>Inherited methods</summary>}
+\itemize{
+\item \out{<span class="pkg-link" data-pkg="tswgewrapped" data-topic="ModelCompareBase" data-id="add_models">}\href{../../tswgewrapped/html/ModelCompareBase.html#method-add_models}{\code{tswgewrapped::ModelCompareBase$add_models()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="tswgewrapped" data-topic="ModelCompareBase" data-id="compute_metrics">}\href{../../tswgewrapped/html/ModelCompareBase.html#method-compute_metrics}{\code{tswgewrapped::ModelCompareBase$compute_metrics()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="tswgewrapped" data-topic="ModelCompareBase" data-id="get_batch_size">}\href{../../tswgewrapped/html/ModelCompareBase.html#method-get_batch_size}{\code{tswgewrapped::ModelCompareBase$get_batch_size()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="tswgewrapped" data-topic="ModelCompareBase" data-id="get_data">}\href{../../tswgewrapped/html/ModelCompareBase.html#method-get_data}{\code{tswgewrapped::ModelCompareBase$get_data()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="tswgewrapped" data-topic="ModelCompareBase" data-id="get_n.ahead">}\href{../../tswgewrapped/html/ModelCompareBase.html#method-get_n.ahead}{\code{tswgewrapped::ModelCompareBase$get_n.ahead()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="tswgewrapped" data-topic="ModelCompareBase" data-id="get_tabular_metrics">}\href{../../tswgewrapped/html/ModelCompareBase.html#method-get_tabular_metrics}{\code{tswgewrapped::ModelCompareBase$get_tabular_metrics()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="tswgewrapped" data-topic="ModelCompareBase" data-id="plot_batch_ases">}\href{../../tswgewrapped/html/ModelCompareBase.html#method-plot_batch_ases}{\code{tswgewrapped::ModelCompareBase$plot_batch_ases()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="tswgewrapped" data-topic="ModelCompareBase" data-id="plot_batch_forecasts">}\href{../../tswgewrapped/html/ModelCompareBase.html#method-plot_batch_forecasts}{\code{tswgewrapped::ModelCompareBase$plot_batch_forecasts()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="tswgewrapped" data-topic="ModelCompareBase" data-id="plot_histogram_ases">}\href{../../tswgewrapped/html/ModelCompareBase.html#method-plot_histogram_ases}{\code{tswgewrapped::ModelCompareBase$plot_histogram_ases()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="tswgewrapped" data-topic="ModelCompareBase" data-id="plot_simple_forecasts">}\href{../../tswgewrapped/html/ModelCompareBase.html#method-plot_simple_forecasts}{\code{tswgewrapped::ModelCompareBase$plot_simple_forecasts()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="tswgewrapped" data-topic="ModelCompareBase" data-id="statistical_compare">}\href{../../tswgewrapped/html/ModelCompareBase.html#method-statistical_compare}{\code{tswgewrapped::ModelCompareBase$statistical_compare()}}\out{</span>}
+}
+\out{</details>}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-new"></a>}}
@@ -93,7 +103,7 @@ print(forecasts)
 Initialize an object to compare several Univatiate Time Series Models
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{ModelCompareUnivariate$new(
-  x = NA,
+  data = NA,
   mdl_list,
   n.ahead = NA,
   batch_size = NA,
@@ -104,7 +114,7 @@ Initialize an object to compare several Univatiate Time Series Models
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{x}}{Time Series Realization}
+\item{\code{data}}{A Univariate Time Series Realization}
 
 \item{\code{mdl_list}}{A names list of all models (see format below)}
 
@@ -123,143 +133,17 @@ A new `ModelCompareUnivariate` object.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-get_x"></a>}}
-\if{latex}{\out{\hypertarget{method-get_x}{}}}
-\subsection{Method \code{get_x()}}{
-Returns the time series realization
+\if{html}{\out{<a id="method-get_data_var_interest"></a>}}
+\if{latex}{\out{\hypertarget{method-get_data_var_interest}{}}}
+\subsection{Method \code{get_data_var_interest()}}{
+Returns the dependent variable data only
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{ModelCompareUnivariate$get_x()}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{ModelCompareUnivariate$get_data_var_interest()}\if{html}{\out{</div>}}
 }
 
 \subsection{Returns}{
-The Time Series Realization
+The dependent variable data only
 }
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-get_batch_size"></a>}}
-\if{latex}{\out{\hypertarget{method-get_batch_size}{}}}
-\subsection{Method \code{get_batch_size()}}{
-Returns the batch size value
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{ModelCompareUnivariate$get_batch_size()}\if{html}{\out{</div>}}
-}
-
-\subsection{Returns}{
-The Batch Size Value
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-get_n.ahead"></a>}}
-\if{latex}{\out{\hypertarget{method-get_n.ahead}{}}}
-\subsection{Method \code{get_n.ahead()}}{
-Returns the n.ahead value
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{ModelCompareUnivariate$get_n.ahead()}\if{html}{\out{</div>}}
-}
-
-\subsection{Returns}{
-The n.ahead value
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-add_models"></a>}}
-\if{latex}{\out{\hypertarget{method-add_models}{}}}
-\subsection{Method \code{add_models()}}{
-Add models to the existing object
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{ModelCompareUnivariate$add_models(mdl_list)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{mdl_list}}{The list of new models to add}
-}
-\if{html}{\out{</div>}}
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-compute_metrics"></a>}}
-\if{latex}{\out{\hypertarget{method-compute_metrics}{}}}
-\subsection{Method \code{compute_metrics()}}{
-Computes the Metrics for the models
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{ModelCompareUnivariate$compute_metrics(step_n.ahead = TRUE)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{step_n.ahead}}{If TRUE, for rolling window calculations, the step size 
-will be equal to n.ahead, else it will be equal to 1}
-}
-\if{html}{\out{</div>}}
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-plot_simple_forecasts"></a>}}
-\if{latex}{\out{\hypertarget{method-plot_simple_forecasts}{}}}
-\subsection{Method \code{plot_simple_forecasts()}}{
-Plots the simple forecast for each model
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{ModelCompareUnivariate$plot_simple_forecasts(lastn = FALSE, limits = FALSE)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{lastn}}{If TRUE, this will plot the forecasts forthe last n.ahead values of the realization (Default: FALSE)}
-
-\item{\code{limits}}{If TRUE, this will also plot the lower and upper limits of the forecasts (Default: FALSE)}
-}
-\if{html}{\out{</div>}}
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-plot_batch_forecasts"></a>}}
-\if{latex}{\out{\hypertarget{method-plot_batch_forecasts}{}}}
-\subsection{Method \code{plot_batch_forecasts()}}{
-Plots the forecasts per batch for all models
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{ModelCompareUnivariate$plot_batch_forecasts(only_sliding = TRUE)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{only_sliding}}{If TRUE, this will only plot the batch forecasts 
-for the models that used window ASE calculations}
-}
-\if{html}{\out{</div>}}
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-plot_batch_ases"></a>}}
-\if{latex}{\out{\hypertarget{method-plot_batch_ases}{}}}
-\subsection{Method \code{plot_batch_ases()}}{
-Plots the ASEs per batch for all models
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{ModelCompareUnivariate$plot_batch_ases(only_sliding = TRUE)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{only_sliding}}{If TRUE, this will only plot the ASEs for
-the models that used window ASE calculations}
-}
-\if{html}{\out{</div>}}
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-plot_histogram_ases"></a>}}
-\if{latex}{\out{\hypertarget{method-plot_histogram_ases}{}}}
-\subsection{Method \code{plot_histogram_ases()}}{
-Plots the histogram of the ASE values for the models
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{ModelCompareUnivariate$plot_histogram_ases()}\if{html}{\out{</div>}}
-}
-
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-plot_multiple_realizations"></a>}}
@@ -315,41 +199,6 @@ this method will check whetehr the residuals are white noise or not.
 }
 \subsection{Returns}{
 A dataframe containing the results of the 2 Ljung-Box tests
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-statistical_compare"></a>}}
-\if{latex}{\out{\hypertarget{method-statistical_compare}{}}}
-\subsection{Method \code{statistical_compare()}}{
-Statistically compares the ASE values of the models using 
-ANOVA and Tukey Adjustment for multiple comparison
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{ModelCompareUnivariate$statistical_compare()}\if{html}{\out{</div>}}
-}
-
-\subsection{Returns}{
-The results of the ANOVA test
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-get_tabular_metrics"></a>}}
-\if{latex}{\out{\hypertarget{method-get_tabular_metrics}{}}}
-\subsection{Method \code{get_tabular_metrics()}}{
-Gets the metrics and results in tabular format
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{ModelCompareUnivariate$get_tabular_metrics(only_sliding = FALSE, ases = TRUE)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{only_sliding}}{If TRUE, this will only get results for models that use a 
-sliding ASE calculation method. (Default: FALSE)}
-
-\item{\code{ases}}{If TRUE returns the ASE values for each batch. If FALSE returns the 
-forecasts, and the lower and upper limits asscoiated with the forecasts}
-}
-\if{html}{\out{</div>}}
 }
 }
 \if{html}{\out{<hr>}}

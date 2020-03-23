@@ -47,8 +47,8 @@ models = list("VARS AIC No Trend A" = list(type = "VAR", select = "aic", trend_t
 # Initialize the ModelCompareUnivariate object
 ```{r}
 #### With n_step.ahead = TRUE (Default)              
-mdl_compare = ModelCompareMultivariate$new(data = data, var_interest = var_interest,
-                                             mdl_list = models, n.ahead = n.ahead, batch_size = batch_size)
+mdl_compare = ModelCompareMultivariateVAR$new(data = data, var_interest = var_interest,
+                                              mdl_list = models, n.ahead = n.ahead, batch_size = batch_size)
 ```
 
 # Compare the models
