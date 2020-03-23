@@ -94,7 +94,7 @@ ModelCompareMultivariateVAR = R6::R6Class(
                             trend_type = private$get_models()[[name]][['trend_type']],
                             n.ahead = self$get_n.ahead(),
                             batch_size = private$get_models()[[name]][['batch_size']],
-                            step_n.ahead = step_n.ahead)
+                            step_n.ahead = step_n.ahead, verbose = private$get_verbose())
       
       return (res)
     },
@@ -148,35 +148,43 @@ ModelCompareMultivariateVAR = R6::R6Class(
     build_models  = function(verbose = 0){
       for (name in names(private$get_models())){
         cat("\n\n\n")
-        cat(paste("Model: ", name))
+        cat(paste("Model: ", name, "\n"))
         trend_type = private$get_models()[[name]][['trend_type']]
-        cat(paste("\nTrend type: ", trend_type))
+        cat(paste("Trend type: ", trend_type, "\n"))
         
         varselect = vars::VARselect(self$get_data(), lag.max = private$get_models()[[name]][['lag.max']], type = trend_type, season = NULL, exogen = NULL)
         if (verbose >= 1){
+          cat("\nVARselect Object:\n")
           print(varselect) 
         }
         
+        selection = private$extract_correct_varselection(varselect)
+        
         select = tolower(private$get_models()[[name]][['select']])
         if (select == 'aic'){
-          k = varselect$selection[["AIC(n)"]] 
+          k = selection[["AIC(n)"]]
         }
         else if (select == 'bic'){
-          k = varselect$selection[["SC(n)"]]  
+          k = selection[["SC(n)"]]
         }
         else{
           stop("'select' argument must be with 'aic' or 'bic'")
         }
-        print(paste("lag K to use for the VAR Model: ", k))  
+        cat(paste("Lag K to use for the VAR Model: ", k, "\n")) 
+        
+        ## If using sliding ASE, make sure that the batch size is large enough to support the number of lags
+        if (private$get_models()[[name]][['sliding_ase']] == TRUE){
+          k = private$validate_k(k)
+        }
         
         # Fit to Entire Data
         # This might be needed in many places to computing it here.
         varfit = vars::VAR(self$get_data(), p=k, type=trend_type)
         
-        # a = summary(varfit)
-        # 
-        # print("build_models.1")
-        # print(a$varresult[self$get_var_interest()])  # $coefficients[,"Pr(>|t|)"]
+        if (verbose >= 1){
+          cat(paste0("\n\nPrinting summary of the VAR fit for the variable of interest: ", var_interest, "\n"))
+          print(summary(varfit$varresult[[var_interest]]))
+        }
         
         ## Inplace
         private$models[[name]][['varselect_alldata']] = varselect
@@ -191,13 +199,43 @@ ModelCompareMultivariateVAR = R6::R6Class(
         
         varfit = private$models[[name]][['varfit_alldata']]
         
-        AIC = stats::AIC(varfit)
-        BIC = stats::BIC(varfit)
+        # AIC = stats::AIC(varfit)
+        # BIC = stats::BIC(varfit)
         
-        private$models[[name]][['AIC']] = AIC
-        private$models[[name]][['BIC']] = BIC
+        private$models[[name]][['AIC']] = NA #AIC
+        private$models[[name]][['BIC']] = NA #BIC
       }  
+    },
+    
+    extract_correct_varselection = function(vselect){
+      criteria = vselect$criteria
+      
+      if(sum(criteria == -Inf, na.rm = TRUE) > 0){
+        warning("VARselect produced -Inf values. These will be removed before making final 'K' selection.")
+        
+        criteria[criteria == -Inf] = max(criteria) + 1
+      }
+      
+      selection = data.frame(t(Rfast::rowMins(criteria)))
+      colnames(selection) = rownames(criteria)
+      
+      selection = selection %>% 
+        assertr::verify(assertr::has_all_names("AIC(n)", "HQ(n)", "SC(n)", "FPE(n)"))
+      
+      return(selection)
+    },
+    
+    validate_k = function(k){
+      new_k = k
+      num_vars = ncol(self$get_data())
+      if (k * num_vars >= (self$get_batch_size()-1)){
+        new_k = floor((self$get_batch_size()-1)/num_vars) - 1 # Being a little more conservative 
+        warning("Although the lag value k: ", k, " selected by VARselect will work for your full dataset, is too large for your batch size. Reducing k to allow Batch ASE calculations. New k: ", new_k, " If you do not want to reduce the k value, increase the batch size or make sliding_ase = FALSE for this model in the model list")
+      }
+      return((new_k))
     }
+    
+    
     
     
     

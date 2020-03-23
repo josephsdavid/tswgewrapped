@@ -12,7 +12,8 @@ sliding_ase_var(
   trend_type = NA,
   n.ahead = NA,
   batch_size = NA,
-  step_n.ahead = TRUE
+  step_n.ahead = TRUE,
+  verbose = 0
 )
 }
 \arguments{
@@ -29,6 +30,8 @@ sliding_ase_var(
 \item{batch_size}{Window Size used}
 
 \item{step_n.ahead}{Whether to step each batch by n.ahead values (Default = FALSE)}
+
+\item{verbose}{How much to print during the model building and other processes (Default = 0)}
 }
 \value{
 Named list 

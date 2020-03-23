@@ -136,6 +136,7 @@ sliding_ase_univariate = function(x,
 #' @param batch_size Window Size used 
 #' @param n.ahead last n.ahead data points in each batch will be used for prediction and ASE calculations
 #' @param step_n.ahead Whether to step each batch by n.ahead values (Default = FALSE)
+#' @param verbose How much to print during the model building and other processes (Default = 0)
 #' @return Named list 
 #'         'ASEs' - ASE values
 #'         'time_test_start' - Time Index indicating start of test time corresponding to the ASE values
@@ -151,7 +152,7 @@ sliding_ase_univariate = function(x,
 sliding_ase_var = function(data, var_interest,
                            k, trend_type = NA,
                            n.ahead = NA, batch_size = NA,    # Forecasting specific arguments
-                           step_n.ahead = TRUE
+                           step_n.ahead = TRUE, verbose = 0
                            )                              
 {
   # Sliding CV ... batches are mutually exclusive
@@ -225,6 +226,13 @@ sliding_ase_var = function(data, var_interest,
     
     # Fit model for the batch
     varfit = vars::VAR(train_data, p=k, type=trend_type)
+    
+    if (verbose >= 2){
+      cat(paste0("\nBatch: ", i+1, "\n"))
+      cat(paste0("Printing summary of the VAR fit for the variable of interest: ", var_interest, "\n\n"))
+      print(summary(varfit$varresult[[var_interest]]))
+    }
+   
     
     # Forecast for the batch
     forecasts = stats::predict(varfit, n.ahead=n.ahead)

@@ -22,11 +22,12 @@ ModelCompareBase = R6::R6Class(
     #' @return A new `ModelCompareBase` object.
     initialize = function(data = NA, mdl_list, n.ahead = NA, batch_size = NA, step_n.ahead = TRUE, verbose = 0)
     {
+      self$set_verbose(verbose = verbose)
       private$set_data(data = data)
       self$add_models(mdl_list)
       private$set_n.ahead(n.ahead)
       private$set_batch_size(batch_size)
-      private$build_models(verbose = verbose)
+      private$build_models(verbose = private$get_verbose())
       private$evaluate_xIC()
       self$compute_metrics(step_n.ahead = step_n.ahead)
       
@@ -52,6 +53,14 @@ ModelCompareBase = R6::R6Class(
     #' @return The n.ahead value
     get_n.ahead = function(){return(private$n.ahead)},
     
+    #' @description Adjust the verbosity level
+    #' @param verbose 0 = Minimal Printing only (usualy limited to step being performed)
+    #'                1 = Basic printing of model builds, etc.
+    #'                2 = Reserved for debugging mode. May slow down the run due to excessive printing, especially when using batches   
+    set_verbose = function(verbose = 0){
+      private$verbose = verbose
+    },
+    
     #' @description Add models to the existing object
     #' @param mdl_list The list of new models to add
     add_models = function(mdl_list){
@@ -76,6 +85,22 @@ ModelCompareBase = R6::R6Class(
     },
     
     #### General Public Methods ----
+    
+    #' @description Remove models from the object
+    #' @param mdl_names A vecotr of the model names to remove. 
+    remove_models = function(mdl_names){
+      for (name in mdl_names){
+        if (name %in% names(private$get_models())){
+          cat(paste0("\nModel: '", name, "' found in object. This will be removed."))
+          private$models[[name]] = NULL
+        }
+        else{
+          cat(paste0("\nModel: '", name, "' was not found in object. Please verify that the correct name."))
+        }
+      }
+      cat("\n")
+    },
+    
     
     #' @description Computes the Metrics for the models
     #' @param step_n.ahead If TRUE, for rolling window calculations, the step size 
@@ -124,13 +149,14 @@ ModelCompareBase = R6::R6Class(
       
       
       p = ggplot2::ggplot() +
-        ggplot2::geom_line(results, mapping = ggplot2::aes(x=Time, y=f, color = Model), size = 0.4) +
+        ggplot2::geom_line(results %>% dplyr::filter(Model == "Actual"), mapping = ggplot2::aes(x=Time, y=f, color = Model), size = 1) +
+        ggplot2::geom_line(results %>% dplyr::filter(Model != "Actual"), mapping = ggplot2::aes(x=Time, y=f, color = Model), size = 0.75) +
         ggplot2::ylab("Simple Forecasts")
       
       if (limits == TRUE){
         p = p + 
-          ggplot2::geom_line(results, mapping = ggplot2::aes(x=Time, y=ll, color = Model), linetype = "dashed", size = 0.2) +
-          ggplot2::geom_line(results, mapping = ggplot2::aes(x=Time, y=ul, color = Model), linetype = "dashed", size = 0.2)
+          ggplot2::geom_line(results, mapping = ggplot2::aes(x=Time, y=ll, color = Model), linetype = "dashed", size = 0.5) +
+          ggplot2::geom_line(results, mapping = ggplot2::aes(x=Time, y=ul, color = Model), linetype = "dashed", size = 0.5)
       }
       
       print(p)
@@ -191,7 +217,8 @@ ModelCompareBase = R6::R6Class(
       
       p = ggplot2::ggplot() + 
         ggplot2::geom_rect(data = rects, ggplot2::aes(xmin = xstart, xmax = xend, ymin = -Inf, ymax = Inf, fill = Batch), alpha = 0.1, show.legend = FALSE) +  
-        ggplot2::geom_line(results.forecasts, mapping = ggplot2::aes(x = Time, y = f, color = Model)) +
+        ggplot2::geom_line(results.forecasts %>% dplyr::filter(Model == 'Realization'), mapping = ggplot2::aes(x = Time, y = f, color = Model), size = 1) +
+        ggplot2::geom_line(results.forecasts %>% dplyr::filter(Model != 'Realization'), mapping = ggplot2::aes(x = Time, y = f, color = Model), size = 0.75) +
         ggplot2::ylab("Forecasts")
       
       print(p) 
@@ -199,8 +226,10 @@ ModelCompareBase = R6::R6Class(
       
       p = ggplot2::ggplot() +
         ggplot2::geom_rect(data = rects, ggplot2::aes(xmin = xstart, xmax = xend, ymin = -Inf, ymax = Inf, fill = Batch), alpha = 0.1, show.legend = FALSE) +  
-        ggplot2::geom_line(results.forecasts, mapping = ggplot2::aes(x=Time, y=ll, color = Model)) + 
-        ggplot2::geom_line(results.forecasts, mapping = ggplot2::aes(x=Time, y=ul, color = Model)) +
+        ggplot2::geom_line(results.forecasts %>% dplyr::filter(Model == 'Realization'), mapping = ggplot2::aes(x=Time, y=ll, color = Model), size = 1) + 
+        ggplot2::geom_line(results.forecasts %>% dplyr::filter(Model == 'Realization'), mapping = ggplot2::aes(x=Time, y=ll, color = Model), size = 1) + 
+        ggplot2::geom_line(results.forecasts %>% dplyr::filter(Model != 'Realization'), mapping = ggplot2::aes(x=Time, y=ll, color = Model), size = 0.75) + 
+        ggplot2::geom_line(results.forecasts %>% dplyr::filter(Model != 'Realization'), mapping = ggplot2::aes(x=Time, y=ul, color = Model), size = 0.75) +
         ggplot2::ylab("Upper and Lower Forecast Limits (95%)")
       
       print(p)
@@ -259,11 +288,11 @@ ModelCompareBase = R6::R6Class(
       
       data = data.frame(Time = seq(1, private$get_len_x()), Data = self$get_data_var_interest())
       
-      g1 = ggplot2::ggplot(data, ggplot2::aes(x = Time, y = Data)) + 
-        ggplot2::geom_line()
+      g1 = ggplot2::ggplot() + 
+        ggplot2::geom_line(data, mapping = ggplot2::aes(x = Time, y = Data), size = 1)
       
-      g2 = ggplot2::ggplot(results, ggplot2::aes(x = Time, y = ASE, color = Model)) +
-        ggplot2::geom_line()
+      g2 = ggplot2::ggplot() +
+        ggplot2::geom_line(results, mapping = ggplot2::aes(x = Time, y = ASE, color = Model), size = 1)
       
       print(g1/g2)
       
@@ -374,6 +403,7 @@ ModelCompareBase = R6::R6Class(
     models = NA,
     n.ahead = NA,
     batch_size = NA,
+    verbose = NA,
     
     set_data = function(data){
       if (all(is.na(data))){ stop("You have not provided the time series data. Please provide to continue.") }
@@ -386,6 +416,10 @@ ModelCompareBase = R6::R6Class(
     
     get_models = function(){
       return(private$models)
+    },
+    
+    get_verbose = function(){
+      return(private$verbose)
     },
     
     clean_model_input = function(mdl_list){

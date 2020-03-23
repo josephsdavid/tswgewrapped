@@ -34,6 +34,8 @@ R6 class ModelCompareMultivariate
 \item \out{<span class="pkg-link" data-pkg="tswgewrapped" data-topic="ModelCompareBase" data-id="plot_batch_forecasts">}\href{../../tswgewrapped/html/ModelCompareBase.html#method-plot_batch_forecasts}{\code{tswgewrapped::ModelCompareBase$plot_batch_forecasts()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="tswgewrapped" data-topic="ModelCompareBase" data-id="plot_histogram_ases">}\href{../../tswgewrapped/html/ModelCompareBase.html#method-plot_histogram_ases}{\code{tswgewrapped::ModelCompareBase$plot_histogram_ases()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="tswgewrapped" data-topic="ModelCompareBase" data-id="plot_simple_forecasts">}\href{../../tswgewrapped/html/ModelCompareBase.html#method-plot_simple_forecasts}{\code{tswgewrapped::ModelCompareBase$plot_simple_forecasts()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="tswgewrapped" data-topic="ModelCompareBase" data-id="remove_models">}\href{../../tswgewrapped/html/ModelCompareBase.html#method-remove_models}{\code{tswgewrapped::ModelCompareBase$remove_models()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="tswgewrapped" data-topic="ModelCompareBase" data-id="set_verbose">}\href{../../tswgewrapped/html/ModelCompareBase.html#method-set_verbose}{\code{tswgewrapped::ModelCompareBase$set_verbose()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="tswgewrapped" data-topic="ModelCompareBase" data-id="statistical_compare">}\href{../../tswgewrapped/html/ModelCompareBase.html#method-statistical_compare}{\code{tswgewrapped::ModelCompareBase$statistical_compare()}}\out{</span>}
 }
 \out{</details>}
