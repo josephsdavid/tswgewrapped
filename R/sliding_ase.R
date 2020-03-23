@@ -197,8 +197,8 @@ sliding_ase_var = function(data, var_interest,
   time_test_start = numeric(num_batches)
   time_test_end = numeric(num_batches)
   batch_num = numeric(num_batches)
-  AICs = numeric(num_batches)
-  BICs = numeric(num_batches)
+  # AICs = numeric(num_batches)
+  # BICs = numeric(num_batches)
   
   for (i in 0:(num_batches-1))
   {
@@ -238,9 +238,9 @@ sliding_ase_var = function(data, var_interest,
     forecasts.ul[test_start: test_end] = forecasts[, 'upper']
     time.forecasts[test_start: test_end] = seq(test_start, test_end, 1)
     
-    # Batch AIC and BIC
-    AICs[i+1] = stats::AIC(varfit)
-    BICs[i+1] = stats::BIC(varfit)
+    # # Batch AIC and BIC
+    # AICs[i+1] = stats::AIC(varfit)
+    # BICs[i+1] = stats::BIC(varfit)
     
   }
   
@@ -248,8 +248,8 @@ sliding_ase_var = function(data, var_interest,
               time_test_start = time_test_start,
               time_test_end = time_test_end,
               batch_num = batch_num,
-              AICs = AICs,
-              BICs = BICs,
+              # AICs = AICs,
+              # BICs = BICs,
               f = forecasts.f,
               ll = forecasts.ll,
               ul = forecasts.ul,
