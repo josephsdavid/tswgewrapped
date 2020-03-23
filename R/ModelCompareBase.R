@@ -30,6 +30,7 @@ ModelCompareBase = R6::R6Class(
       private$build_models(verbose = private$get_verbose())
       private$evaluate_xIC()
       self$compute_metrics(step_n.ahead = step_n.ahead)
+      print(self$summarize_build())
       
     },
     
@@ -87,7 +88,7 @@ ModelCompareBase = R6::R6Class(
     #### General Public Methods ----
     
     #' @description Remove models from the object
-    #' @param mdl_names A vecotr of the model names to remove. 
+    #' @param mdl_names A vector of the model names to remove. 
     remove_models = function(mdl_names){
       for (name in mdl_names){
         if (name %in% names(private$get_models())){
@@ -96,6 +97,18 @@ ModelCompareBase = R6::R6Class(
         }
         else{
           cat(paste0("\nModel: '", name, "' was not found in object. Please verify that the correct name."))
+        }
+      }
+      cat("\n")
+    },
+    
+    #' @description Keep only the provided models
+    #' @param mdl_names A vector of the model names to keep. 
+    keep_models = function(mdl_names){
+      for (name in names(private$get_models())){
+        if (!(name %in% mdl_names)){
+          cat(paste0("\nModel: '", name, "' will be removed."))
+          private$models[[name]] = NULL
         }
       }
       cat("\n")
@@ -391,6 +404,11 @@ ModelCompareBase = R6::R6Class(
       }
       
       return(results)
+    },
+    
+    #' @description Returns the model Build Summary (if applicable)
+    summarize_build = function(){
+      stop("You are calling the 'summarize_build' method in the parent class. This should be implemented in the child class.")
     }
     
     

@@ -19,6 +19,7 @@ R6 class ModelCompareBase
 \item \href{#method-set_verbose}{\code{ModelCompareBase$set_verbose()}}
 \item \href{#method-add_models}{\code{ModelCompareBase$add_models()}}
 \item \href{#method-remove_models}{\code{ModelCompareBase$remove_models()}}
+\item \href{#method-keep_models}{\code{ModelCompareBase$keep_models()}}
 \item \href{#method-compute_metrics}{\code{ModelCompareBase$compute_metrics()}}
 \item \href{#method-plot_simple_forecasts}{\code{ModelCompareBase$plot_simple_forecasts()}}
 \item \href{#method-plot_batch_forecasts}{\code{ModelCompareBase$plot_batch_forecasts()}}
@@ -26,6 +27,7 @@ R6 class ModelCompareBase
 \item \href{#method-plot_histogram_ases}{\code{ModelCompareBase$plot_histogram_ases()}}
 \item \href{#method-statistical_compare}{\code{ModelCompareBase$statistical_compare()}}
 \item \href{#method-get_tabular_metrics}{\code{ModelCompareBase$get_tabular_metrics()}}
+\item \href{#method-summarize_build}{\code{ModelCompareBase$summarize_build()}}
 }
 }
 \if{html}{\out{<hr>}}
@@ -167,7 +169,24 @@ Remove models from the object
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{mdl_names}}{A vecotr of the model names to remove.}
+\item{\code{mdl_names}}{A vector of the model names to remove.}
+}
+\if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-keep_models"></a>}}
+\if{latex}{\out{\hypertarget{method-keep_models}{}}}
+\subsection{Method \code{keep_models()}}{
+Keep only the provided models
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{ModelCompareBase$keep_models(mdl_names)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{mdl_names}}{A vector of the model names to keep.}
 }
 \if{html}{\out{</div>}}
 }
@@ -289,5 +308,15 @@ forecasts, and the lower and upper limits asscoiated with the forecasts}
 }
 \if{html}{\out{</div>}}
 }
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-summarize_build"></a>}}
+\if{latex}{\out{\hypertarget{method-summarize_build}{}}}
+\subsection{Method \code{summarize_build()}}{
+Returns the model Build Summary (if applicable)
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{ModelCompareBase$summarize_build()}\if{html}{\out{</div>}}
+}
+
 }
 }
