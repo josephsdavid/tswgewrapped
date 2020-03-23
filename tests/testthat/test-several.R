@@ -377,7 +377,7 @@ test_that("Sliding Window", {
   
   # Using sliding window function
   # Default assumes only 1 batch
-  r = sliding_ase(x, phi = phi, theta = theta, n.ahead = n.ahead)  
+  r = sliding_ase_univariate(x, phi = phi, theta = theta, n.ahead = n.ahead)  
   ASEs = r$ASEs
   Time = r$time
   
@@ -392,7 +392,7 @@ test_that("Sliding Window", {
   # Without Sliding Window (usual method)
   ase1 = mean((x[(n-n.ahead+1):n] - f$f)^2)
   
-  r = sliding_ase(x, phi = phi, theta = theta, d = d, s = s, n.ahead = n.ahead)  
+  r = sliding_ase_univariate(x, phi = phi, theta = theta, d = d, s = s, n.ahead = n.ahead)  
   ASEs = r$ASEs
   Time = r$time
   
@@ -429,7 +429,7 @@ test_that("ModelCompareUnivariate", {
                 )
   
   #### With n_step.ahead = TRUE (Default)              
-  mdl_compare = ModelCompareUnivariate$new(x = airlog, mdl_list = models,
+  mdl_compare = ModelCompareUnivariate$new(data = airlog, mdl_list = models,
                                            n.ahead = 36, batch_size = 72)
   
   mdl_compare$plot_simple_forecasts()
@@ -491,7 +491,7 @@ test_that("ModelCompareUnivariate", {
   
   #### With n_step.ahead = FALSE
   
-  mdl_compare = ModelCompareUnivariate$new(x = airlog, mdl_list = models,
+  mdl_compare = ModelCompareUnivariate$new(data = airlog, mdl_list = models,
                                            n.ahead = 36, batch_size = 72, step_n.ahead = FALSE)
 
 
@@ -539,7 +539,7 @@ test_that("ModelCompareUnivariate", {
   
   models = list("Model 1" = list(phi = 0.5, res = wn, sliding_ase = FALSE))  # Hypothetical Model
   
-  mdl_compare = ModelCompareUnivariate$new(x = wn, mdl_list = models, n.ahead = 10)
+  mdl_compare = ModelCompareUnivariate$new(data = wn, mdl_list = models, n.ahead = 10)
   table = mdl_compare$evaluate_residuals()
   
   expect_equal(table %>% dplyr::filter(K == 24) %>% dplyr::select(pval) %>% purrr::pluck(1), k24$pval)
@@ -552,7 +552,7 @@ test_that("ModelCompareUnivariate", {
 
 
 #### Model Compare Multivariate Class ####
-test_that("ModelCompareMultivariate", {
+test_that("ModelCompareMultivariateVAR", {
   library(tseries)
   data("USeconomic")
   
@@ -581,7 +581,7 @@ test_that("ModelCompareMultivariate", {
   #var_interest = 'cmort'
   
   #### With n_step.ahead = TRUE (Default)              
-  mdl_compare = ModelCompareMultivariate$new(data = data, var_interest = var_interest,
+  mdl_compare = ModelCompareMultivariateVAR$new(data = data, var_interest = var_interest,
                                              mdl_list = models, n.ahead = n.ahead, batch_size = batch_size)
   
   
@@ -732,7 +732,7 @@ test_that("ModelCompareMultivariate", {
   
   #### With n_step.ahead = FALSE
   
-  mdl_compare = ModelCompareMultivariate$new(data = data, var_interest = var_interest,
+  mdl_compare = ModelCompareMultivariateVAR$new(data = data, var_interest = var_interest,
                                              mdl_list = models, n.ahead = n.ahead, batch_size = batch_size,
                                              step_n.ahead = FALSE)
   
@@ -780,7 +780,7 @@ test_that("ModelCompareMultivariate", {
   # 
   # models = list("Model 1" = list(phi = 0.5, res = wn, sliding_ase = FALSE))  # Hypothetical Model
   # 
-  # mdl_compare = ModelCompareUnivariate$new(x = wn, mdl_list = models, n.ahead = 10)
+  # mdl_compare = ModelCompareUnivariate$new(data = wn, mdl_list = models, n.ahead = 10)
   # table = mdl_compare$evaluate_residuals()
   # 
   # expect_equal(table %>% dplyr::filter(K == 24) %>% dplyr::select(pval) %>% purrr::pluck(1), k24$pval)
@@ -820,7 +820,7 @@ test_that("White Noise Eval - White Noise Eval", {
   
   # Generated White Noise 
   wn = tswge::gen.arma.wge(n = 200, sn = 101, plot = FALSE)
-  table = white_noise_eval(wn)
+  table = evaluate_residuals(wn)
   
   k24 = tswge::ljung.wge(wn, K = 24)
   k48 = tswge::ljung.wge(wn, K = 48)
@@ -832,7 +832,7 @@ test_that("White Noise Eval - White Noise Eval", {
   
   # Not White Noise
   data(hadley) 
-  table = white_noise_eval(hadley)
+  table = evaluate_residuals(hadley)
   
   k24 = ljung.wge(hadley, K = 24)
   k48 = ljung.wge(hadley, K = 48)

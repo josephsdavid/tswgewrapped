@@ -57,14 +57,14 @@ ljung_box <- function(x, p = 0, q = 0, k_val = c(24,48), model_name = "My Model"
 #' 
 #' # Generated White Noise 
 #' wn = gen.arma.wge(n = 200, sn = 101)
-#' white_noise_eval(wn)
+#' evaluate_residuals(wn)
 #' 
 #' # Not White Noise
 #' data(hadley) 
-#' white_noise_eval(hadley)
+#' evaluate_residuals(hadley)
 #' 
 #' @export
-white_noise_eval = function(x, p = 0, q = 0, k_val = c(24,48), alpha = 0.05, lag.max = 50, model_name = "My Model"){
+evaluate_residuals = function(x, p = 0, q = 0, k_val = c(24,48), alpha = 0.05, lag.max = 50, model_name = "My Model"){
   # Need to add these in here explicitly, else this function does not work.
   requireNamespace("ggfortify")
   requireNamespace("patchwork")
