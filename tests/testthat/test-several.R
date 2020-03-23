@@ -578,8 +578,7 @@ test_that("ModelCompareMultivariateVAR", {
   n.ahead = 2
   batch_size = 50
   var_interest = 'logGNP'
-  #var_interest = 'cmort'
-  
+
   #### With n_step.ahead = TRUE (Default)              
   mdl_compare = ModelCompareMultivariateVAR$new(data = data, var_interest = var_interest,
                                              mdl_list = models, n.ahead = n.ahead, batch_size = batch_size)

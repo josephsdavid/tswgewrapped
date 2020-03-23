@@ -194,6 +194,11 @@ ModelCompareUnivariate = R6::R6Class(
       }
       
       return(final.results)
+    },
+    
+    #' @description Not applicable for the Univariate Compare, since we are passing already build models
+    summarize_build = function(){
+
     }
     
     

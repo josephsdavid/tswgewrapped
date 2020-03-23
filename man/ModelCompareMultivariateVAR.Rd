@@ -3,6 +3,15 @@
 \name{ModelCompareMultivariateVAR}
 \alias{ModelCompareMultivariateVAR}
 \title{R6 class ModelCompareMultivariate}
+\value{
+A dataframe containing the following columns
+         'Model': Name of the model
+         'Selection': The selection criteria used for K value (AIC or BIC)
+         'Trend': The trend argument used in the VARselect and VAR functions
+         'SlidingASE': Whether Sliding ASE will be used for this model
+         'Init_K': The K value recommended by the VARselect function
+         'Final_K': The adjusted K value to take into account the smaller batch size (only when using sliding_ase)
+}
 \description{
 R6 class ModelCompareMultivariate
 
@@ -18,6 +27,7 @@ R6 class ModelCompareMultivariate
 \item \href{#method-get_var_interest}{\code{ModelCompareMultivariateVAR$get_var_interest()}}
 \item \href{#method-get_data_var_interest}{\code{ModelCompareMultivariateVAR$get_data_var_interest()}}
 \item \href{#method-get_xIC}{\code{ModelCompareMultivariateVAR$get_xIC()}}
+\item \href{#method-summarize_build}{\code{ModelCompareMultivariateVAR$summarize_build()}}
 \item \href{#method-clone}{\code{ModelCompareMultivariateVAR$clone()}}
 }
 }
@@ -30,6 +40,7 @@ R6 class ModelCompareMultivariate
 \item \out{<span class="pkg-link" data-pkg="tswgewrapped" data-topic="ModelCompareBase" data-id="get_data">}\href{../../tswgewrapped/html/ModelCompareBase.html#method-get_data}{\code{tswgewrapped::ModelCompareBase$get_data()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="tswgewrapped" data-topic="ModelCompareBase" data-id="get_n.ahead">}\href{../../tswgewrapped/html/ModelCompareBase.html#method-get_n.ahead}{\code{tswgewrapped::ModelCompareBase$get_n.ahead()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="tswgewrapped" data-topic="ModelCompareBase" data-id="get_tabular_metrics">}\href{../../tswgewrapped/html/ModelCompareBase.html#method-get_tabular_metrics}{\code{tswgewrapped::ModelCompareBase$get_tabular_metrics()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="tswgewrapped" data-topic="ModelCompareBase" data-id="keep_models">}\href{../../tswgewrapped/html/ModelCompareBase.html#method-keep_models}{\code{tswgewrapped::ModelCompareBase$keep_models()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="tswgewrapped" data-topic="ModelCompareBase" data-id="plot_batch_ases">}\href{../../tswgewrapped/html/ModelCompareBase.html#method-plot_batch_ases}{\code{tswgewrapped::ModelCompareBase$plot_batch_ases()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="tswgewrapped" data-topic="ModelCompareBase" data-id="plot_batch_forecasts">}\href{../../tswgewrapped/html/ModelCompareBase.html#method-plot_batch_forecasts}{\code{tswgewrapped::ModelCompareBase$plot_batch_forecasts()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="tswgewrapped" data-topic="ModelCompareBase" data-id="plot_histogram_ases">}\href{../../tswgewrapped/html/ModelCompareBase.html#method-plot_histogram_ases}{\code{tswgewrapped::ModelCompareBase$plot_histogram_ases()}}\out{</span>}
@@ -124,6 +135,16 @@ Returns the AIC and the BIC for the model using the entire dataset
 }
 \if{html}{\out{</div>}}
 }
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-summarize_build"></a>}}
+\if{latex}{\out{\hypertarget{method-summarize_build}{}}}
+\subsection{Method \code{summarize_build()}}{
+Returns the VAR model Build Summary
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{ModelCompareMultivariateVAR$summarize_build()}\if{html}{\out{</div>}}
+}
+
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-clone"></a>}}

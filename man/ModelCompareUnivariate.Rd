@@ -76,6 +76,7 @@ print(forecasts)
 \item \href{#method-get_data_var_interest}{\code{ModelCompareUnivariate$get_data_var_interest()}}
 \item \href{#method-plot_multiple_realizations}{\code{ModelCompareUnivariate$plot_multiple_realizations()}}
 \item \href{#method-evaluate_residuals}{\code{ModelCompareUnivariate$evaluate_residuals()}}
+\item \href{#method-summarize_build}{\code{ModelCompareUnivariate$summarize_build()}}
 \item \href{#method-clone}{\code{ModelCompareUnivariate$clone()}}
 }
 }
@@ -88,6 +89,7 @@ print(forecasts)
 \item \out{<span class="pkg-link" data-pkg="tswgewrapped" data-topic="ModelCompareBase" data-id="get_data">}\href{../../tswgewrapped/html/ModelCompareBase.html#method-get_data}{\code{tswgewrapped::ModelCompareBase$get_data()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="tswgewrapped" data-topic="ModelCompareBase" data-id="get_n.ahead">}\href{../../tswgewrapped/html/ModelCompareBase.html#method-get_n.ahead}{\code{tswgewrapped::ModelCompareBase$get_n.ahead()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="tswgewrapped" data-topic="ModelCompareBase" data-id="get_tabular_metrics">}\href{../../tswgewrapped/html/ModelCompareBase.html#method-get_tabular_metrics}{\code{tswgewrapped::ModelCompareBase$get_tabular_metrics()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="tswgewrapped" data-topic="ModelCompareBase" data-id="keep_models">}\href{../../tswgewrapped/html/ModelCompareBase.html#method-keep_models}{\code{tswgewrapped::ModelCompareBase$keep_models()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="tswgewrapped" data-topic="ModelCompareBase" data-id="plot_batch_ases">}\href{../../tswgewrapped/html/ModelCompareBase.html#method-plot_batch_ases}{\code{tswgewrapped::ModelCompareBase$plot_batch_ases()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="tswgewrapped" data-topic="ModelCompareBase" data-id="plot_batch_forecasts">}\href{../../tswgewrapped/html/ModelCompareBase.html#method-plot_batch_forecasts}{\code{tswgewrapped::ModelCompareBase$plot_batch_forecasts()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="tswgewrapped" data-topic="ModelCompareBase" data-id="plot_histogram_ases">}\href{../../tswgewrapped/html/ModelCompareBase.html#method-plot_histogram_ases}{\code{tswgewrapped::ModelCompareBase$plot_histogram_ases()}}\out{</span>}
@@ -205,6 +207,16 @@ this method will check whetehr the residuals are white noise or not.
 \subsection{Returns}{
 A dataframe containing the results of the 2 Ljung-Box tests
 }
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-summarize_build"></a>}}
+\if{latex}{\out{\hypertarget{method-summarize_build}{}}}
+\subsection{Method \code{summarize_build()}}{
+Not applicable for the Univariate Compare, since we are passing already build models
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{ModelCompareUnivariate$summarize_build()}\if{html}{\out{</div>}}
+}
+
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-clone"></a>}}

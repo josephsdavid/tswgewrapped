@@ -65,6 +65,32 @@ ModelCompareMultivariateVAR = R6::R6Class(
       
       return(results)
       
+    },
+    
+    #' @description Returns the VAR model Build Summary
+    #' @returns A dataframe containing the following columns
+    #'          'Model': Name of the model
+    #'          'Selection': The selection criteria used for K value (AIC or BIC)
+    #'          'Trend': The trend argument used in the VARselect and VAR functions
+    #'          'SlidingASE': Whether Sliding ASE will be used for this model
+    #'          'Init_K': The K value recommended by the VARselect function
+    #'          'Final_K': The adjusted K value to take into account the smaller batch size (only when using sliding_ase)
+    summarize_build = function(){
+      results = dplyr::tribble(~Model, ~Selection, ~Trend, ~SlidingASE, ~Init_K, ~Final_K)
+      
+      for (name in names(private$get_models())){
+        results = results %>% 
+          dplyr::add_row(Model = name,
+                         Selection = private$models[[name]][['select']],
+                         Trend = private$models[[name]][['trend_type']],
+                         SlidingASE = private$models[[name]][['sliding_ase']],
+                         Init_K = private$models[[name]][['k_initial']],
+                         Final_K = private$models[[name]][['k_final']]
+                         )
+       
+      }
+      
+      return(results)
     }
     
   ),
@@ -90,7 +116,7 @@ ModelCompareMultivariateVAR = R6::R6Class(
     get_sliding_ase_results = function(name, step_n.ahead){
       res = sliding_ase_var(data = self$get_data(),
                             var_interest = self$get_var_interest(),
-                            k = private$get_models()[[name]][['k']],
+                            k = private$get_models()[[name]][['k_final']],
                             trend_type = private$get_models()[[name]][['trend_type']],
                             n.ahead = self$get_n.ahead(),
                             batch_size = private$get_models()[[name]][['batch_size']],
@@ -123,7 +149,7 @@ ModelCompareMultivariateVAR = R6::R6Class(
       for (name in names(private$get_models())){
         
         var_interest = self$get_var_interest()
-        k = private$get_models()[[name]][['k']]
+        k = private$get_models()[[name]][['k_final']]
         trend_type = private$get_models()[[name]][['trend_type']]
         
         # Fit model for the batch
@@ -172,14 +198,15 @@ ModelCompareMultivariateVAR = R6::R6Class(
         }
         cat(paste("Lag K to use for the VAR Model: ", k, "\n")) 
         
+        k_final = k
         ## If using sliding ASE, make sure that the batch size is large enough to support the number of lags
         if (private$get_models()[[name]][['sliding_ase']] == TRUE){
-          k = private$validate_k(k)
+          k_final = private$validate_k(k)
         }
         
         # Fit to Entire Data
         # This might be needed in many places to computing it here.
-        varfit = vars::VAR(self$get_data(), p=k, type=trend_type)
+        varfit = vars::VAR(self$get_data(), p=k_final, type=trend_type)
         
         if (verbose >= 1){
           cat(paste0("\n\nPrinting summary of the VAR fit for the variable of interest: ", var_interest, "\n"))
@@ -188,7 +215,8 @@ ModelCompareMultivariateVAR = R6::R6Class(
         
         ## Inplace
         private$models[[name]][['varselect_alldata']] = varselect
-        private$models[[name]][['k']] = k
+        private$models[[name]][['k_initial']] = k
+        private$models[[name]][['k_final']] = k_final
         private$models[[name]][['varfit_alldata']] = varfit
         
       }
@@ -199,11 +227,11 @@ ModelCompareMultivariateVAR = R6::R6Class(
         
         varfit = private$models[[name]][['varfit_alldata']]
         
-        # AIC = stats::AIC(varfit)
-        # BIC = stats::BIC(varfit)
+        AIC = stats::AIC(varfit)
+        BIC = stats::BIC(varfit)
         
-        private$models[[name]][['AIC']] = NA #AIC
-        private$models[[name]][['BIC']] = NA #BIC
+        private$models[[name]][['AIC']] = AIC
+        private$models[[name]][['BIC']] = BIC
       }  
     },
     
