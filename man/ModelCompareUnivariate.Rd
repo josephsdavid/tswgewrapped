@@ -107,7 +107,8 @@ Initialize an object to compare several Univatiate Time Series Models
   mdl_list,
   n.ahead = NA,
   batch_size = NA,
-  step_n.ahead = TRUE
+  step_n.ahead = TRUE,
+  verbose = 0
 )}\if{html}{\out{</div>}}
 }
 
@@ -125,6 +126,8 @@ then this number indicates the batch size to use}
 
 \item{\code{step_n.ahead}}{If using sliding window, should batches be incremented by n.ahead
 (Default = TRUE)}
+
+\item{\code{verbose}}{How much to print during the model building and other processes (Default = 0)}
 }
 \if{html}{\out{</div>}}
 }

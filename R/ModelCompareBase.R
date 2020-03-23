@@ -18,25 +18,15 @@ ModelCompareBase = R6::R6Class(
     #'                   then this number indicates the batch size to use
     #' @param step_n.ahead If using sliding window, should batches be incremented by n.ahead
     #'                     (Default = TRUE)
+    #' @param verbose How much to print during the model building and other processes (Default = 0)                      
     #' @return A new `ModelCompareBase` object.
-    initialize = function(data = NA, mdl_list, n.ahead = NA, batch_size = NA, step_n.ahead = TRUE)
+    initialize = function(data = NA, mdl_list, n.ahead = NA, batch_size = NA, step_n.ahead = TRUE, verbose = 0)
     {
-      # # Add checks here
-      # if (all(is.na(data))){ stop("You have not provided the time series data. Please provide to continue.") }
-      # 
-      # private$set_data(data = data)
-      # self$add_models(mdl_list)
-      # private$set_n.ahead(n.ahead)
-      # private$set_batch_size(batch_size)
-      # private$build_models()
-      # private$evaluate_xIC()
-      # self$compute_metrics(step_n.ahead = step_n.ahead)
-      
       private$set_data(data = data)
       self$add_models(mdl_list)
       private$set_n.ahead(n.ahead)
       private$set_batch_size(batch_size)
-      private$build_models()
+      private$build_models(verbose = verbose)
       private$evaluate_xIC()
       self$compute_metrics(step_n.ahead = step_n.ahead)
       
@@ -461,7 +451,7 @@ ModelCompareBase = R6::R6Class(
       private$set_batch_per_model()
     },
     
-    build_models  = function(){
+    build_models  = function(verbose = 0){
       stop("You are calling the 'build_models' method in the parent class. This should be implemented in the child class.")
     },
     

@@ -820,7 +820,7 @@ test_that("White Noise Eval - White Noise Eval", {
   
   # Generated White Noise 
   wn = tswge::gen.arma.wge(n = 200, sn = 101, plot = FALSE)
-  table = white_noise_eval(wn)
+  table = evaluate_residuals(wn)
   
   k24 = tswge::ljung.wge(wn, K = 24)
   k48 = tswge::ljung.wge(wn, K = 48)
@@ -832,7 +832,7 @@ test_that("White Noise Eval - White Noise Eval", {
   
   # Not White Noise
   data(hadley) 
-  table = white_noise_eval(hadley)
+  table = evaluate_residuals(hadley)
   
   k24 = ljung.wge(hadley, K = 24)
   k48 = ljung.wge(hadley, K = 48)

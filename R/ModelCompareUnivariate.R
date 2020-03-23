@@ -78,11 +78,14 @@ ModelCompareUnivariate = R6::R6Class(
     #'                   then this number indicates the batch size to use
     #' @param step_n.ahead If using sliding window, should batches be incremented by n.ahead
     #'                     (Default = TRUE)
+    #' @param verbose How much to print during the model building and other processes (Default = 0)
     #' @return A new `ModelCompareUnivariate` object.
-    initialize = function(data = NA, mdl_list, n.ahead = NA, batch_size = NA, step_n.ahead = TRUE)
+    initialize = function(data = NA, mdl_list, n.ahead = NA, batch_size = NA, step_n.ahead = TRUE, verbose = 0)
     {
       
-      super$initialize(data = data, mdl_list = mdl_list, n.ahead = n.ahead, batch_size = batch_size, step_n.ahead = step_n.ahead)
+      super$initialize(data = data, mdl_list = mdl_list,
+                       n.ahead = n.ahead, batch_size = batch_size, step_n.ahead = step_n.ahead,
+                       verbose = verbose)
       
     },
     
@@ -176,7 +179,7 @@ ModelCompareUnivariate = R6::R6Class(
             q = length(private$models[[name]][['theta']])
           }
           
-          table = white_noise_eval(private$models[[name]][['res']], p = p, q = q, model_name = name, lag.max = lag.max)
+          table = evaluate_residuals(private$models[[name]][['res']], p = p, q = q, model_name = name, lag.max = lag.max)
         
           if (all(is.na(final.results))){
             final.results = table
@@ -276,7 +279,7 @@ ModelCompareUnivariate = R6::R6Class(
       ## Do nothing. There is only 1 variable of interest.
     },
     
-    build_models  = function(){
+    build_models  = function(verbose = 0){
       ## Do nothing. We are expecting the build model (all parameters known) to be passed
     },
     

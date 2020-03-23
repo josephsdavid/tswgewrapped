@@ -22,12 +22,15 @@ ModelCompareMultivariateVAR = R6::R6Class(
     #'                   then this number indicates the batch size to use
     #' @param step_n.ahead If using sliding window, should batches be incremented by n.ahead
     #'                     (Default = TRUE)
+    #' @param verbose How much to print during the model building and other processes (Default = 0)
     #' @return A new `ModelCompareMultivariateVAR` object.
-    initialize = function(data = NA, var_interest = NA, mdl_list, n.ahead = NA, batch_size = NA, step_n.ahead = TRUE)
+    initialize = function(data = NA, var_interest = NA, mdl_list, n.ahead = NA, batch_size = NA, step_n.ahead = TRUE, verbose = 0)
     {
       
       private$set_var_interest(var_interest = var_interest)
-      super$initialize(data = data, mdl_list = mdl_list, n.ahead = n.ahead, batch_size = batch_size, step_n.ahead = step_n.ahead)
+      super$initialize(data = data, mdl_list = mdl_list,
+                       n.ahead = n.ahead, batch_size = batch_size, step_n.ahead = step_n.ahead,
+                       verbose = verbose)
       
     },
     
@@ -142,15 +145,17 @@ ModelCompareMultivariateVAR = R6::R6Class(
       return(results)
     },
     
-    build_models  = function(){
+    build_models  = function(verbose = 0){
       for (name in names(private$get_models())){
-        cat("\n\n\n\n\n")
-        print(paste("Model: ", name))
+        cat("\n\n\n")
+        cat(paste("Model: ", name))
         trend_type = private$get_models()[[name]][['trend_type']]
-        print(paste("trend_type: ", trend_type))
+        cat(paste("\nTrend type: ", trend_type))
         
         varselect = vars::VARselect(self$get_data(), lag.max = private$get_models()[[name]][['lag.max']], type = trend_type, season = NULL, exogen = NULL)
-        print(varselect) 
+        if (verbose >= 1){
+          print(varselect) 
+        }
         
         select = tolower(private$get_models()[[name]][['select']])
         if (select == 'aic'){
