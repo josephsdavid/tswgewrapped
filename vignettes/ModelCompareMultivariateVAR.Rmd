@@ -74,6 +74,7 @@ mdl_compare$plot_simple_forecasts(lastn = TRUE, limits = FALSE)
 mdl_compare$plot_simple_forecasts(lastn = TRUE, limits = TRUE)
 mdl_compare$plot_simple_forecasts(lastn = FALSE, limits = FALSE)
 mdl_compare$plot_simple_forecasts(lastn = FALSE, limits = TRUE)
+mdl_compare$plot_simple_forecasts(zoom = 50)  ## Zoom into plot
 ```
 
 ## Plot and compare the forecasts per batch
@@ -91,6 +92,4 @@ print(ASEs)
 forecasts = mdl_compare$get_tabular_metrics(ases = FALSE)
 print(forecasts)
 ```
-
-
 
