@@ -89,6 +89,7 @@ mdl_compare$plot_simple_forecasts(lastn = TRUE, limits = FALSE)
 mdl_compare$plot_simple_forecasts(lastn = TRUE, limits = TRUE)
 mdl_compare$plot_simple_forecasts(lastn = FALSE, limits = FALSE)
 mdl_compare$plot_simple_forecasts(lastn = FALSE, limits = TRUE)
+mdl_compare$plot_simple_forecasts(zoom = 50)  ## Zoom into plot
 ```
 
 ## Plot and compare the forecasts per batch
@@ -106,3 +107,71 @@ print(ASEs)
 forecasts = mdl_compare$get_tabular_metrics(ases = FALSE)
 print(forecasts)
 ```
+
+
+# Advanced Options
+
+## Adding models after object initialization
+```{r}
+## Add initial set of models (without sliding ASE)
+models = list("Woodward Gray Model A" = list(phi = phi_wg, d = d_wg, s = s_wg, vara = 0.001357009, sliding_ase = FALSE),
+              "Parzen Model A" = list(phi = phi_pz, s = s_pz, vara = 0.002933592, sliding_ase = FALSE),
+              "Box Model A" = list(theta = theta_bx, d = d_bx, s = s_bx, vara = 0.001391604, sliding_ase = FALSE)
+              )
+  
+mdl_compare = ModelCompareUnivariate$new(data = airlog, mdl_list = models,
+                                         n.ahead = 36)
+```
+
+```{r}
+# Following will give an error because we are trying to add models with the same name again
+# mdl_compare$add_models(mdl_list = models)
+```
+
+```{r}
+## Add models with Sliding ASE
+models = list("Woodward Gray Model B" = list(phi = phi_wg, d = d_wg, s = s_wg, vara = 0.001357009, sliding_ase = TRUE),
+              "Parzen Model B" = list(phi = phi_pz, s = s_pz, vara = 0.002933592, sliding_ase = TRUE),
+              "Box Model B" = list(theta = theta_bx, d = d_bx, s = s_bx, vara = 0.001391604, sliding_ase = TRUE)
+             )
+  
+# This will give warning for batch size which has not been set.
+# Internally it will be set to use just 1 batch since nothing has been specified.
+mdl_compare$add_models(mdl_list = models)  # This will give a warning and set only 1 batch
+# mdl_compare$add_models(mdl_list = models, batch_size = 72)  ## This will not give a warning
+```
+
+## Adjusting Batch Size
+```{r}
+# If you had forgotten to set the batch size, you can do it after the fact  
+mdl_compare$set_batch_size(72)
+
+
+# Check all functions after data manipulation
+mdl_compare$plot_simple_forecasts(zoom = 72)
+mdl_compare$plot_batch_forecasts(only_sliding = TRUE)
+mdl_compare$plot_batch_ases(only_sliding = TRUE)
+mdl_compare$plot_histogram_ases()
+mdl_compare$statistical_compare()
+```
+
+## Removing Unwanted Models
+```{r}
+## After comparison, maybe you want to remove some models that are not performing well or you do not want to show in your plots
+mdl_names = c("Woodward Gray Model A", "Parzen Model A", "Box Model A", "Parzen Model B")
+
+# Remove models
+mdl_compare$remove_models(mdl_names = mdl_names)
+  
+# Check all functions after data manipulation
+mdl_compare$plot_simple_forecasts()
+mdl_compare$plot_batch_forecasts()
+mdl_compare$plot_batch_ases()
+mdl_compare$plot_histogram_ases()
+mdl_compare$statistical_compare()
+```
+
+```{r}
+
+```
+

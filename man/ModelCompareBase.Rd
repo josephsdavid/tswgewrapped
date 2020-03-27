@@ -15,6 +15,7 @@ R6 class ModelCompareBase
 \item \href{#method-get_data}{\code{ModelCompareBase$get_data()}}
 \item \href{#method-get_data_var_interest}{\code{ModelCompareBase$get_data_var_interest()}}
 \item \href{#method-get_batch_size}{\code{ModelCompareBase$get_batch_size()}}
+\item \href{#method-set_batch_size}{\code{ModelCompareBase$set_batch_size()}}
 \item \href{#method-get_n.ahead}{\code{ModelCompareBase$get_n.ahead()}}
 \item \href{#method-set_verbose}{\code{ModelCompareBase$set_verbose()}}
 \item \href{#method-add_models}{\code{ModelCompareBase$add_models()}}
@@ -109,6 +110,23 @@ The Batch Size Value
 }
 }
 \if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-set_batch_size"></a>}}
+\if{latex}{\out{\hypertarget{method-set_batch_size}{}}}
+\subsection{Method \code{set_batch_size()}}{
+Sets the batch size value
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{ModelCompareBase$set_batch_size(batch_size)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{batch_size}}{Batch Size Value}
+}
+\if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-get_n.ahead"></a>}}
 \if{latex}{\out{\hypertarget{method-get_n.ahead}{}}}
 \subsection{Method \code{get_n.ahead()}}{
@@ -146,13 +164,15 @@ Adjust the verbosity level
 \subsection{Method \code{add_models()}}{
 Add models to the existing object
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{ModelCompareBase$add_models(mdl_list)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{ModelCompareBase$add_models(mdl_list, batch_size = -1)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
 \item{\code{mdl_list}}{The list of new models to add}
+
+\item{\code{batch_size}}{The batch size to use if model is using sliding ASE calculations}
 }
 \if{html}{\out{</div>}}
 }
@@ -215,7 +235,11 @@ will be equal to n.ahead, else it will be equal to 1}
 \subsection{Method \code{plot_simple_forecasts()}}{
 Plots the simple forecast for each model
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{ModelCompareBase$plot_simple_forecasts(lastn = FALSE, limits = FALSE)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{ModelCompareBase$plot_simple_forecasts(
+  lastn = FALSE,
+  limits = FALSE,
+  zoom = NA
+)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -224,6 +248,10 @@ Plots the simple forecast for each model
 \item{\code{lastn}}{If TRUE, this will plot the forecasts forthe last n.ahead values of the realization (Default: FALSE)}
 
 \item{\code{limits}}{If TRUE, this will also plot the lower and upper limits of the forecasts (Default: FALSE)}
+
+\item{\code{zoom}}{A number indicating how much to zoom into the plot. 
+For example zoom = 50 will only plot the last 50 points of the realization
+Useful for cases where realizations that are long and n.ahead is small.}
 }
 \if{html}{\out{</div>}}
 }

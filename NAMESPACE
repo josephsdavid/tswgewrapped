@@ -3,6 +3,7 @@
 export("%>%")
 export(ModelCompareMultivariateVAR)
 export(ModelCompareUnivariate)
+export(MultivariateEDA)
 export(aic5)
 export(aicbic)
 export(ase)

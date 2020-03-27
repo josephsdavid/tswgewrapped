@@ -24,14 +24,10 @@ ModelCompareBase = R6::R6Class(
     {
       self$set_verbose(verbose = verbose)
       private$set_data(data = data)
-      self$add_models(mdl_list)
       private$set_n.ahead(n.ahead)
-      private$set_batch_size(batch_size)
-      private$build_models(verbose = private$get_verbose())
-      private$evaluate_xIC()
-      self$compute_metrics(step_n.ahead = step_n.ahead)
-      print(self$summarize_build())
+      private$set_step_n.ahead(step_n.ahead)
       
+      self$add_models(mdl_list, batch_size)
     },
     
     #### Getters and Setters ----
@@ -50,6 +46,25 @@ ModelCompareBase = R6::R6Class(
     #' @return The Batch Size Value
     get_batch_size = function(){return(private$batch_size)},
     
+    #' @description Sets the batch size value
+    #' @param batch_size Batch Size Value
+    set_batch_size = function(batch_size){
+      if (private$any_sliding_ase() & is.na(batch_size)){
+        warning("You have provided models that require sliding ASE calculations, but the batch size has been set to NA. Setting the batch size to the length of the realization.")
+        private$batch_size = private$get_len_x()
+        
+      }
+      private$batch_size = batch_size
+      private$set_batch_per_model()
+      
+      ## Evaluate models any time the batch size is set -- 
+      ## (1) either when model are added (during initialization or manually) or 
+      ## (2) when user resets batch size manually
+      private$evaluate_models()
+      
+      
+    },
+    
     #' @description Returns the n.ahead value
     #' @return The n.ahead value
     get_n.ahead = function(){return(private$n.ahead)},
@@ -62,9 +77,12 @@ ModelCompareBase = R6::R6Class(
       private$verbose = verbose
     },
     
+    #### General Public Methods ----
+    
     #' @description Add models to the existing object
     #' @param mdl_list The list of new models to add
-    add_models = function(mdl_list){
+    #' @param batch_size The batch size to use if model is using sliding ASE calculations
+    add_models = function(mdl_list, batch_size = -1){
       if (length(unique(names(mdl_list))) != length(names(mdl_list))){
         stop("The model names in the provided list contain duplicates. Please fix and rerun.")
       }
@@ -83,9 +101,22 @@ ModelCompareBase = R6::R6Class(
       else{
         private$models = c(private$models, mdl_list)
       }
+      
+      ## We are setting the batch size here since we want to allow the users
+      ## to add models even after the object has been created.
+      
+      ## If we add models during initialization, we will always pass value (or NA) for batch_size, so
+      ## it will never be = -1. It will be equal to -1 only when user adds model after initializing the 
+      ## object, in which case, we pass the internal batch size to the setter (which warns user if needed)
+      if(!is.na(batch_size) & batch_size == -1){
+        self$set_batch_size(self$get_batch_size())
+      }
+      else{
+        self$set_batch_size(batch_size)
+      }
+      
     },
     
-    #### General Public Methods ----
     
     #' @description Remove models from the object
     #' @param mdl_names A vector of the model names to remove. 
@@ -151,7 +182,10 @@ ModelCompareBase = R6::R6Class(
     #' @description Plots the simple forecast for each model
     #' @param lastn If TRUE, this will plot the forecasts forthe last n.ahead values of the realization (Default: FALSE)
     #' @param limits If TRUE, this will also plot the lower and upper limits of the forecasts (Default: FALSE)
-    plot_simple_forecasts = function(lastn = FALSE, limits = FALSE){
+    #' @param zoom A number indicating how much to zoom into the plot. 
+    #'             For example zoom = 50 will only plot the last 50 points of the realization
+    #'             Useful for cases where realizations that are long and n.ahead is small.
+    plot_simple_forecasts = function(lastn = FALSE, limits = FALSE, zoom = NA){
       
       results = private$compute_simple_forecasts_with_validation(lastn = lastn) %>%   
         dplyr::add_row(Model = "Actual",
@@ -160,6 +194,15 @@ ModelCompareBase = R6::R6Class(
                        ll = self$get_data_var_interest(),
                        ul = self$get_data_var_interest())
       
+      if (!is.na(zoom)){
+        zoom = private$validate_zoom(zoom)
+        
+        n = private$get_len_x()
+        start = n - zoom + 1
+        
+        results = results %>% 
+          dplyr::filter(Time >= start)
+      }
       
       p = ggplot2::ggplot() +
         ggplot2::geom_line(results %>% dplyr::filter(Model == "Actual"), mapping = ggplot2::aes(x=Time, y=f, color = Model), size = 1) +
@@ -421,12 +464,19 @@ ModelCompareBase = R6::R6Class(
     models = NA,
     n.ahead = NA,
     batch_size = NA,
+    step_n.ahead = NA,
     verbose = NA,
     
     set_data = function(data){
       if (all(is.na(data))){ stop("You have not provided the time series data. Please provide to continue.") }
       private$data = data
     },
+    
+    set_step_n.ahead = function(step_n.ahead){
+      private$step_n.ahead = step_n.ahead
+    },
+    
+    get_step_n.ahead = function(){ return(private$step_n.ahead)},
     
     get_len_x = function(){
       stop("You are calling the 'get_len_x' method in the parent class. This should be implemented in the child class.")
@@ -488,19 +538,13 @@ ModelCompareBase = R6::R6Class(
       for (name in names(private$get_models())){
         if (private$get_models()[[name]][['sliding_ase']]){
           private$models[[name]][['batch_size']] = self$get_batch_size()  ## Inplace, hence not using get_models
+          private$models[[name]][['metric_has_been_computed']] = FALSE  ## Setting to FALSE since the batch size has changed 
         }
         else{
           private$models[[name]][['batch_size']] = NA  ## Inplace, hence not using get_models
+          # Not setting 'metric_has_been_computed' to FALSE since resetting the batch size should not impact models that dont use sliding ASE
         }
       }
-    },
-    
-    set_batch_size = function(batch_size){
-      if (private$any_sliding_ase() & is.na(batch_size)){
-        stop("You have provided models that require sliding ASE calculations, but the batch size has been set to NA. Please provide an appropriate value to proceed.")
-      }
-      private$batch_size = batch_size
-      private$set_batch_per_model()
     },
     
     build_models  = function(verbose = 0){
@@ -509,8 +553,26 @@ ModelCompareBase = R6::R6Class(
     
     evaluate_xIC = function(){
       stop("You are calling the 'evaluate_xIC' method in the parent class. This should be implemented in the child class.")
+    },
+    
+    evaluate_models = function(){
+      private$build_models(verbose = private$get_verbose())
+      private$evaluate_xIC()
+      self$compute_metrics(step_n.ahead = private$get_step_n.ahead())
+      print(self$summarize_build())  
+    },
+    
+    validate_zoom = function(zoom){
+      rvZoom = zoom
+      if (!is.numeric(zoom) | zoom <= 0){
+        warning(paste("The zoom value you have provided: ", zoom, " is not numeric or <= 0. No zoom will be used"))
+        rvZoom = private$get_len_x()
+      }
+      if (zoom < self$get_n.ahead()){
+        message(paste("The zoom value you have provided: ", zoom, " is less than the n.ahead value"))
+      }
+      return(rvZoom)
     }
-
     
   )
   
