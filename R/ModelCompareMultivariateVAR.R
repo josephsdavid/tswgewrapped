@@ -178,7 +178,11 @@ ModelCompareMultivariateVAR = R6::R6Class(
         trend_type = private$get_models()[[name]][['trend_type']]
         cat(paste("Trend type: ", trend_type, "\n"))
         
-        varselect = vars::VARselect(self$get_data(), lag.max = private$get_models()[[name]][['lag.max']], type = trend_type, season = NULL, exogen = NULL)
+        varselect = vars::VARselect(self$get_data(),
+                                    lag.max = private$get_models()[[name]][['lag.max']],
+                                    type = trend_type,
+                                    season = NULL, exogen = NULL)
+        
         if (verbose >= 1){
           cat("\nVARselect Object:\n")
           print(varselect) 
