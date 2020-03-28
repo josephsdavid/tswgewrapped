@@ -1,0 +1,11 @@
+"Model","select","trend_type","season","p","SigVar","OriginalVar","Lag","MaxLag"
+"AIC None","aic","none",0,3,"logGNP.l1","logGNP",-1,-1
+"AIC Trend","aic","trend",0,3,"logGNP.l1","logGNP",-1,-1
+"AIC Trend","aic","trend",0,3,"rs.l1","rs",-1,-1
+"AIC Trend","aic","trend",0,3,"rl.l1","rl",-1,-1
+"AIC Trend","aic","trend",0,3,"trend","trend",0,0
+"AIC Both","aic","both",0,10,"logGNP.l1","logGNP",-1,-1
+"AIC Both","aic","both",0,10,"logM1.l3","logM1",-3,-3
+"BIC None","bic","none",0,2,"logGNP.l1","logGNP",-1,-1
+"BIC Trend","bic","trend",0,2,"logGNP.l1","logGNP",-1,-1
+"BIC Both","bic","both",0,2,"logGNP.l1","logGNP",-1,-1

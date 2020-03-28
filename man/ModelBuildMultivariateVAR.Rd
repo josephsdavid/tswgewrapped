@@ -25,7 +25,11 @@ R6 class ModelBuildMultivariateVAR
 \item \href{#method-get_var_interest}{\code{ModelBuildMultivariateVAR$get_var_interest()}}
 \item \href{#method-get_data_var_interest}{\code{ModelBuildMultivariateVAR$get_data_var_interest()}}
 \item \href{#method-set_verbose}{\code{ModelBuildMultivariateVAR$set_verbose()}}
+\item \href{#method-set_alpha}{\code{ModelBuildMultivariateVAR$set_alpha()}}
 \item \href{#method-summarize_build}{\code{ModelBuildMultivariateVAR$summarize_build()}}
+\item \href{#method-get_recommendations}{\code{ModelBuildMultivariateVAR$get_recommendations()}}
+\item \href{#method-build_recommended_models}{\code{ModelBuildMultivariateVAR$build_recommended_models()}}
+\item \href{#method-get_final_models}{\code{ModelBuildMultivariateVAR$get_final_models()}}
 \item \href{#method-add_models}{\code{ModelBuildMultivariateVAR$add_models()}}
 \item \href{#method-remove_models}{\code{ModelBuildMultivariateVAR$remove_models()}}
 \item \href{#method-keep_models}{\code{ModelBuildMultivariateVAR$keep_models()}}
@@ -42,6 +46,7 @@ Initialize an object to compare several Univatiate Time Series Models
   data = NA,
   var_interest = NA,
   mdl_list,
+  alpha = 0.05,
   verbose = 0,
   ...
 )}\if{html}{\out{</div>}}
@@ -55,6 +60,8 @@ Initialize an object to compare several Univatiate Time Series Models
 \item{\code{var_interest}}{The output variable of interest (dependent variable)}
 
 \item{\code{mdl_list}}{A names list of all models (see format below)}
+
+\item{\code{alpha}}{Significance level to use for filtering of variables from the recommendations}
 
 \item{\code{verbose}}{How much to print during the model building and other processes (Default = 0)}
 
@@ -125,6 +132,23 @@ Adjust the verbosity level
 }
 }
 \if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-set_alpha"></a>}}
+\if{latex}{\out{\hypertarget{method-set_alpha}{}}}
+\subsection{Method \code{set_alpha()}}{
+Set the significance level to use for filtering of variables from the recommendations
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{ModelBuildMultivariateVAR$set_alpha(alpha = 0.05)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{alpha}}{Significance level to use (Default = 0.05)}
+}
+\if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-summarize_build"></a>}}
 \if{latex}{\out{\hypertarget{method-summarize_build}{}}}
 \subsection{Method \code{summarize_build()}}{
@@ -135,18 +159,72 @@ Returns the VAR model Build Summary
 
 }
 \if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-get_recommendations"></a>}}
+\if{latex}{\out{\hypertarget{method-get_recommendations}{}}}
+\subsection{Method \code{get_recommendations()}}{
+Returns a dataframe with recommended variables to use 
+for each VAR model along with its corresponding lag value
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{ModelBuildMultivariateVAR$get_recommendations()}\if{html}{\out{</div>}}
+}
+
+\subsection{Returns}{
+A data frame with the recommendations
+(1) Number of significant variables
+(2) The names of the significant variables to use
+(3) Lag value to use for the model
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-build_recommended_models"></a>}}
+\if{latex}{\out{\hypertarget{method-build_recommended_models}{}}}
+\subsection{Method \code{build_recommended_models()}}{
+Builds the models with the recommended lags and variables
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{ModelBuildMultivariateVAR$build_recommended_models()}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-get_final_models"></a>}}
+\if{latex}{\out{\hypertarget{method-get_final_models}{}}}
+\subsection{Method \code{get_final_models()}}{
+Returns a final models
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{ModelBuildMultivariateVAR$get_final_models(subset = "a", mdl_names = NA)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{subset}}{The subset of models to get.
+'a': All models (Default)
+'u': Only User Defined Models
+'r': Only the recommended models}
+
+\item{\code{mdl_names}}{Vector of model names to get. This honors the subset variable.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+A named list of models
+}
+}
+\if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-add_models"></a>}}
 \if{latex}{\out{\hypertarget{method-add_models}{}}}
 \subsection{Method \code{add_models()}}{
 Add models to the existing object
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{ModelBuildMultivariateVAR$add_models(mdl_list, ...)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{ModelBuildMultivariateVAR$add_models(mdl_list, alpha = NA, ...)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
 \item{\code{mdl_list}}{The list of new models to add}
+
+\item{\code{alpha}}{Significance level to use for filtering of variables from the recommendations (Default = 0.05)}
 
 \item{\code{...}}{Additional parameers to feed to VARSelect (if applicable) and VAR --> Most notably "exogen"}
 }

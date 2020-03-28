@@ -1,0 +1,7 @@
+"Model","trend_type","season","num_sig_vars","lag_to_use","vars_to_use"
+"AIC Both","both",0,2,3,"logGNP,logM1"
+"AIC None","none",0,1,1,"logGNP"
+"AIC Trend","trend",0,3,1,"logGNP,rs,rl"
+"BIC Both","both",0,1,1,"logGNP"
+"BIC None","none",0,1,1,"logGNP"
+"BIC Trend","trend",0,1,1,"logGNP"
