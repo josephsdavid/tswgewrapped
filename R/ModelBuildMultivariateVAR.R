@@ -16,17 +16,19 @@ ModelBuildMultivariateVAR = R6::R6Class(
     #' @param data The dataframe containing the time series realizations (data should not contain time index)
     #' @param var_interest The output variable of interest (dependent variable)
     #' @param mdl_list A names list of all models (see format below)
+    #' @param alpha Significance level to use for filtering of variables from the recommendations
     #' @param verbose How much to print during the model building and other processes (Default = 0)
     #' @param ... Additional parameers to feed to VARSelect (if applicable) and VAR --> Most notably "exogen"
     #' @return A new `ModelCompareMultivariateVAR` object.
-    initialize = function(data = NA, var_interest = NA, mdl_list, verbose = 0, ...)
+    initialize = function(data = NA, var_interest = NA, mdl_list, alpha = 0.05, verbose = 0, ...)
     {
       
       self$set_verbose(verbose = verbose)
+      self$set_alpha(alpha = alpha)
       private$set_data(data = data)
       private$set_var_interest(var_interest = var_interest)
       
-      self$add_models(mdl_list, ...)
+      self$add_models(mdl_list, alpha = private$get_alpha(), ...)
     },
     
     #### Getters and Setters ----
@@ -51,29 +53,14 @@ ModelBuildMultivariateVAR = R6::R6Class(
       private$verbose = verbose
     },
     
+    #' @description Set the significance level to use for filtering of variables from the recommendations
+    #' @param alpha Significance level to use (Default = 0.05)
+    set_alpha = function(alpha = 0.05){
+      private$alpha = alpha
+    },
+    
     #### General Public Methods ----
    
-    # #' @description Returns the AIC and the BIC for the model using the entire dataset
-    # #' @param sort_by 'AIC' or 'BIC'. Selects which column to sort the results by (Default: 'AIC')
-    # get_xIC = function(sort_by = "AIC"){
-    #   results = dplyr::tribble(~Model, ~AIC, ~BIC)
-    #   
-    #   for (name in names(private$get_models())){
-    #     AIC = private$models[[name]][['AIC']]
-    #     BIC = private$models[[name]][['BIC']]
-    #     
-    #     results = results %>% 
-    #       dplyr::add_row(Model = name, AIC = AIC, BIC = BIC)
-    #     
-    #   }  
-    #   
-    #   results = results %>% 
-    #     dplyr::arrange_at(sort_by)
-    #   
-    #   return(results)
-    #   
-    # },
-    
     #' @description Returns the VAR model Build Summary
     #' @returns A dataframe containing the following columns
     #'          'Model': Name of the model
@@ -83,15 +70,15 @@ ModelBuildMultivariateVAR = R6::R6Class(
     #'          'Init_K': The K value recommended by the VARselect function
     #'          'Final_K': The adjusted K value to take into account the smaller batch size (only when using sliding_ase)
     summarize_build = function(){
-      results = dplyr::tribble(~Model, ~Selection, ~Trend, ~Season, ~K, ~SigVar, ~OriginalVar, ~Lag, ~MaxLag)
+      results = dplyr::tribble(~Model, ~select, ~trend_type, ~season, ~p, ~SigVar, ~OriginalVar, ~Lag, ~MaxLag)
       
       for (name in names(private$get_models())){
         results = results %>% 
           dplyr::add_row(Model = name,
-                         Selection = private$models[[name]][['select']],
-                         Trend = private$models[[name]][['trend_type']],
-                         Season = ifelse(is.null(private$models[[name]][['season']]), 0, private$models[[name]][['season']]),
-                         K = private$models[[name]][['k']],
+                         select = private$models[[name]][['select']],
+                         trend_type = private$models[[name]][['trend_type']],
+                         season = ifelse(is.null(private$models[[name]][['season']]), 0, private$models[[name]][['season']]),
+                         p = private$models[[name]][['p']],
                          SigVar = private$models[[name]][['sigvars']][['sig_var']],
                          OriginalVar = private$models[[name]][['sigvars']][['original_var']],
                          Lag = private$models[[name]][['sigvars']][['lag']],
@@ -102,10 +89,151 @@ ModelBuildMultivariateVAR = R6::R6Class(
       return(results)
     },
     
+    #' @description Returns a dataframe with recommended variables to use 
+    #' for each VAR model along with its corresponding lag value
+    #' @return A data frame with the recommendations
+    #' (1) Number of significant variables
+    #' (2) The names of the significant variables to use
+    #' (3) Lag value to use for the model
+    get_recommendations = function(){
+      results = self$summarize_build() %>% 
+        dplyr::filter(!(OriginalVar %in% c("trend", "const"))) %>% 
+        dplyr::filter(!(grepl("^s[0-9]+$", OriginalVar))) %>% # Remove seasonality factors
+        dplyr::group_by(Model, trend_type, season) %>% 
+        dplyr::summarise(num_sig_vars = dplyr::n(),
+                         lag_to_use = -min(MaxLag, na.rm = TRUE),
+                         vars_to_use =  paste0(OriginalVar, collapse = ",")) %>%
+        dplyr::ungroup()                   
+        
+      return(results)
+    },
+    
+    #' @description Builds the models with the recommended lags and variables
+    build_recommended_models = function(){
+      recommendations = self$get_recommendations() %>% 
+        dplyr::mutate(Model = paste0(Model, " - R")) %>% 
+        dplyr::mutate(model_built = FALSE) %>% 
+        tibble::column_to_rownames(var = "Model") %>% 
+        dplyr::rename(p = lag_to_use) %>% 
+        dplyr::select(-num_sig_vars) 
+      
+      # https://stackoverflow.com/questions/3492379/data-frame-rows-to-a-list
+      recommendations = setNames(split(recommendations, seq(nrow(recommendations))), rownames(recommendations))
+      
+      for (name in names(recommendations)){
+        if (recommendations[[name]][['model_built']] == FALSE){
+          cat("\n\n\n")
+          cat(paste("Model: ", name, "\n"))
+          trend_type = recommendations[[name]][['trend_type']]
+          season = recommendations[[name]][['season']]
+          if (season == 0){
+            season = NULL
+          }
+          cat(paste("Trend type: ", trend_type, "\n"))
+          cat(paste("Seasonality: ", season, "\n"))
+          
+          col_names = unlist(strsplit(recommendations[[name]][['vars_to_use']], split = ","))
+          col_names = c(self$get_var_interest(), col_names)
+          col_names = unique(col_names)
+
+          if (length(col_names) == 1){
+            warning("This recommendation is to use just the variable of interest (dependent variable) to model the time series, hence this model will not be built. Please use a univariate approach to model this separately.")
+          }
+          else{
+            selected_data = private$get_selected_data(col_names)
+
+            # Fit to Entire Data
+            # This might be needed in many places to computing it here.
+            varfit = vars::VAR(selected_data,
+                               p = recommendations[[name]][['p']],
+                               type = trend_type,
+                               season = season #,
+                               #...
+                               )
+
+            ## Find the significant variables only
+            results = summary(varfit[['varresult']][[self$get_var_interest()]])
+
+            if (private$get_verbose() >= 1){
+              cat(paste0("\n\nPrinting summary of the VAR fit for the variable of interest: ", self$get_var_interest(), "\n"))
+              print(results)
+            }
+
+            ## Inplace
+            # https://stackoverflow.com/questions/32626925/problems-using-double-lists
+            # If the first element inserted is not a list, then if we subsequently try to add a list, it gives error
+            # Hence kept the varfit first
+            private$models[[name]][['varfit']] = varfit  ## TODO: Check Need to add list here else it gives error. 
+            private$models[[name]][['p']] = recommendations[[name]][['p']]
+            private$models[[name]][['sigvars']] = NA  # We dont care here since we are going to use all
+            private$models[[name]][['model_type']] = "recommended"
+            private$models[[name]][['model_built']] = TRUE
+     
+          }
+        }
+        else{
+          warning(paste("Model: '", name, "' has already been built. This will not be built again."))
+        }
+      }
+      
+    },
+    
+    #' @description Returns a final models 
+    #' @param subset The subset of models to get.
+    #'              'a': All models (Default)
+    #'              'u': Only User Defined Models
+    #'              'r': Only the recommended models
+    #' @param mdl_names Vector of model names to get. This honors the subset variable.
+    #' @return A named list of models
+    get_final_models = function(subset = 'a', mdl_names = NA){
+      if (subset != 'a' & subset != 'u' & subset != 'r'){
+        warning("The subset value mentioned is not correct. Allowed values are 'a', 'u' or 'r. The default value 'a' will be used")
+        subset = 'a'
+      }
+      
+      mdl_subset_names = c()
+
+      for (name in names(private$get_models())){
+        if (subset == 'a' | subset == 'r'){
+          if (private$models[[name]][['model_type']] == 'recommended'){
+            if (is.na(mdl_names)){
+              mdl_subset_names = c(mdl_subset_names, name)  
+            }
+            else{
+              if (name %in% mdl_names){
+                mdl_subset_names = c(mdl_subset_names, name)
+              }
+            }
+          }
+        }
+        if (subset == 'a' | subset == 'u'){
+          if (private$models[[name]][['model_type']] == 'user_defined'){
+            if (is.na(mdl_names)){
+              mdl_subset_names = c(mdl_subset_names, name)  
+            }
+            else{
+              if (name %in% mdl_names){
+                mdl_subset_names = c(mdl_subset_names, name)
+              }
+            }  
+          }
+        }
+      }
+      
+      mdl_subset = list()
+      
+      for (name in mdl_subset_names){
+        mdl_subset[[name]] = private$models[[name]][['varfit']]
+      }
+      
+      return(mdl_subset)
+    },
+    
     #' @description Add models to the existing object
     #' @param mdl_list The list of new models to add
+    #' @param alpha Significance level to use for filtering of variables from the recommendations (Default = 0.05)
     #' @param ... Additional parameers to feed to VARSelect (if applicable) and VAR --> Most notably "exogen"
-    add_models = function(mdl_list, ...){
+    add_models = function(mdl_list, alpha = NA, ...){
       if (length(unique(names(mdl_list))) != length(names(mdl_list))){
         stop("The model names in the provided list contain duplicates. Please fix and rerun.")
       }
@@ -125,7 +253,11 @@ ModelBuildMultivariateVAR = R6::R6Class(
         private$models = c(private$models, mdl_list)
       }
       
-      private$build_models(verbose = private$get_verbose(), ...)
+      if (is.na(alpha)){
+        alpha = private$get_alpha()
+      }
+      
+      private$build_models(verbose = private$get_verbose(), alpha = alpha, ...)
       
     },
     
@@ -164,6 +296,7 @@ ModelBuildMultivariateVAR = R6::R6Class(
     data = NA,
     var_interest = NA,
     models = NA,
+    alpha = NA,
     verbose = NA,
     
     set_data = function(data){
@@ -171,10 +304,18 @@ ModelBuildMultivariateVAR = R6::R6Class(
       private$data = data
     },
     
+    get_selected_data = function(col_names){
+      return(self$get_data() %>% dplyr::select(col_names))
+    },
+    
     set_var_interest = function(var_interest){private$var_interest = var_interest},
     
     get_models = function(){
       return(private$models)
+    },
+    
+    get_alpha = function(){
+      return(private$alpha)
     },
     
     get_verbose = function(){
@@ -199,98 +340,76 @@ ModelBuildMultivariateVAR = R6::R6Class(
       return(mdl_list)
     },
     
-    # get_len_x = function(){
-    #   return(nrow(self$get_data()))
-    # },
-
-    build_models  = function(verbose = 0, ...){
+    build_models  = function(verbose = 0, alpha, ...){
       for (name in names(private$get_models())){
-        cat("\n\n\n")
-        cat(paste("Model: ", name, "\n"))
-        trend_type = private$get_models()[[name]][['trend_type']]
-        cat(paste("Trend type: ", trend_type, "\n"))
-        
-        varselect = vars::VARselect(self$get_data(),
-                                    lag.max = private$get_models()[[name]][['lag.max']],
-                                    type = trend_type,
-                                    season = private$get_models()[[name]][['season']],
-                                    ...)
-        
-        if (verbose >= 1){
-          cat("\nVARselect Object:\n")
-          print(varselect) 
-        }
-        
-        selection = private$extract_correct_varselection(varselect)
-        
-        select = tolower(private$get_models()[[name]][['select']])
-        if (select == 'aic'){
-          k = selection[["AIC(n)"]]
-        }
-        else if (select == 'bic'){
-          k = selection[["SC(n)"]]
+        if (private$get_models()[[name]][['model_built']] == FALSE){
+          cat("\n\n\n")
+          cat(paste("Model: ", name, "\n"))
+          trend_type = private$get_models()[[name]][['trend_type']]
+          season = private$get_models()[[name]][['season']]
+          cat(paste("Trend type: ", trend_type, "\n"))
+          cat(paste("Seasonality: ", season, "\n"))
+          
+          varselect = vars::VARselect(self$get_data(),
+                                      lag.max = private$get_models()[[name]][['lag.max']],
+                                      type = trend_type,
+                                      season = season,
+                                      ...)
+          
+          if (private$get_verbose() >= 1){
+            cat("\nVARselect Object:\n")
+            print(varselect) 
+          }
+          
+          selection = private$extract_correct_varselection(varselect)
+          
+          select = tolower(private$get_models()[[name]][['select']])
+          if (select == 'aic'){
+            p = selection[["AIC(n)"]]
+          }
+          else if (select == 'bic'){
+            p = selection[["SC(n)"]]
+          }
+          else{
+            stop("'select' argument must be with 'aic' or 'bic'")
+          }
+          cat(paste("Lag K to use for the VAR Model: ", p, "\n")) 
+          
+          # Fit to Entire Data
+          # This might be needed in many places to computing it here.
+          varfit = vars::VAR(self$get_data(),
+                             p = p,
+                             type = trend_type,
+                             season = season,
+                             ...
+                             )
+          
+          ## Find the significant variables only
+          results = summary(varfit[['varresult']][[self$get_var_interest()]])
+          
+          if (private$get_verbose() >= 1){
+            cat(paste0("\n\nPrinting summary of the VAR fit for the variable of interest: ", self$get_var_interest(), "\n"))
+            print(results)
+          }
+          
+          ## Inplace
+          # https://stackoverflow.com/questions/32626925/problems-using-double-lists
+          # If the first element inserted is not a list, then if we subsequently try to add a list, it gives error
+          # Hence kept the varfit first
+          private$models[[name]][['varselect']] = varselect
+          private$models[[name]][['varfit']] = varfit
+          private$models[[name]][['p']] = p
+          private$models[[name]][['sigvars']] = private$get_significant_vars(results, alpha)  # What were the significant column (variables in the model)
+          private$models[[name]][['model_type']] = "user_defined"
+          private$models[[name]][['model_built']] = TRUE
+          
         }
         else{
-          stop("'select' argument must be with 'aic' or 'bic'")
+          warning(paste("Model: '", name, "' has already been built. This will not be built again."))
         }
-        cat(paste("Lag K to use for the VAR Model: ", k, "\n")) 
-        
-        # Fit to Entire Data
-        # This might be needed in many places to computing it here.
-        varfit = vars::VAR(self$get_data(),
-                           p = k,
-                           type = trend_type,
-                           season = private$get_models()[[name]][['season']],
-                           ...
-                           )
-        
-        ## Find the significant variables only
-        results = summary(varfit[['varresult']][[self$get_var_interest()]])
-        
-        if (verbose >= 1){
-          cat(paste0("\n\nPrinting summary of the VAR fit for the variable of interest: ", self$get_var_interest(), "\n"))
-          print(results)
-        }
-        
-        significant = as.data.frame(results$coefficients)[which(results$coefficients[,"Pr(>|t|)"] < 0.05), ]
-        sig_vars = as.data.frame(rownames(significant))
-        colnames(sig_vars) = "sig_var"
-        
-        sig_vars = sig_vars %>% 
-          tidyr::separate(col = sig_var, into = c("original_var", "lag"), sep = "\\.", remove = FALSE) %>% 
-          dplyr::mutate(lag = -as.numeric(stringr::str_replace(lag, "l", ""))) %>% 
-          dplyr::group_by(original_var) %>% 
-          dplyr::mutate(max_lag = min(lag)) %>% 
-          dplyr::ungroup()
-        
-        ## Inplace
-        private$models[[name]][['varselect']] = varselect
-        private$models[[name]][['k']] = k
-        private$models[[name]][['varfit']] = varfit
-        private$models[[name]][['sigvars']] = sig_vars
         
       }
     },
-    
-    # evaluate_xIC = function(){
-    #   for (name in names(private$get_models())){
-    #     
-    #     varfit = private$models[[name]][['varfit_alldata']]
-    #     
-    #     AIC = stats::AIC(varfit)
-    #     BIC = stats::BIC(varfit)
-    #     
-    #     private$models[[name]][['AIC']] = AIC
-    #     private$models[[name]][['BIC']] = BIC
-    #   }  
-    # },
-    
-    # evaluate_models = function(...){
-    #   private$build_models(verbose = private$get_verbose(), ...)
-    #   # private$evaluate_xIC()
-    #   # self$compute_metrics(step_n.ahead = private$get_step_n.ahead())
-    #   # print(self$summarize_build())  
-    # },
     
     extract_correct_varselection = function(vselect){
       criteria = vselect$criteria
@@ -308,6 +427,22 @@ ModelBuildMultivariateVAR = R6::R6Class(
         assertr::verify(assertr::has_all_names("AIC(n)", "HQ(n)", "SC(n)", "FPE(n)"))
       
       return(selection)
+    },
+    
+    get_significant_vars = function(results, alpha){
+      significant = as.data.frame(results[["coefficients"]])[which(results[["coefficients"]][,"Pr(>|t|)"] < alpha), ]
+      sig_vars = as.data.frame(rownames(significant))
+      colnames(sig_vars) = "sig_var"
+      
+      sig_vars = sig_vars %>% 
+        tidyr::separate(col = sig_var, into = c("original_var", "lag"), sep = "\\.", remove = FALSE) %>% 
+        tidyr::replace_na(list(lag = 0)) %>% 
+        dplyr::mutate(lag = -as.numeric(stringr::str_replace(lag, "l", ""))) %>% 
+        dplyr::group_by(original_var) %>% 
+        dplyr::mutate(max_lag = min(lag)) %>% 
+        dplyr::ungroup()
+      
+      return(sig_vars)
     }
     
     
