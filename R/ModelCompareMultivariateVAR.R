@@ -70,19 +70,19 @@ ModelCompareMultivariateVAR = R6::R6Class(
     #' @description Returns the VAR model Build Summary
     #' @returns A dataframe containing the following columns
     #'          'Model': Name of the model
-    #'          'Selection': The selection criteria used for K value (AIC or BIC)
-    #'          'Trend': The trend argument used in the VARselect and VAR functions
+    #'          'Trend': The trend argument used in the VAR functions
+    #'          'Season' The season argument used in the VAR functions
     #'          'SlidingASE': Whether Sliding ASE will be used for this model
     #'          'Init_K': The K value recommended by the VARselect function
     #'          'Final_K': The adjusted K value to take into account the smaller batch size (only when using sliding_ase)
     summarize_build = function(){
-      results = dplyr::tribble(~Model, ~Selection, ~Trend, ~SlidingASE, ~Init_K, ~Final_K)
+      results = dplyr::tribble(~Model, ~Trend, ~Season, ~SlidingASE, ~Init_K, ~Final_K)
       
       for (name in names(private$get_models())){
         results = results %>% 
           dplyr::add_row(Model = name,
-                         Selection = private$models[[name]][['select']],
                          Trend = private$models[[name]][['trend_type']],
+                         Season = ifelse(is.null(private$models[[name]][['season']]), 0, private$models[[name]][['season']]),
                          SlidingASE = private$models[[name]][['sliding_ase']],
                          Init_K = private$models[[name]][['k_initial']],
                          Final_K = private$models[[name]][['k_final']]
@@ -102,22 +102,54 @@ ModelCompareMultivariateVAR = R6::R6Class(
     
     set_var_interest = function(var_interest){private$var_interest = var_interest},
     
+    get_data_subset = function(col_names){
+      return(self$get_data() %>% dplyr::select(col_names))
+    },
+    
     get_len_x = function(){
       return(nrow(self$get_data()))
     },
     
-    clean_model_input = function(mdl_list){
+    clean_model_input = function(mdl_list, batch_size){
       
       mdl_list = super$clean_model_input(mdl_list)
+      
+      for (name in names(mdl_list)){
+        k = mdl_list[[name]]$varfit$p
+        
+        mdl_list[[name]][['varfit_alldata']] = mdl_list[[name]]$varfit
+        mdl_list[[name]][['vars_to_use']] = colnames(mdl_list[[name]]$varfit$y)
+        mdl_list[[name]][['k_initial']] = k
+        mdl_list[[name]][['trend_type']] = mdl_list[[name]]$varfit$type
+        mdl_list[[name]][['season']] = mdl_list[[name]]$varfit$call$season
+        
+        k_final = k
+        ## If using sliding ASE, make sure that the batch size is large enough to support the number of lags
+        if (mdl_list[[name]][['sliding_ase']] == TRUE){
+          k_final = private$validate_k(k, batch_size,
+                                       season = mdl_list[[name]]$varfit$call$season,
+                                       col_names = colnames(mdl_list[[name]]$varfit$y))
+        }
+        
+        mdl_list[[name]][['k_final']] = k_final
+        
+        AIC = stats::AIC(mdl_list[[name]]$varfit)
+        BIC = stats::BIC(mdl_list[[name]]$varfit)
+         
+        mdl_list[[name]][['AIC']] = AIC
+        mdl_list[[name]][['BIC']] = BIC
+        
+      }
       
       return(mdl_list)
     },
     
     get_sliding_ase_results = function(name, step_n.ahead){
-      res = sliding_ase_var(data = self$get_data(),
+      res = sliding_ase_var(data = private$get_data_subset(col_names = private$get_models()[[name]][['vars_to_use']]),
                             var_interest = self$get_var_interest(),
                             k = private$get_models()[[name]][['k_final']],
                             trend_type = private$get_models()[[name]][['trend_type']],
+                            season = private$get_models()[[name]][['season']],
                             n.ahead = self$get_n.ahead(),
                             batch_size = private$get_models()[[name]][['batch_size']],
                             step_n.ahead = step_n.ahead, verbose = private$get_verbose())
@@ -172,96 +204,29 @@ ModelCompareMultivariateVAR = R6::R6Class(
     },
     
     build_models  = function(verbose = 0){
-      for (name in names(private$get_models())){
-        cat("\n\n\n")
-        cat(paste("Model: ", name, "\n"))
-        trend_type = private$get_models()[[name]][['trend_type']]
-        cat(paste("Trend type: ", trend_type, "\n"))
-        
-        varselect = vars::VARselect(self$get_data(),
-                                    lag.max = private$get_models()[[name]][['lag.max']],
-                                    type = trend_type,
-                                    season = NULL, exogen = NULL)
-        
-        if (verbose >= 1){
-          cat("\nVARselect Object:\n")
-          print(varselect) 
-        }
-        
-        selection = private$extract_correct_varselection(varselect)
-        
-        select = tolower(private$get_models()[[name]][['select']])
-        if (select == 'aic'){
-          k = selection[["AIC(n)"]]
-        }
-        else if (select == 'bic'){
-          k = selection[["SC(n)"]]
-        }
-        else{
-          stop("'select' argument must be with 'aic' or 'bic'")
-        }
-        cat(paste("Lag K to use for the VAR Model: ", k, "\n")) 
-        
-        k_final = k
-        ## If using sliding ASE, make sure that the batch size is large enough to support the number of lags
-        if (private$get_models()[[name]][['sliding_ase']] == TRUE){
-          k_final = private$validate_k(k)
-        }
-        
-        # Fit to Entire Data
-        # This might be needed in many places to computing it here.
-        varfit = vars::VAR(self$get_data(), p=k_final, type=trend_type)
-        
-        if (verbose >= 1){
-          cat(paste0("\n\nPrinting summary of the VAR fit for the variable of interest: ", var_interest, "\n"))
-          print(summary(varfit$varresult[[var_interest]]))
-        }
-        
-        ## Inplace
-        private$models[[name]][['varselect_alldata']] = varselect
-        private$models[[name]][['k_initial']] = k
-        private$models[[name]][['k_final']] = k_final
-        private$models[[name]][['varfit_alldata']] = varfit
-        
-      }
+      
     },
     
     evaluate_xIC = function(){
-      for (name in names(private$get_models())){
-        
-        varfit = private$models[[name]][['varfit_alldata']]
-        
-        AIC = stats::AIC(varfit)
-        BIC = stats::BIC(varfit)
-        
-        private$models[[name]][['AIC']] = AIC
-        private$models[[name]][['BIC']] = BIC
-      }  
+      
     },
     
-    extract_correct_varselection = function(vselect){
-      criteria = vselect$criteria
+    validate_k = function(k, batch_size, season, col_names){
+      # https://stats.stackexchange.com/questions/234975/how-many-endogenous-variables-in-a-var-model-with-120-observations
+      ## num_vars (in code) = K in the equation in link
+      ## k (code) = p in the equation in link
+      t =  batch_size - self$get_n.ahead()
+      num_vars = length(col_names)  
       
-      if(sum(criteria == -Inf, na.rm = TRUE) > 0){
-        warning("VARselect produced -Inf values. These will be removed before making final 'K' selection.")
-        
-        criteria[criteria == -Inf] = max(criteria) + 1
+      if (is.null(season)){
+        season = 1  # So we dont subtract anthign from the numerator
       }
       
-      selection = data.frame(t(Rfast::rowMins(criteria)))
-      colnames(selection) = rownames(criteria)
-      
-      selection = selection %>% 
-        assertr::verify(assertr::has_all_names("AIC(n)", "HQ(n)", "SC(n)", "FPE(n)"))
-      
-      return(selection)
-    },
-    
-    validate_k = function(k){
       new_k = k
-      num_vars = ncol(self$get_data())
-      if (k * num_vars >= (self$get_batch_size()-1)){
-        new_k = floor((self$get_batch_size()-1)/num_vars) - 1 # Being a little more conservative 
+      
+      # NOTE: I changed 1 to 2 since we can also have a case with trend and const instead of just constant.
+      if (k * (num_vars+1) + 2 > t){
+        new_k =  floor((t-2-(season-1))/(num_vars + 1))
         warning("Although the lag value k: ", k, " selected by VARselect will work for your full dataset, is too large for your batch size. Reducing k to allow Batch ASE calculations. New k: ", new_k, " If you do not want to reduce the k value, increase the batch size or make sliding_ase = FALSE for this model in the model list")
       }
       return((new_k))

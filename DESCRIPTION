@@ -1,6 +1,6 @@
 Package: tswgewrapped
 Title: Helpful wrappers for 'tswge' and 'vars' packages
-Version: 1.8.8
+Version: 1.8.9
 Authors@R: c(person("David", "Josephs", email = "josephsd@smu.edu", role = c("aut", "cre")),
              person("Nikhil", "Gupta", email = "guptan@smu.edu", role = c("aut")))
 Description: This package provides several helpful wrappers for the already useful tswge package. In the future, this package intends to move away from the tswge backend, to be faster, with more readable source code.

@@ -133,10 +133,12 @@ sliding_ase_univariate = function(x,
 #' @param var_interest The output variable of interest (dependent variable)
 #' @param k The lag value to use for the VAR model (generally determined by the VARselect function)
 #' @param trend_type The trend type to use in VARselect and the VAR model. Refer to vars::VARselect and vars::VAR for valid options.
+#' @param season The seasonality to use in the VAR model.
 #' @param batch_size Window Size used 
 #' @param n.ahead last n.ahead data points in each batch will be used for prediction and ASE calculations
 #' @param step_n.ahead Whether to step each batch by n.ahead values (Default = FALSE)
 #' @param verbose How much to print during the model building and other processes (Default = 0)
+#' @param ... Additional arguments to pass to the VAR model
 #' @return Named list 
 #'         'ASEs' - ASE values
 #'         'time_test_start' - Time Index indicating start of test time corresponding to the ASE values
@@ -150,9 +152,10 @@ sliding_ase_univariate = function(x,
 #'         'time.forecasts' - Time Corresponding to each forecast, upper and lower limit values
 #' @export
 sliding_ase_var = function(data, var_interest,
-                           k, trend_type = NA,
+                           k, trend_type = NA, season = NULL,
                            n.ahead = NA, batch_size = NA,    # Forecasting specific arguments
-                           step_n.ahead = TRUE, verbose = 0
+                           step_n.ahead = TRUE, verbose = 0,
+                           ...
                            )                              
 {
   # Sliding CV ... batches are mutually exclusive
@@ -198,8 +201,6 @@ sliding_ase_var = function(data, var_interest,
   time_test_start = numeric(num_batches)
   time_test_end = numeric(num_batches)
   batch_num = numeric(num_batches)
-  # AICs = numeric(num_batches)
-  # BICs = numeric(num_batches)
   
   for (i in 0:(num_batches-1))
   {
@@ -225,7 +226,7 @@ sliding_ase_var = function(data, var_interest,
     test_data = data[test_start:test_end, ]
     
     # Fit model for the batch
-    varfit = vars::VAR(train_data, p=k, type=trend_type)
+    varfit = vars::VAR(train_data, p=k, type=trend_type, season = season, ...)
     
     if (verbose >= 2){
       cat(paste0("\nBatch: ", i+1, "\n"))
@@ -236,7 +237,7 @@ sliding_ase_var = function(data, var_interest,
     
     # Forecast for the batch
     forecasts = stats::predict(varfit, n.ahead=n.ahead)
-    forecasts = forecasts$fcst[[var_interest]] ## Get the forecasts only for the dependent variable
+    forecasts = forecasts[['fcst']][[var_interest]] ## Get the forecasts only for the dependent variable
     
     ASEs[i+1] = mean((test_data[, var_interest] - forecasts[, 'fcst'])^2)
     start = start + step_size
@@ -246,18 +247,12 @@ sliding_ase_var = function(data, var_interest,
     forecasts.ul[test_start: test_end] = forecasts[, 'upper']
     time.forecasts[test_start: test_end] = seq(test_start, test_end, 1)
     
-    # # Batch AIC and BIC
-    # AICs[i+1] = stats::AIC(varfit)
-    # BICs[i+1] = stats::BIC(varfit)
-    
   }
   
   return(list(ASEs = ASEs,
               time_test_start = time_test_start,
               time_test_end = time_test_end,
               batch_num = batch_num,
-              # AICs = AICs,
-              # BICs = BICs,
               f = forecasts.f,
               ll = forecasts.ll,
               ul = forecasts.ul,

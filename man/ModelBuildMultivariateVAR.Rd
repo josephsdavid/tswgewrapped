@@ -61,7 +61,7 @@ Initialize an object to compare several Univatiate Time Series Models
 
 \item{\code{mdl_list}}{A names list of all models (see format below)}
 
-\item{\code{alpha}}{Significance level to use for filtering of variables from the recommendations}
+\item{\code{alpha}}{Significance level to use for filtering of variables from the recommendations (Default = 0.05)}
 
 \item{\code{verbose}}{How much to print during the model building and other processes (Default = 0)}
 

@@ -211,7 +211,7 @@ ModelCompareUnivariate = R6::R6Class(
       return(length(self$get_data()))
     },
     
-    clean_model_input = function(mdl_list){
+    clean_model_input = function(mdl_list, batch_size){
       # If the inputs are missing p, d, q, or s values, this will add 0s to make it consistent
       for (name in names(mdl_list)){
         if (is.null(mdl_list[[name]][['phi']])){

@@ -28,27 +28,58 @@ data = as.data.frame(USeconomic)
 colnames(data) = c("logM1", "logGNP", "rs", "rl")
 ```
  
-# Setup Models to be compared 
-```{r} 
-lag.max = 10
-n.ahead = 4
-batch_size = 40
-var_interest = 'logGNP'
 
-models = list("VARS AIC No Trend A" = list(select = "aic", trend_type = "none", lag.max = lag.max, sliding_ase = FALSE),
-              "VARS AIC Trend A"    = list(select = "aic", trend_type = "trend", lag.max = lag.max, sliding_ase = FALSE),
-              "VARS AIC Const + Trend A" = list(select = "aic", trend_type = "both", lag.max = lag.max, sliding_ase = FALSE),
-              "VARS BIC No Trend A" = list(select = "bic", trend_type = "none", lag.max = lag.max, sliding_ase = FALSE),
-              "VARS BIC Trend A"    = list(select = "bic", trend_type = "trend", lag.max = lag.max, sliding_ase = FALSE),
-              "VARS BIC Const + Trend A" = list(select = "bic", trend_type = "both", lag.max = lag.max, sliding_ase = FALSE)
-              )
+# Get Model Recommendations
+
+```{r}
+lag.max = 10
+
+models = list("AIC None" = list(select = "aic", trend_type = "none", lag.max = lag.max),
+              "AIC Trend"    = list(select = "aic", trend_type = "trend", lag.max = lag.max),
+              "AIC Both" = list(select = "aic", trend_type = "both", lag.max = lag.max),
+              "BIC None" = list(select = "bic", trend_type = "none", lag.max = lag.max),
+              "BIC Trend"    = list(select = "bic", trend_type = "trend", lag.max = lag.max),
+              "BIC Both" = list(select = "bic", trend_type = "both", lag.max = lag.max))
+
+var_interest = 'logGNP'
 ```
 
-# Initialize the ModelCompareUnivariate object
+```{r}
+mdl_build = ModelBuildMultivariateVAR$new(data = data, var_interest = var_interest,
+                                          mdl_list = models, verbose = 1)
+```
+
+```{r}
+mdl_build$get_recommendations()
+```
+
+```{r}
+mdl_build$build_recommended_models()
+```
+
+```{r}
+# Get only user defined models
+# Other options are ony recommended models (subset = 'r') or all models (subset = 'a') 
+models = mdl_build$get_final_models(subset = 'u')
+```
+
+# Setup Models to be compared 
+```{r} 
+#### With sliding ASE = TRUE
+for (name in names(models)){
+  models[[name]][['sliding_ase']] = TRUE
+}
+  
+batch_size = 38
+n.ahead = 2
+```
+
+# Initialize the ModelCompareMultivariateVAR object
 ```{r}
 #### With n_step.ahead = TRUE (Default)              
 mdl_compare = ModelCompareMultivariateVAR$new(data = data, var_interest = var_interest,
-                                              mdl_list = models, n.ahead = n.ahead, batch_size = batch_size)
+                                              mdl_list = models, n.ahead = n.ahead, batch_size = batch_size, verbose = 1)
+
 ```
 
 # Compare the models

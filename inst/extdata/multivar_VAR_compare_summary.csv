@@ -1,0 +1,7 @@
+Model,Trend,Season,SlidingASE,Init_K,Final_K
+AIC None,none,0,TRUE,3,3
+AIC Trend,trend,0,TRUE,3,3
+AIC Both,both,0,TRUE,10,6
+BIC None,none,0,TRUE,2,2
+BIC Trend,trend,0,TRUE,2,2
+BIC Both,both,0,TRUE,2,2

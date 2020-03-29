@@ -93,7 +93,7 @@ ModelCompareBase = R6::R6Class(
         stop("The model names above already exist in this comparison object. Please provide unique names.")
       }
       
-      mdl_list = private$clean_model_input(mdl_list)
+      mdl_list = private$clean_model_input(mdl_list, batch_size)
       
       if (all(is.na(private$models))){
         private$models = mdl_list
@@ -162,8 +162,6 @@ ModelCompareBase = R6::R6Class(
           private$models[[name]][['time_test_start']] = res$time_test_start
           private$models[[name]][['time_test_end']] = res$time_test_end
           private$models[[name]][['batch_num']] = res$batch_num
-          # private$models[[name]][['AICs']] = res$AICs
-          # private$models[[name]][['BICs']] = res$BICs
           private$models[[name]][['f']] = res$f
           private$models[[name]][['ll']] = res$ll
           private$models[[name]][['ul']] = res$ul
@@ -472,6 +470,10 @@ ModelCompareBase = R6::R6Class(
       private$data = data
     },
     
+    get_data_subset = function(col_names){
+      stop("You are calling the 'get_data_subset' method in the parent class. This should be implemented in the child class.")
+    },
+    
     set_step_n.ahead = function(step_n.ahead){
       private$step_n.ahead = step_n.ahead
     },
@@ -490,7 +492,7 @@ ModelCompareBase = R6::R6Class(
       return(private$verbose)
     },
     
-    clean_model_input = function(mdl_list){
+    clean_model_input = function(mdl_list, batch_size){
       # If the inputs are missing sliding_ase, make it FALSE
       # Also add 'metric_has_been_computed' key
       for (name in names(mdl_list)){
@@ -499,7 +501,6 @@ ModelCompareBase = R6::R6Class(
         }
         
         mdl_list[[name]][['metric_has_been_computed']] = FALSE
-        
       }
       
       return(mdl_list)

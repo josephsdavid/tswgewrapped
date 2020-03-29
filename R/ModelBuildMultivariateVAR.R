@@ -16,7 +16,7 @@ ModelBuildMultivariateVAR = R6::R6Class(
     #' @param data The dataframe containing the time series realizations (data should not contain time index)
     #' @param var_interest The output variable of interest (dependent variable)
     #' @param mdl_list A names list of all models (see format below)
-    #' @param alpha Significance level to use for filtering of variables from the recommendations
+    #' @param alpha Significance level to use for filtering of variables from the recommendations (Default = 0.05)
     #' @param verbose How much to print during the model building and other processes (Default = 0)
     #' @param ... Additional parameers to feed to VARSelect (if applicable) and VAR --> Most notably "exogen"
     #' @return A new `ModelCompareMultivariateVAR` object.
@@ -96,15 +96,29 @@ ModelBuildMultivariateVAR = R6::R6Class(
     #' (2) The names of the significant variables to use
     #' (3) Lag value to use for the model
     get_recommendations = function(){
+      
+      # Check if any seasonality term is significant
+      season_data = self$summarize_build() %>% 
+        dplyr::group_by(Model, trend_type, season) %>% 
+        dplyr::filter(grepl("^sd[0-9]+$", OriginalVar)) %>% 
+        dplyr::summarise(num_sig_season_factors = n()) %>% 
+        dplyr::ungroup() %>% 
+        dplyr::mutate(sig_season_factors = ifelse(num_sig_season_factors >= 1, TRUE, FALSE)) %>% 
+        dplyr::select(-num_sig_season_factors)
+      
       results = self$summarize_build() %>% 
         dplyr::filter(!(OriginalVar %in% c("trend", "const"))) %>% 
-        dplyr::filter(!(grepl("^s[0-9]+$", OriginalVar))) %>% # Remove seasonality factors
+        dplyr::filter(!(grepl("^sd[0-9]+$", OriginalVar))) %>% # Remove seasonality factors
         dplyr::group_by(Model, trend_type, season) %>% 
         dplyr::summarise(num_sig_vars = dplyr::n(),
                          lag_to_use = -min(MaxLag, na.rm = TRUE),
                          vars_to_use =  paste0(OriginalVar, collapse = ",")) %>%
-        dplyr::ungroup()                   
-        
+        dplyr::ungroup() %>% 
+        dplyr::left_join(season_data, by = c("Model", "trend_type", "season")) %>% 
+        dplyr::mutate(season_to_use = ifelse(sig_season_factors == TRUE, season, 0)) %>% 
+        tidyr::replace_na(list(season_to_use = 0)) %>% 
+        dplyr::select(-sig_season_factors)
+      
       return(results)
     },
     
@@ -125,7 +139,7 @@ ModelBuildMultivariateVAR = R6::R6Class(
           cat("\n\n\n")
           cat(paste("Model: ", name, "\n"))
           trend_type = recommendations[[name]][['trend_type']]
-          season = recommendations[[name]][['season']]
+          season = recommendations[[name]][['season_to_use']]
           if (season == 0){
             season = NULL
           }
@@ -223,7 +237,8 @@ ModelBuildMultivariateVAR = R6::R6Class(
       mdl_subset = list()
       
       for (name in mdl_subset_names){
-        mdl_subset[[name]] = private$models[[name]][['varfit']]
+        mdl_subset[[name]][['varfit']] = private$models[[name]][['varfit']]
+        mdl_subset[[name]][['sliding_ase']] = FALSE
       }
       
       return(mdl_subset)
