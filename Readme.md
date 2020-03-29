@@ -151,8 +151,33 @@ xs <- playground(400)
 
 # Univariate Time Series Model Comparison
 Check out the vignette 'ModelCompareUnivariate'
+* Supports comparig the performance of multiple univariate models (ARMA, ARIMA and Seasonal ARIMA)
+* Suppport for simple forecasts and plotting
+* Support for Batch ASE calculations and plotting
+* Statistical Comparison of models (when using batch ASE method)
+* Histogram of model comparison (ASE values)
+* Tabular metrics for manual anaysis (if needed)
+
+# Multivariate Time Series Model EDA
+Vignete pending
+* Supports plotting of realizations
+* Supports scatterplot matrix to check for correlations between variables and independence of dependent variables (assumnption of MLR model with correlated errors)
+* Support for plotting and analyzing cross-correlation data (CCF function)
+* Support for lag plots (pending)
+
+# Multivariate Time Series Model (VAR) Model Building
+Check out the vignette 'ModelBuildMultivariateVAR'
+* VAR models are prone to overfitting if we use a lot of exogenous variables with a large lag order. 
+* This class supports building multiple VAR models at the same time and provides recommendations for which features to keep in the final model. 
+* User can then choose to keep all original variables or use the recommended model alternative. 
+* The output from this class works well with the ModelCompareMultivariateVAR class and all the original and recommended models can be compared with each other using this class
 
 # Multivariate Time Series Model (VAR) Comparison
 Check out the vignette 'ModelCompareMultivariateVAR'
-
+* Supports comparig the performance of multiple multivariate VAR models
+* Suppport for simple forecasts and plotting
+* Support for Batch ASE calculations and plotting
+* Statistical Comparison of models (when using batch ASE method)
+* Histogram of model comparison (ASE values)
+* Tabular metrics for manual anaysis (if needed)
 
