@@ -6,8 +6,8 @@
 \value{
 A dataframe containing the following columns
          'Model': Name of the model
-         'Selection': The selection criteria used for K value (AIC or BIC)
-         'Trend': The trend argument used in the VARselect and VAR functions
+         'Trend': The trend argument used in the VAR functions
+         'Season' The season argument used in the VAR functions
          'SlidingASE': Whether Sliding ASE will be used for this model
          'Init_K': The K value recommended by the VARselect function
          'Final_K': The adjusted K value to take into account the smaller batch size (only when using sliding_ase)

@@ -1,0 +1,3 @@
+"Model","trend_type","season","num_sig_vars","lag_to_use","vars_to_use","season_to_use"
+"AIC Trend","trend",3,2,3,"logGNP,logM1",0
+"BIC Trend","trend",4,2,1,"logGNP,rl",4

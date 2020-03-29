@@ -1,0 +1,7 @@
+"Model","select","trend_type","season","p","SigVar","OriginalVar","Lag","MaxLag"
+"AIC Trend","aic","trend",3,10,"logGNP.l1","logGNP",-1,-1
+"AIC Trend","aic","trend",3,10,"logM1.l3","logM1",-3,-3
+"AIC Trend","aic","trend",3,10,"trend","trend",0,0
+"BIC Trend","bic","trend",4,2,"logGNP.l1","logGNP",-1,-1
+"BIC Trend","bic","trend",4,2,"rl.l1","rl",-1,-1
+"BIC Trend","bic","trend",4,2,"sd1","sd1",0,0

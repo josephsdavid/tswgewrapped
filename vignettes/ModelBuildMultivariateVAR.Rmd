@@ -1,0 +1,130 @@
+---
+title: "ModelBuildMultivariateVAR"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{ModelBuildMultivariateVAR}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+# Setup Libraries
+```{r setup}
+library(tswgewrapped)
+library(tseries)
+```
+
+# Load Data
+```{r}
+data("USeconomic")
+  
+data = as.data.frame(USeconomic)
+colnames(data) = c("logM1", "logGNP", "rs", "rl")
+```
+ 
+
+# Basic Analysis
+
+## Setup Model Configurations
+
+```{r}
+lag.max = 10
+
+models = list("AIC None" = list(select = "aic", trend_type = "none", lag.max = lag.max),
+              "AIC Trend"    = list(select = "aic", trend_type = "trend", lag.max = lag.max),
+              "AIC Both" = list(select = "aic", trend_type = "both", lag.max = lag.max),
+              "BIC None" = list(select = "bic", trend_type = "none", lag.max = lag.max),
+              "BIC Trend"    = list(select = "bic", trend_type = "trend", lag.max = lag.max),
+              "BIC Both" = list(select = "bic", trend_type = "both", lag.max = lag.max))
+
+var_interest = 'logGNP'
+```
+
+## Build Models
+```{r}
+mdl_build = ModelBuildMultivariateVAR$new(data = data, var_interest = var_interest,
+                                          mdl_list = models, verbose = 1)
+```
+
+## Summarize the initial build
+```{r}
+mdl_build$summarize_build()
+```
+
+## Get recommendations to prevent overfitting
+```{r}
+mdl_build$get_recommendations()
+```
+
+
+
+## Build the recommended models
+```{r}
+mdl_build$build_recommended_models()
+```
+
+## Get the final models
+```{r}
+# Get only user defined models (subset = 'u')
+# Other options are ony recommended models (subset = 'r') or all models (subset = 'a') 
+models = mdl_build$get_final_models(subset = 'u')
+print(names(models))
+```
+
+
+# Advanced Options
+
+## Adding Seasonality
+
+```{r}
+lag.max = 10
+
+models = list("AIC Trend"    = list(select = "aic", trend_type = "trend", season = 3, lag.max = lag.max),
+              "BIC Trend"    = list(select = "bic", trend_type = "trend", season = 4, lag.max = lag.max)
+              )
+
+var_interest = 'logGNP'
+```
+
+### Build Models
+```{r}
+mdl_build = ModelBuildMultivariateVAR$new(data = data, var_interest = var_interest,
+                                          mdl_list = models, verbose = 1)
+```
+
+### Summarize the initial build
+```{r}
+mdl_build$summarize_build()
+```
+
+### Get recommendations to prevent overfitting
+```{r}
+mdl_build$get_recommendations()
+```
+
+## Build the recommended models
+```{r}
+mdl_build$build_recommended_models()
+```
+
+## Getting Final Models
+
+```{r}
+# Get only recommended model
+models = mdl_build$get_final_models(subset = 'r')
+print(names(models))
+```
+
+
+```{r}
+# Get all models
+models = mdl_build$get_final_models(subset = 'a')
+print(names(models))
+```
+

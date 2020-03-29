@@ -10,10 +10,12 @@ sliding_ase_var(
   var_interest,
   k,
   trend_type = NA,
+  season = NULL,
   n.ahead = NA,
   batch_size = NA,
   step_n.ahead = TRUE,
-  verbose = 0
+  verbose = 0,
+  ...
 )
 }
 \arguments{
@@ -25,6 +27,8 @@ sliding_ase_var(
 
 \item{trend_type}{The trend type to use in VARselect and the VAR model. Refer to vars::VARselect and vars::VAR for valid options.}
 
+\item{season}{The seasonality to use in the VAR model.}
+
 \item{n.ahead}{last n.ahead data points in each batch will be used for prediction and ASE calculations}
 
 \item{batch_size}{Window Size used}
@@ -32,6 +36,8 @@ sliding_ase_var(
 \item{step_n.ahead}{Whether to step each batch by n.ahead values (Default = FALSE)}
 
 \item{verbose}{How much to print during the model building and other processes (Default = 0)}
+
+\item{...}{Additional arguments to pass to the VAR model}
 }
 \value{
 Named list 
