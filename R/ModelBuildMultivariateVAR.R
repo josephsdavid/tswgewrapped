@@ -136,15 +136,18 @@ ModelBuildMultivariateVAR = R6::R6Class(
       
       for (name in names(recommendations)){
         if (recommendations[[name]][['model_built']] == FALSE){
-          cat("\n\n\n")
-          cat(paste("Model: ", name, "\n"))
+          
           trend_type = recommendations[[name]][['trend_type']]
           season = recommendations[[name]][['season_to_use']]
           if (season == 0){
             season = NULL
           }
-          cat(paste("Trend type: ", trend_type, "\n"))
-          cat(paste("Seasonality: ", season, "\n"))
+          
+          if (private$get_verbose() >= 1){
+            cat(paste0("\nModel: ", name))
+            cat(paste0("\nTrend type: ", trend_type))
+            cat(paste0("\nSeasonality: ", season))
+          }
           
           col_names = unlist(strsplit(recommendations[[name]][['vars_to_use']], split = ","))
           col_names = c(self$get_var_interest(), col_names)
@@ -169,7 +172,7 @@ ModelBuildMultivariateVAR = R6::R6Class(
             results = summary(varfit[['varresult']][[self$get_var_interest()]])
 
             if (private$get_verbose() >= 1){
-              cat(paste0("\n\nPrinting summary of the VAR fit for the variable of interest: ", self$get_var_interest(), "\n"))
+              cat(paste0("\n\nPrinting summary of the VAR fit for the variable of interest: ", self$get_var_interest()))
               print(results)
             }
 
@@ -358,12 +361,15 @@ ModelBuildMultivariateVAR = R6::R6Class(
     build_models  = function(verbose = 0, alpha, ...){
       for (name in names(private$get_models())){
         if (private$get_models()[[name]][['model_built']] == FALSE){
-          cat("\n\n\n")
-          cat(paste("Model: ", name, "\n"))
+          
           trend_type = private$get_models()[[name]][['trend_type']]
           season = private$get_models()[[name]][['season']]
-          cat(paste("Trend type: ", trend_type, "\n"))
-          cat(paste("Seasonality: ", season, "\n"))
+          
+          if (private$get_verbose() >= 1){
+            cat(paste0("\nModel: ", name))
+            cat(paste0("\nTrend type: ", trend_type))
+            cat(paste0("\nSeasonality: ", season))
+          }
           
           varselect = vars::VARselect(self$get_data(),
                                       lag.max = private$get_models()[[name]][['lag.max']],
@@ -388,7 +394,10 @@ ModelBuildMultivariateVAR = R6::R6Class(
           else{
             stop("'select' argument must be with 'aic' or 'bic'")
           }
-          cat(paste("Lag K to use for the VAR Model: ", p, "\n")) 
+          
+          if (private$get_verbose() >= 1){
+            cat(paste("\nLag K to use for the VAR Model: ", p)) 
+          }
           
           # Fit to Entire Data
           # This might be needed in many places to computing it here.
@@ -403,7 +412,7 @@ ModelBuildMultivariateVAR = R6::R6Class(
           results = summary(varfit[['varresult']][[self$get_var_interest()]])
           
           if (private$get_verbose() >= 1){
-            cat(paste0("\n\nPrinting summary of the VAR fit for the variable of interest: ", self$get_var_interest(), "\n"))
+            cat(paste0("\nPrinting summary of the VAR fit for the variable of interest: ", self$get_var_interest(), "\n"))
             print(results)
           }
           

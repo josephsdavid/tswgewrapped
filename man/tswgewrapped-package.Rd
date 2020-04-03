@@ -4,9 +4,9 @@
 \name{tswgewrapped-package}
 \alias{tswgewrapped}
 \alias{tswgewrapped-package}
-\title{tswgewrapped: Helpful wrappers for 'tswge' and 'vars' packages}
+\title{tswgewrapped: Helpful wrappers for 'tswge', 'vars' and 'nnfor' time series packages}
 \description{
-This package provides several helpful wrappers for the already useful tswge package. In the future, this package intends to move away from the tswge backend, to be faster, with more readable source code.
+This package provides several helpful wrappers for the already useful 'tswge', 'vars' and 'nnfor' package. In the future, this package intends to move away from the tswge backend, to be faster, with more readable source code.
 }
 \author{
 \strong{Maintainer}: David Josephs \email{josephsd@smu.edu}

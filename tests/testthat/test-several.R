@@ -117,7 +117,7 @@ test_that("AICBIC", {
   # Generated White Noise 
   arma.2.1 = gen.arma.wge(n = 200, phi = c(-0.5, -0.55), theta = 0.8, sn = 101)
   
-  g.aicbic = aicbic(arma.2.1, p = 0:5, q = 0:2)
+  g.aicbic = aicbic(arma.2.1, p = 0:5, q = 0:2, silent = TRUE)
   
   g.aic = aic5.wge(arma.2.1)
   g.bic = aic5.wge(arma.2.1, type = 'bic')
@@ -142,7 +142,7 @@ test_that("AICBIC", {
   expect_equal(s.aicbic.bic.sum$bic, s.bic.sum$bic)
   
   ## Merge
-  g.aicbic = aicbic(arma.2.1, p = 0:5, q = 0:2, merge = TRUE)
+  g.aicbic = aicbic(arma.2.1, p = 0:5, q = 0:2, merge = TRUE, silent = TRUE)
   s.aicbic.sum = g.aicbic %>% dplyr::summarise_all(sum)
   expect_equal(s.aicbic.sum$p, s.aic.sum$p)
   expect_equal(s.aicbic.sum$q, s.aic.sum$q)

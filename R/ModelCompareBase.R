@@ -153,7 +153,10 @@ ModelCompareBase = R6::R6Class(
       for (name in names(private$get_models())){
 
         if (private$models[[name]][['metric_has_been_computed']] == FALSE){
-          cat(paste("\n\n\nComputing metrics for: ", name, "\n"))
+          
+          if (private$get_verbose() >= 1){
+            cat(paste("\nComputing metrics for: ", name, "\n"))
+          }
 
           res = private$get_sliding_ase_results(name = name, step_n.ahead = step_n.ahead)
           
