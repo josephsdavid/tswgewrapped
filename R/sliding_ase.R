@@ -10,6 +10,7 @@
 #' @param batch_size Window Size used 
 #' @param n.ahead last n.ahead data points in each batch will be used for prediction and ASE calculations
 #' @param step_n.ahead Whether to step each batch by n.ahead values (Default = FALSE)
+#' @param verbose How much to print during the model building and other processes (Default = 0)
 #' @param ... any additional arguments to be passed to the forecast functions (e.g. max.p for sigplusnoise model, lambda for ARUMA models)
 #' @return Named list 
 #'         'ASEs' - ASE values
@@ -26,6 +27,7 @@ sliding_ase_univariate = function(x,
                                   linear = NA, freq = NA,           # Signal + Noise arguments
                                   n.ahead = NA, batch_size = NA,    # Forecasting specific arguments
                                   step_n.ahead = TRUE,
+                                  verbose = 0,
                                   ...)                              # max.p (sigplusnoise), lambda (ARUMA)      
 {
   # Sliding CV ... batches are mutually exclusive
@@ -73,7 +75,9 @@ sliding_ase_univariate = function(x,
     num_batches = floor((n-batch_size)/n.ahead)  + 1
   }
   
-  cat(paste("\nNumber of batches expected: ", num_batches))
+  if (verbose >= 1){
+    cat(paste("\nNumber of batches expected: ", num_batches))
+  }
   
   ASEs = numeric(num_batches)
   time_test_start = numeric(num_batches)
@@ -193,7 +197,9 @@ sliding_ase_var = function(data, var_interest,
     num_batches = floor((n-batch_size)/n.ahead)  + 1
   }
   
-  cat(paste("\nNumber of batches expected: ", num_batches))
+  if (verbose >= 1){
+    cat(paste("\nNumber of batches expected: ", num_batches))
+  }
   
   ASEs = numeric(num_batches)
   time_test_start = numeric(num_batches)

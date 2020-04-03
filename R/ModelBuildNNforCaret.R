@@ -64,50 +64,47 @@ ModelBuildNNforCaret = R6::R6Class(
     
     
     
-    #' @description Returns the dependent variable data only
-    #' @return The dependent variable data only
-    get_data_var_interest = function(){return(self$get_data()[, private$get_var_interest()])},
-    
+    # #' @description Returns the dependent variable data only
+    # #' @return The dependent variable data only
+    # get_data_var_interest = function(){return(self$get_data()[, private$get_var_interest()])},
 
-    
-    
-    
-    
     #### General Public Methods ----
    
-    #' @description Returns the VAR model Build Summary
-    #' @returns A dataframe containing the following columns
-    #'          'Model': Name of the model
-    #'          'Selection': The selection criteria used for K value (AIC or BIC)
-    #'          'Trend': The trend argument used in the VARselect and VAR functions
-    #'          'SlidingASE': Whether Sliding ASE will be used for this model
-    #'          'Init_K': The K value recommended by the VARselect function
-    #'          'Final_K': The adjusted K value to take into account the smaller batch size (only when using sliding_ase)
-    summarize_build = function(){
-      results = dplyr::tribble(~Model, ~select, ~trend_type, ~season, ~p, ~SigVar, ~OriginalVar, ~Lag, ~MaxLag)
+    #' @description Summarizes the results of all the hyperparameter combinations
+    #' @returns A dataframe containing the information about the different models
+    summarize_hyperparam_results = function(){
+      caret_model = self$get_final_models(subset = 'a')
+      return(caret_model$results)
+    },
+    
+    #' @description Summarizes the best hyperparameter combination
+    #' @returns A dataframe containing the hyperparameters for the best model
+    summarize_best_hyperparams = function(){
+      caret_model = self$get_final_models(subset = 'a')
+      return(caret_model$bestTune)
+    },
+    
+    #' @description Plots the ASE metric variation along the hyperparameter space
+    #' @param level_plot A boolean indicating whether a level plot should be shown. useful for 'grid' search (Default = TRUE).  
+    plot_hyperparam_results = function(level_plot = TRUE){
+      caret_model = self$get_final_models(subset = 'a')
       
-      for (name in names(private$get_models())){
-        results = results %>% 
-          dplyr::add_row(Model = name,
-                         select = private$models[[name]][['select']],
-                         trend_type = private$models[[name]][['trend_type']],
-                         season = ifelse(is.null(private$models[[name]][['season']]), 0, private$models[[name]][['season']]),
-                         p = private$models[[name]][['p']],
-                         SigVar = private$models[[name]][['sigvars']][['sig_var']],
-                         OriginalVar = private$models[[name]][['sigvars']][['original_var']],
-                         Lag = private$models[[name]][['sigvars']][['lag']],
-                         MaxLag = private$models[[name]][['sigvars']][['max_lag']]
-                         )
+      print(ggplot2::ggplot(caret_model))
+
+      if (level_plot == TRUE){
+        # Opt 3 (Useful for grid searches not for random)
+        # lattice::trellis.par.set(caretTheme())
+        plot(caret_model, metric = "ASE", plotType = "level",
+             scales = list(x = list(rot = 90)))
       }
-      
-      return(results)
     },
     
     #' @description Returns a final models 
     #' @param subset The subset of models to get.
     #'              'a': All models (Default)
     #'              'r': Only the recommended models
-    #' @return A named list of models
+    #' @return If subset = 'a', returns the caret model object
+    #'         If subset = 'r', returns just the nnfor model
     get_final_models = function(subset = 'a'){
       if (subset != 'a' & subset != 'r'){
         warning("The subset value mentioned is not correct. Allowed values are 'a', or 'r. The default value 'a' will be used")
@@ -121,6 +118,27 @@ ModelBuildNNforCaret = R6::R6Class(
         return(private$get_models()$finalModel)
       }
       
+    },
+    
+    #' @description Summarizes the entire build process
+    #' @param level_plot A boolean indicating whether a level plot should be shown. useful for 'grid' search (Default = TRUE).  
+    summarize_build = function(level_plot = TRUE){
+      cat("\n\n------------------------------")
+      cat("\nHyperparameter Tuning Results:")
+      cat("\n------------------------------\n\n")
+      print(self$summarize_hyperparam_results())
+      
+      self$plot_hyperparam_results(level_plot = level_plot)
+      
+      cat("\n\n---------------------")
+      cat("\nBest Hyperparameters:")
+      cat("\n---------------------\n\n")
+      print(self$summarize_best_hyperparams())
+      
+      cat("\n\n--------------")
+      cat("\nFinal Model:")
+      cat("\n--------------\n\n")
+      print(self$get_final_models(subset = 'r'))
     }
     
   ),
@@ -270,22 +288,22 @@ ModelBuildNNforCaret = R6::R6Class(
                                            verbose = as.logical(private$get_verbose()),
                                            parallel = private$get_parallel())
       
-      print(fitControl)
+      # print(fitControl)
       
       # http://sshaikh.org/2015/05/06/parallelize-machine-learning-in-r-with-multi-core-cpus/
       if (private$get_parallel() == TRUE){
         num_cores = parallel::detectCores()
-        cl = parallel::makeCluster(ifelse(num_cores <= 2, 1, num_cores - 2)) # Leave 2 out
+        cl = parallel::makeCluster(ifelse(num_cores <= 1, 1, num_cores - 1)) # Leave 1 out
         doParallel::registerDoParallel(cl)
       }
       
       form = as.formula(paste(private$get_var_interest(), ".", sep=" ~ "))
       
-      print(paste0("Formula: ", form))
-      print("Grid: ")
-      print(private$get_grid())
-      print(paste0("Tune Length: ", private$get_tune_length()))
-      print(paste0("Frequency: ", private$get_m()))
+      # print(paste0("Formula: ", form))
+      # print("Grid: ")
+      # print(private$get_grid())
+      # print(paste0("Tune Length: ", private$get_tune_length()))
+      # print(paste0("Frequency: ", private$get_m()))
       
       tictoc::tic("- Total Time for training: ")
       
@@ -356,7 +374,7 @@ ModelBuildNNforCaret = R6::R6Class(
     
     get_fit_control = function(initialWindow, h, search = "random", verbose = TRUE, parallel = TRUE){
       
-      print(paste0("get_fit_control >> verbose: ", verbose))
+      # print(paste0("get_fit_control >> verbose: ", verbose))
       
       fitControl = caret::trainControl(method = "timeslice",
                                        horizon = h,
