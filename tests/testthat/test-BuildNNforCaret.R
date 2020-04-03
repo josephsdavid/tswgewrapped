@@ -3,13 +3,17 @@
 ## TODO: Then compare above to manual test in nnfor
 ## TODO: Check reproducibility of 2 runs with caret
 
+## TODO: For now, we are predicting with the actual future values of xreg.
+##       In the future, change this to use forecasted values of xreg
+##       This can probably be achieved by passing xreg_name_predicted in the data and adjusting the source_caret_nnfor file accordingly
+   
 # test_that("Random Parallel", {
 #   # http://r-pkgs.had.co.nz/tests.html
 #   # skip_on_cran()
-#   
+# 
 #   # Load Data
 #   data = USeconomic
-#   
+# 
 #   library(caret)
 # 
 #   # Random Parallel
@@ -20,6 +24,11 @@
 #                                    parallel = TRUE,
 #                                    seed = 1,
 #                                    verbose = 1)
+# 
+#   model$summarize_hyperparam_results()
+#   model$summarize_best_hyperparams()
+#   model$plot_hyperparam_results()
+#   model$summarize_build()
 # 
 #   # # #testthat::expect_equal(good, TRUE)
 # 

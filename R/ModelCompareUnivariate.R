@@ -242,7 +242,7 @@ ModelCompareUnivariate = R6::R6Class(
                                    s = private$get_models()[[name]][['s']],
                                    n.ahead = self$get_n.ahead(),
                                    batch_size = private$get_models()[[name]][['batch_size']],
-                                   step_n.ahead = step_n.ahead)
+                                   step_n.ahead = step_n.ahead, verbose = private$get_verbose())
       
       return (res)
     },

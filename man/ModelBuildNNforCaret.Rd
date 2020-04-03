@@ -4,13 +4,9 @@
 \alias{ModelBuildNNforCaret}
 \title{R6 class ModelBuildNNforCaret}
 \value{
-A dataframe containing the following columns
-         'Model': Name of the model
-         'Selection': The selection criteria used for K value (AIC or BIC)
-         'Trend': The trend argument used in the VARselect and VAR functions
-         'SlidingASE': Whether Sliding ASE will be used for this model
-         'Init_K': The K value recommended by the VARselect function
-         'Final_K': The adjusted K value to take into account the smaller batch size (only when using sliding_ase)
+A dataframe containing the information about the different models
+
+A dataframe containing the hyperparameters for the best model
 }
 \description{
 R6 class ModelBuildNNforCaret
@@ -22,9 +18,11 @@ R6 class ModelBuildNNforCaret
 \itemize{
 \item \href{#method-new}{\code{ModelBuildNNforCaret$new()}}
 \item \href{#method-get_data}{\code{ModelBuildNNforCaret$get_data()}}
-\item \href{#method-get_data_var_interest}{\code{ModelBuildNNforCaret$get_data_var_interest()}}
-\item \href{#method-summarize_build}{\code{ModelBuildNNforCaret$summarize_build()}}
+\item \href{#method-summarize_hyperparam_results}{\code{ModelBuildNNforCaret$summarize_hyperparam_results()}}
+\item \href{#method-summarize_best_hyperparams}{\code{ModelBuildNNforCaret$summarize_best_hyperparams()}}
+\item \href{#method-plot_hyperparam_results}{\code{ModelBuildNNforCaret$plot_hyperparam_results()}}
 \item \href{#method-get_final_models}{\code{ModelBuildNNforCaret$get_final_models()}}
+\item \href{#method-summarize_build}{\code{ModelBuildNNforCaret$summarize_build()}}
 \item \href{#method-clone}{\code{ModelBuildNNforCaret$clone()}}
 }
 }
@@ -100,27 +98,41 @@ The Time Series Realization
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-get_data_var_interest"></a>}}
-\if{latex}{\out{\hypertarget{method-get_data_var_interest}{}}}
-\subsection{Method \code{get_data_var_interest()}}{
-Returns the dependent variable data only
+\if{html}{\out{<a id="method-summarize_hyperparam_results"></a>}}
+\if{latex}{\out{\hypertarget{method-summarize_hyperparam_results}{}}}
+\subsection{Method \code{summarize_hyperparam_results()}}{
+Summarizes the results of all the hyperparameter combinations
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{ModelBuildNNforCaret$get_data_var_interest()}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{ModelBuildNNforCaret$summarize_hyperparam_results()}\if{html}{\out{</div>}}
 }
 
-\subsection{Returns}{
-The dependent variable data only
-}
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-summarize_build"></a>}}
-\if{latex}{\out{\hypertarget{method-summarize_build}{}}}
-\subsection{Method \code{summarize_build()}}{
-Returns the VAR model Build Summary
+\if{html}{\out{<a id="method-summarize_best_hyperparams"></a>}}
+\if{latex}{\out{\hypertarget{method-summarize_best_hyperparams}{}}}
+\subsection{Method \code{summarize_best_hyperparams()}}{
+Summarizes the best hyperparameter combination
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{ModelBuildNNforCaret$summarize_build()}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{ModelBuildNNforCaret$summarize_best_hyperparams()}\if{html}{\out{</div>}}
 }
 
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-plot_hyperparam_results"></a>}}
+\if{latex}{\out{\hypertarget{method-plot_hyperparam_results}{}}}
+\subsection{Method \code{plot_hyperparam_results()}}{
+Plots the ASE metric variation along the hyperparameter space
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{ModelBuildNNforCaret$plot_hyperparam_results(level_plot = TRUE)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{level_plot}}{A boolean indicating whether a level plot should be shown. useful for 'grid' search (Default = TRUE).}
+}
+\if{html}{\out{</div>}}
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-get_final_models"></a>}}
@@ -141,7 +153,25 @@ Returns a final models
 \if{html}{\out{</div>}}
 }
 \subsection{Returns}{
-A named list of models
+If subset = 'a', returns the caret model object
+        If subset = 'r', returns just the nnfor model
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-summarize_build"></a>}}
+\if{latex}{\out{\hypertarget{method-summarize_build}{}}}
+\subsection{Method \code{summarize_build()}}{
+Summarizes the entire build process
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{ModelBuildNNforCaret$summarize_build(level_plot = TRUE)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{level_plot}}{A boolean indicating whether a level plot should be shown. useful for 'grid' search (Default = TRUE).}
+}
+\if{html}{\out{</div>}}
 }
 }
 \if{html}{\out{<hr>}}

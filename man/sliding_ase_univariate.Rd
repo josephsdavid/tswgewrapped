@@ -16,6 +16,7 @@ sliding_ase_univariate(
   n.ahead = NA,
   batch_size = NA,
   step_n.ahead = TRUE,
+  verbose = 0,
   ...
 )
 }
@@ -39,6 +40,8 @@ sliding_ase_univariate(
 \item{batch_size}{Window Size used}
 
 \item{step_n.ahead}{Whether to step each batch by n.ahead values (Default = FALSE)}
+
+\item{verbose}{How much to print during the model building and other processes (Default = 0)}
 
 \item{...}{any additional arguments to be passed to the forecast functions (e.g. max.p for sigplusnoise model, lambda for ARUMA models)}
 }
