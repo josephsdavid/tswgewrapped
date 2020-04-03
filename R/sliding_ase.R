@@ -33,8 +33,7 @@ sliding_ase_univariate = function(x,
   n = length(x)
   
   if (is.na(batch_size)){
-    warning("Batch Size has not been specified. Will assume a single batch")
-    cat("\n")
+    cat("\nBatch Size has not been specified. Will assume a single batch.")
     batch_size = n
   }
   
@@ -74,7 +73,7 @@ sliding_ase_univariate = function(x,
     num_batches = floor((n-batch_size)/n.ahead)  + 1
   }
   
-  cat(paste("Number of batches expected: ", num_batches, "\n"))
+  cat(paste("\nNumber of batches expected: ", num_batches))
   
   ASEs = numeric(num_batches)
   time_test_start = numeric(num_batches)
@@ -164,8 +163,7 @@ sliding_ase_var = function(data, var_interest,
   n = nrow(data)
   
   if (is.na(batch_size)){
-    warning("Batch Size has not been specified. Will assume a single batch")
-    cat("\n")
+    message("Batch Size has not been specified. Will assume a single batch")
     batch_size = n
   }
   
@@ -195,7 +193,7 @@ sliding_ase_var = function(data, var_interest,
     num_batches = floor((n-batch_size)/n.ahead)  + 1
   }
   
-  cat(paste("Number of batches expected: ", num_batches, "\n"))
+  cat(paste("\nNumber of batches expected: ", num_batches))
   
   ASEs = numeric(num_batches)
   time_test_start = numeric(num_batches)
@@ -229,8 +227,8 @@ sliding_ase_var = function(data, var_interest,
     varfit = vars::VAR(train_data, p=k, type=trend_type, season = season, ...)
     
     if (verbose >= 2){
-      cat(paste0("\nBatch: ", i+1, "\n"))
-      cat(paste0("Printing summary of the VAR fit for the variable of interest: ", var_interest, "\n\n"))
+      cat(paste0("\nBatch: ", i+1))
+      cat(paste0("\nPrinting summary of the VAR fit for the variable of interest: ", var_interest, "\n\n"))
       print(summary(varfit$varresult[[var_interest]]))
     }
    

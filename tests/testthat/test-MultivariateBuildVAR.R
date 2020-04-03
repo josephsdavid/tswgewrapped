@@ -5,9 +5,11 @@
 #### Non Seasonal Model ####
 test_that("Non Seasonal Model", {
 
-  data("USeconomic")
-  data = as.data.frame(USeconomic)
-  colnames(data) = c("logM1", "logGNP", "rs", "rl")
+  # data("USeconomic")
+  # data = as.data.frame(USeconomic)
+  # colnames(data) = c("logM1", "logGNP", "rs", "rl")
+  
+  data = USeconomic
   
   lag.max = 10
   
@@ -21,7 +23,7 @@ test_that("Non Seasonal Model", {
   var_interest = 'logGNP'
 
   mdl_build = ModelBuildMultivariateVAR$new(data = data, var_interest = var_interest,
-                                            mdl_list = models, verbose = 1)
+                                            mdl_list = models, verbose = 0)
 
   
   summary_build = mdl_build$summarize_build()
@@ -36,25 +38,24 @@ test_that("Non Seasonal Model", {
   summary_target = read.csv(summary_target_file, header = TRUE, stringsAsFactors = FALSE) %>% 
     dplyr::as_tibble() %>% 
     dplyr::mutate_if(is.numeric, as.double)  # Converts integer to double to match type
-  good = all.equal(summary_build, summary_target)
-  testthat::expect_equal(good, TRUE)
+  good1 = all.equal(summary_build, summary_target)
+  testthat::expect_equal(good1, TRUE)
   
   recommendation_target_file = system.file("extdata", "multivar_VAR_build_no_season_recommendations.csv", package = "tswgewrapped", mustWork = TRUE)
   recommendation_target = read.csv(recommendation_target_file, header = TRUE, stringsAsFactors = FALSE) %>% 
     dplyr::as_tibble() %>% 
     dplyr::mutate_if(is.numeric, as.double)  # Converts integer to double to match type
-  good = all.equal(recommendations %>% dplyr::mutate_if(is.numeric, as.double), recommendation_target)
-  testthat::expect_equal(good, TRUE)
+  good2 = all.equal(recommendations %>% dplyr::mutate_if(is.numeric, as.double), recommendation_target)
+  testthat::expect_equal(good2, TRUE)
   
   mdl_build$build_recommended_models()
   final_models = mdl_build$get_final_models()
-  
-  # saveRDS(final_models, "multivar_VAR_final_model_list.rds")
-  
+  # saveRDS(final_models, "multivar_VAR_build_final_model_no_season_list.rds")
   final_model_list_file = system.file("extdata", "multivar_VAR_build_final_model_no_season_list.rds", package = "tswgewrapped", mustWork = TRUE)
   final_models_target = readRDS(final_model_list_file)
-  good = all.equal(final_models, final_models_target)
-  testthat::expect_equal(good, TRUE)
+  good3 = all.equal(final_models, final_models_target)
+  print(good3)
+  testthat::expect_equal(good3, TRUE)
   
   
 })
@@ -62,9 +63,11 @@ test_that("Non Seasonal Model", {
 #### Seasonal Model ####
 test_that("Seasonal Model", {
   
-  data("USeconomic")
-  data = as.data.frame(USeconomic)
-  colnames(data) = c("logM1", "logGNP", "rs", "rl")
+  # data("USeconomic")
+  # data = as.data.frame(USeconomic)
+  # colnames(data) = c("logM1", "logGNP", "rs", "rl")
+  
+  data = USeconomic
   
   lag.max = 10
   
@@ -74,7 +77,7 @@ test_that("Seasonal Model", {
   var_interest = 'logGNP'
   
   mdl_build = ModelBuildMultivariateVAR$new(data = data, var_interest = var_interest,
-                                            mdl_list = models, verbose = 1)
+                                            mdl_list = models, verbose = 0)
   
   summary_build = mdl_build$summarize_build()
   recommendations = mdl_build$get_recommendations()
@@ -88,25 +91,23 @@ test_that("Seasonal Model", {
   summary_target = read.csv(summary_target_file, header = TRUE, stringsAsFactors = FALSE) %>% 
     dplyr::as_tibble() %>% 
     dplyr::mutate_if(is.numeric, as.double)  # Converts integer to double to match type
-  good = all.equal(summary_build, summary_target)
-  testthat::expect_equal(good, TRUE)
+  good1 = all.equal(summary_build, summary_target)
+  testthat::expect_equal(good1, TRUE)
   
   recommendation_target_file = system.file("extdata", "multivar_VAR_build_season_recommendations.csv", package = "tswgewrapped", mustWork = TRUE)
   recommendation_target = read.csv(recommendation_target_file, header = TRUE, stringsAsFactors = FALSE) %>% 
     dplyr::as_tibble() %>% 
     dplyr::mutate_if(is.numeric, as.double)  # Converts integer to double to match type
-  good = all.equal(recommendations %>% dplyr::mutate_if(is.numeric, as.double), recommendation_target)
-  testthat::expect_equal(good, TRUE)
+  good2 = all.equal(recommendations %>% dplyr::mutate_if(is.numeric, as.double), recommendation_target)
+  testthat::expect_equal(good2, TRUE)
   
   mdl_build$build_recommended_models()
   final_models = mdl_build$get_final_models()
-  
-  # saveRDS(final_models, "multivar_VAR_build_final_model_season_list.rds")
-  
+  #saveRDS(final_models, "multivar_VAR_build_final_model_season_list.rds")
   final_model_list_file = system.file("extdata", "multivar_VAR_build_final_model_season_list.rds", package = "tswgewrapped", mustWork = TRUE)
   final_models_target = readRDS(final_model_list_file)
-  good = all.equal(final_models, final_models_target)
-  testthat::expect_equal(good, TRUE)
+  good3 = all.equal(final_models, final_models_target)
+  testthat::expect_equal(good3, TRUE)
   
   
 })

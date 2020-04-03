@@ -17,15 +17,13 @@ knitr::opts_chunk$set(
 # Setup Libraries
 ```{r setup}
 library(tswgewrapped)
-library(tseries)
 ```
 
 # Load Data
 ```{r}
-data("USeconomic")
-  
-data = as.data.frame(USeconomic)
-colnames(data) = c("logM1", "logGNP", "rs", "rl")
+file = system.file("extdata", "USeconomic.csv", package = "tswgewrapped", mustWork = TRUE)
+data = read.csv(file, header = TRUE, stringsAsFactors = FALSE, check.names = FALSE)
+names(data) = gsub("[(|)]", "", colnames(data))
 ```
  
 
@@ -50,6 +48,10 @@ mdl_build = ModelBuildMultivariateVAR$new(data = data, var_interest = var_intere
 ```
 
 ```{r}
+mdl_build$summarize_build()
+```
+
+```{r}
 mdl_build$get_recommendations()
 ```
 
@@ -61,6 +63,7 @@ mdl_build$build_recommended_models()
 # Get only user defined models
 # Other options are ony recommended models (subset = 'r') or all models (subset = 'a') 
 models = mdl_build$get_final_models(subset = 'u')
+names(models)
 ```
 
 # Setup Models to be compared 
@@ -101,11 +104,11 @@ mdl_compare$statistical_compare()
 
 ## Simple Forecasts (with various options)
 ```{r fig.width = 10}
-mdl_compare$plot_simple_forecasts(lastn = TRUE, limits = FALSE)
-mdl_compare$plot_simple_forecasts(lastn = TRUE, limits = TRUE)
-mdl_compare$plot_simple_forecasts(lastn = FALSE, limits = FALSE)
-mdl_compare$plot_simple_forecasts(lastn = FALSE, limits = TRUE)
 mdl_compare$plot_simple_forecasts(zoom = 50)  ## Zoom into plot
+mdl_compare$plot_simple_forecasts(lastn = TRUE, limits = FALSE, zoom = 50)
+mdl_compare$plot_simple_forecasts(lastn = TRUE, limits = TRUE, zoom = 50)
+mdl_compare$plot_simple_forecasts(lastn = FALSE, limits = FALSE, zoom = 50)
+mdl_compare$plot_simple_forecasts(lastn = FALSE, limits = TRUE, zoom = 50)
 ```
 
 ## Plot and compare the forecasts per batch

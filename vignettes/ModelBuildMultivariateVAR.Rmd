@@ -17,15 +17,13 @@ knitr::opts_chunk$set(
 # Setup Libraries
 ```{r setup}
 library(tswgewrapped)
-library(tseries)
 ```
 
 # Load Data
 ```{r}
-data("USeconomic")
-  
-data = as.data.frame(USeconomic)
-colnames(data) = c("logM1", "logGNP", "rs", "rl")
+file = system.file("extdata", "USeconomic.csv", package = "tswgewrapped", mustWork = TRUE)
+data = read.csv(file, header = TRUE, stringsAsFactors = FALSE, check.names = FALSE)
+names(data) = gsub("[(|)]", "", colnames(data))
 ```
  
 

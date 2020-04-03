@@ -6,7 +6,7 @@
 #### Batch ASE = FALSE ####
 test_that("Batch ASE = FALSE", {
 
-  data("USeconomic")
+  # data("USeconomic")
   data = as.data.frame(USeconomic)
   colnames(data) = c("logM1", "logGNP", "rs", "rl")
   
@@ -186,7 +186,7 @@ test_that("Batch ASE = FALSE", {
 #### Batch ASE = TRUE ####
 test_that("Batch ASE = TRUE", {
   
-  data("USeconomic")
+  # data("USeconomic")
   data = as.data.frame(USeconomic)
   colnames(data) = c("logM1", "logGNP", "rs", "rl")
   
@@ -251,7 +251,7 @@ test_that("Batch ASE = TRUE", {
 #### "n_step.ahead = FALSE ####
 test_that("n_step.ahead = FALSE", {
   
-  data("USeconomic")
+  # data("USeconomic")
   data = as.data.frame(USeconomic)
   colnames(data) = c("logM1", "logGNP", "rs", "rl")
   
@@ -300,9 +300,10 @@ test_that("n_step.ahead = FALSE", {
 #### Subset of data ####
 test_that("Models that used only subset of data", {
   
-  data("USeconomic")
-  data = as.data.frame(USeconomic)
-  colnames(data) = c("logM1", "logGNP", "rs", "rl")
+  # data("USeconomic")
+  # data = as.data.frame(USeconomic)
+  
+  data = USeconomic
   
   var_interest = 'logGNP'
   subset_cols = c("logM1", "logGNP")

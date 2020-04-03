@@ -2,6 +2,7 @@
 
 export("%>%")
 export(ModelBuildMultivariateVAR)
+export(ModelBuildNNforCaret)
 export(ModelCompareMultivariateVAR)
 export(ModelCompareUnivariate)
 export(MultivariateEDA)
