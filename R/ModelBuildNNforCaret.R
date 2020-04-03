@@ -293,7 +293,7 @@ ModelBuildNNforCaret = R6::R6Class(
       # http://sshaikh.org/2015/05/06/parallelize-machine-learning-in-r-with-multi-core-cpus/
       if (private$get_parallel() == TRUE){
         num_cores = parallel::detectCores()
-        cl = parallel::makeCluster(ifelse(num_cores <= 2, 1, num_cores - 2)) # Leave 2 out
+        cl = parallel::makeCluster(ifelse(num_cores <= 1, 1, num_cores - 1)) # Leave 1 out
         doParallel::registerDoParallel(cl)
       }
       
