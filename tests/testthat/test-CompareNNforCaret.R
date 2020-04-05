@@ -54,7 +54,7 @@ test_that("Random Parallel", {
   good2 = all.equal(as.data.frame(forecasts), forecasts_target %>% dplyr::mutate_if(is.numeric, as.double))
   testthat::expect_equal(good2, TRUE)
   
-  mdl_compare$plot_histogram_ases()
+  mdl_compare$plot_boxplot_ases()
   
   result = mdl_compare$statistical_compare()
   pval = summary(result)[[1]]$`Pr(>F)`[1]

@@ -49,7 +49,7 @@ test_that("Batch ASE = FALSE", {
   mdl_compare$plot_simple_forecasts()
   mdl_compare$plot_batch_forecasts(only_sliding = FALSE)
   mdl_compare$plot_batch_ases(only_sliding = FALSE)
-  mdl_compare$plot_histogram_ases()
+  mdl_compare$plot_boxplot_ases()
   mdl_compare$statistical_compare()
   
   ## Compute ASE values from object
@@ -243,7 +243,7 @@ test_that("Batch ASE = TRUE", {
   mdl_compare$plot_simple_forecasts()
   mdl_compare$plot_batch_forecasts(only_sliding = FALSE)
   mdl_compare$plot_batch_ases(only_sliding = FALSE)
-  mdl_compare$plot_histogram_ases()
+  mdl_compare$plot_boxplot_ases()
   mdl_compare$statistical_compare()
   
 })

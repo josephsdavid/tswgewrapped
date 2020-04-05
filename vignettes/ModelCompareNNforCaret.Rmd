@@ -69,9 +69,9 @@ mdl_compare = ModelCompareNNforCaret$new(data = data, var_interest = 'logGNP',
 
 # Compare the models
 
-## Compare Histogram of ASE values
+## Compare boxplot of ASE values
 ```{r fig.width = 8}
-mdl_compare$plot_histogram_ases()
+mdl_compare$plot_boxplot_ases()
 ```
 
 ## Statistically Compare the models

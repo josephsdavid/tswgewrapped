@@ -33,7 +33,7 @@ test_that("ModelCompareUnivariate", {
   mdl_compare$plot_batch_forecasts(only_sliding = FALSE)
   mdl_compare$plot_batch_ases(only_sliding = TRUE)
   mdl_compare$plot_batch_ases(only_sliding = FALSE)
-  mdl_compare$plot_histogram_ases()
+  mdl_compare$plot_boxplot_ases()
   mdl_compare$statistical_compare()
   
   mdl_compare$plot_multiple_realizations(n.realizations = 4, seed = 100, scales = 'free_y')
@@ -190,7 +190,7 @@ test_that("ModelCompareUnivariate - Add Models", {
   mdl_compare$plot_batch_forecasts(only_sliding = FALSE)
   mdl_compare$plot_batch_ases(only_sliding = TRUE)
   mdl_compare$plot_batch_ases(only_sliding = FALSE)
-  mdl_compare$plot_histogram_ases()
+  mdl_compare$plot_boxplot_ases()
   mdl_compare$statistical_compare()
   
   # Remove models
@@ -205,7 +205,7 @@ test_that("ModelCompareUnivariate - Add Models", {
   mdl_compare$plot_batch_forecasts(only_sliding = FALSE)
   mdl_compare$plot_batch_ases(only_sliding = TRUE)
   mdl_compare$plot_batch_ases(only_sliding = FALSE)
-  mdl_compare$plot_histogram_ases()
+  mdl_compare$plot_boxplot_ases()
   mdl_compare$statistical_compare()
   
   

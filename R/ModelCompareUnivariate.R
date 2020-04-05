@@ -30,7 +30,7 @@
 #'                                          n.ahead = 36, batch_size = 72)
 #' # Plots the historgam of the ASE values for each model.
 #' # This is especially useful when models using a sliding window for ASE calculations. 
-#' mdl_compare$plot_histogram_ases()
+#' mdl_compare$plot_boxplot_ases()
 #' 
 #' # The following method gives 2 plots
 #' # (1) Plots the forecasts for each model along with the realization.
@@ -72,6 +72,7 @@ ModelCompareUnivariate = R6::R6Class(
     #' @description 
     #' Initialize an object to compare several Univatiate Time Series Models
     #' @param data A Univariate Time Series Realization
+    #' @param var_interest If data is a dataframe with multiple columns, then what is the output variable of interest
     #' @param mdl_list A named list of all models (see format below)
     #' @param n.ahead The number of observations used to calculate ASE or forecast ahead
     #' @param batch_size If any of the models used sliding ase method,
@@ -80,8 +81,22 @@ ModelCompareUnivariate = R6::R6Class(
     #'                     (Default = TRUE)
     #' @param verbose How much to print during the model building and other processes (Default = 0)
     #' @return A new `ModelCompareUnivariate` object.
-    initialize = function(data = NA, mdl_list, n.ahead = NA, batch_size = NA, step_n.ahead = TRUE, verbose = 0)
+    initialize = function(data = NA, var_interest = NA,  mdl_list, n.ahead = NA, batch_size = NA, step_n.ahead = TRUE, verbose = 0)
     {
+      if ("data.frame" %in% class(data) | "matrix" %in% class(data)){
+        if (ncol(data) == 1){
+          ## Only 1 column, so just pick it
+          data = data[,1]
+        }
+        else{
+          if (is.na(var_interest)){
+            stop("You have provided multiple columns in the data, but have not specified the column that you want to use for univariate modeling. Please provide this through the 'var_interest' argument.")
+          }
+          data = as.data.frame(data) %>% 
+            assertr::verify(assertr::has_all_names(var_interest)) %>% 
+            purrr::pluck(var_interest)
+        }
+      }
       
       super$initialize(data = data, mdl_list = mdl_list,
                        n.ahead = n.ahead, batch_size = batch_size, step_n.ahead = step_n.ahead,

@@ -92,9 +92,9 @@ mdl_compare = ModelCompareMultivariateVAR$new(data = data, var_interest = var_in
 mdl_compare$get_xIC() 
 ```
 
-## Compare Histogram of ASE values
+## Compare boxplot of ASE values
 ```{r fig.width=10}
-mdl_compare$plot_histogram_ases()
+mdl_compare$plot_boxplot_ases()
 ```
 
 ## Statistically Compare the models

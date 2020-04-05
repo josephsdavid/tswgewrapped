@@ -3,3 +3,7 @@
 ^\.github$
 ^Readme\.md$
 ^build$
+^_pkgdown\.yml$
+^docs$
+^pkgdown$
+^TODO.txt$

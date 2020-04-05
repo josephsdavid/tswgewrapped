@@ -2,7 +2,6 @@
 library(testthat)
 library(tswge)
 library(tswgewrapped)
-# library(tseries)
 
 file = system.file("extdata", "USeconomic.csv", package = "tswgewrapped", mustWork = TRUE)
 USeconomic = read.csv(file, header = TRUE, stringsAsFactors = FALSE, check.names = FALSE)

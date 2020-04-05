@@ -18,6 +18,7 @@ R6 class ModelCompareBase
 \item \href{#method-set_batch_size}{\code{ModelCompareBase$set_batch_size()}}
 \item \href{#method-get_n.ahead}{\code{ModelCompareBase$get_n.ahead()}}
 \item \href{#method-set_verbose}{\code{ModelCompareBase$set_verbose()}}
+\item \href{#method-get_model_names}{\code{ModelCompareBase$get_model_names()}}
 \item \href{#method-add_models}{\code{ModelCompareBase$add_models()}}
 \item \href{#method-remove_models}{\code{ModelCompareBase$remove_models()}}
 \item \href{#method-keep_models}{\code{ModelCompareBase$keep_models()}}
@@ -25,7 +26,7 @@ R6 class ModelCompareBase
 \item \href{#method-plot_simple_forecasts}{\code{ModelCompareBase$plot_simple_forecasts()}}
 \item \href{#method-plot_batch_forecasts}{\code{ModelCompareBase$plot_batch_forecasts()}}
 \item \href{#method-plot_batch_ases}{\code{ModelCompareBase$plot_batch_ases()}}
-\item \href{#method-plot_histogram_ases}{\code{ModelCompareBase$plot_histogram_ases()}}
+\item \href{#method-plot_boxplot_ases}{\code{ModelCompareBase$plot_boxplot_ases()}}
 \item \href{#method-statistical_compare}{\code{ModelCompareBase$statistical_compare()}}
 \item \href{#method-get_tabular_metrics}{\code{ModelCompareBase$get_tabular_metrics()}}
 \item \href{#method-summarize_build}{\code{ModelCompareBase$summarize_build()}}
@@ -159,6 +160,27 @@ Adjust the verbosity level
 }
 }
 \if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-get_model_names"></a>}}
+\if{latex}{\out{\hypertarget{method-get_model_names}{}}}
+\subsection{Method \code{get_model_names()}}{
+Get all the model names
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{ModelCompareBase$get_model_names(only_sliding = FALSE)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{only_sliding}}{If TRUE, this will only plot the ASEs for
+the models that used window ASE calculations}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+A vector of all model names
+}
+}
+\if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-add_models"></a>}}
 \if{latex}{\out{\hypertarget{method-add_models}{}}}
 \subsection{Method \code{add_models()}}{
@@ -262,7 +284,7 @@ Useful for cases where realizations that are long and n.ahead is small.}
 \subsection{Method \code{plot_batch_forecasts()}}{
 Plots the forecasts per batch for all models
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{ModelCompareBase$plot_batch_forecasts(only_sliding = TRUE)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{ModelCompareBase$plot_batch_forecasts(only_sliding = TRUE, plot = TRUE)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -270,6 +292,8 @@ Plots the forecasts per batch for all models
 \describe{
 \item{\code{only_sliding}}{If TRUE, this will only plot the batch forecasts 
 for the models that used window ASE calculations}
+
+\item{\code{plot}}{If FALSE the plots are not plotted; useful when you want to just return the data (Default = TRUE)}
 }
 \if{html}{\out{</div>}}
 }
@@ -280,7 +304,11 @@ for the models that used window ASE calculations}
 \subsection{Method \code{plot_batch_ases()}}{
 Plots the ASEs per batch for all models
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{ModelCompareBase$plot_batch_ases(only_sliding = TRUE)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{ModelCompareBase$plot_batch_ases(
+  only_sliding = TRUE,
+  plot = TRUE,
+  silent = FALSE
+)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -288,19 +316,30 @@ Plots the ASEs per batch for all models
 \describe{
 \item{\code{only_sliding}}{If TRUE, this will only plot the ASEs for
 the models that used window ASE calculations}
+
+\item{\code{plot}}{If FALSE the plots are not plotted; useful when you want to just return the data (Default = TRUE)}
+
+\item{\code{silent}}{If FALSE, any warnings are suppressed}
 }
 \if{html}{\out{</div>}}
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-plot_histogram_ases"></a>}}
-\if{latex}{\out{\hypertarget{method-plot_histogram_ases}{}}}
-\subsection{Method \code{plot_histogram_ases()}}{
-Plots the histogram of the ASE values for the models
+\if{html}{\out{<a id="method-plot_boxplot_ases"></a>}}
+\if{latex}{\out{\hypertarget{method-plot_boxplot_ases}{}}}
+\subsection{Method \code{plot_boxplot_ases()}}{
+Plots the boxplot of the ASE values for the models
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{ModelCompareBase$plot_histogram_ases()}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{ModelCompareBase$plot_boxplot_ases(plot = TRUE)}\if{html}{\out{</div>}}
 }
 
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{plot}}{If FALSE the plots are not plotted; useful when you want to just return the data (Default = TRUE)}
+}
+\if{html}{\out{</div>}}
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-statistical_compare"></a>}}
