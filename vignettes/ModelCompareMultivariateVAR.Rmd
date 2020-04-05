@@ -116,6 +116,11 @@ mdl_compare$plot_simple_forecasts(lastn = FALSE, limits = TRUE, zoom = 50)
 mdl_compare$plot_batch_forecasts(only_sliding = FALSE)
 ```
 
+## Plot and compare the ASEs per batch
+```{r fig.width=10}
+mdl_compare$plot_batch_ases() 
+```
+
 ## Raw Data and Metrics
 ```{r}
 ASEs = mdl_compare$get_tabular_metrics(ases = TRUE)

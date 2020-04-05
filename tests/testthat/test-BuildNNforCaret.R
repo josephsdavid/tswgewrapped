@@ -2,6 +2,7 @@
 ## TODO: Run in series and parallel with random grid and random and with and without user defined grid and tuneLength
 ## TODO: Then compare above to manual test in nnfor
 ## TODO: Check reproducibility of 2 runs with caret
+## TODO: Check univariate test with nnfor
 
 ## TODO: For now, we are predicting with the actual future values of xreg.
 ##       In the future, change this to use forecasted values of xreg

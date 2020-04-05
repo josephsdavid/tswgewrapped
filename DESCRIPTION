@@ -1,10 +1,10 @@
 Package: tswgewrapped
 Title: Helpful wrappers for 'tswge', 'vars' and 'nnfor' time series packages
-Version: 1.8.10.2
+Version: 1.8.10.3
 Authors@R: c(
     person("David", "Josephs", email = "josephsd@smu.edu", role = c("aut", "cre")),
     person("Nikhil", "Gupta", email = "guptan@smu.edu", role = c("aut")))
-Description: This package provides several helpful wrappers for the already useful 'tswge', 'vars' and 'nnfor' package. In the future, this package intends to move away from the tswge backend, to be faster, with more readable source code.
+Description: This package provides several helpful wrappers for the already useful 'tswge', 'vars' and 'nnfor' package. 
 License: AGPL-3
 Encoding: UTF-8
 LazyData: true

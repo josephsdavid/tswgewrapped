@@ -16,7 +16,7 @@ ModelCompareMultivariateVAR = R6::R6Class(
     #' Initialize an object to compare several Univatiate Time Series Models
     #' @param data The dataframe containing the time series realizations (data should not contain time index)
     #' @param var_interest The output variable of interest (dependent variable)
-    #' @param mdl_list A names list of all models (see format below)
+    #' @param mdl_list A named list of all models (see format below)
     #' @param n.ahead The number of observations used to calculate ASE or forecast ahead
     #' @param batch_size If any of the models used sliding ase method,
     #'                   then this number indicates the batch size to use
@@ -77,9 +77,9 @@ ModelCompareMultivariateVAR = R6::R6Class(
     #'          'Final_K': The adjusted K value to take into account the smaller batch size (only when using sliding_ase)
     summarize_build = function(){
       results = dplyr::tribble(~Model, ~Trend, ~Season, ~SlidingASE, ~Init_K, ~Final_K)
-      
+
       for (name in names(private$get_models())){
-        results = results %>% 
+        results = results %>%
           dplyr::add_row(Model = name,
                          Trend = private$models[[name]][['trend_type']],
                          Season = ifelse(is.null(private$models[[name]][['season']]), 0, private$models[[name]][['season']]),
@@ -87,9 +87,9 @@ ModelCompareMultivariateVAR = R6::R6Class(
                          Init_K = private$models[[name]][['k_initial']],
                          Final_K = private$models[[name]][['k_final']]
                          )
-       
+
       }
-      
+
       return(results)
     }
     
@@ -201,14 +201,6 @@ ModelCompareMultivariateVAR = R6::R6Class(
       }
       
       return(results)
-    },
-    
-    build_models  = function(verbose = 0){
-      
-    },
-    
-    evaluate_xIC = function(){
-      
     },
     
     validate_k = function(k, batch_size, season, col_names){
