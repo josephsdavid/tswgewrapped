@@ -1,0 +1,110 @@
+---
+title: "ModelCompareNNforCaret"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{ModelCompareNNforCaret}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+# Setup Libraries
+```{r setup}
+library(tswgewrapped)
+```
+
+# Load Data
+```{r}
+file = system.file("extdata", "USeconomic.csv", package = "tswgewrapped", mustWork = TRUE)
+USeconomic = read.csv(file, header = TRUE, stringsAsFactors = FALSE, check.names = FALSE)
+names(USeconomic) = gsub("[(|)]", "", colnames(USeconomic))
+data = USeconomic
+```
+
+# Build caret model
+
+**Since this process takes some time, I have commented this out for now and saved an already created caret model. However, feel free to uncomment this and run the model build process.**
+
+```{r}
+# library(caret)
+# 
+# # Random Parallel
+# model = ModelBuildNNforCaret$new(data = data, var_interest = "logGNP", m = 2,
+#                                  search = 'random',
+#                                  grid = NA, tuneLength = 2,
+#                                  batch_size = 132, h = 2,
+#                                  parallel = TRUE,
+#                                  seed = 1,
+#                                  verbose = 1)
+# 
+# model$summarize_hyperparam_results()
+# model$plot_hyperparam_results()
+# 
+# model$summarize_best_hyperparams()
+# model$summarize_build()
+# 
+# caret_model = model$get_final_models(subset = 'a')
+```
+
+
+# Load already saved caret model
+```{r}
+file = system.file("extdata", "caret_model_batch_ase.rds", package = "tswgewrapped", mustWork = TRUE)
+caret_model = readRDS(file)
+```
+
+# Initialize the ModelCompareMultivariateVAR object
+
+```{r}
+mdl_compare = ModelCompareNNforCaret$new(data = data, var_interest = 'logGNP',
+                                         mdl_list = caret_model,
+                                         verbose = 1)
+```
+
+# Compare the models
+
+## Compare Histogram of ASE values
+```{r fig.width = 8}
+mdl_compare$plot_histogram_ases()
+```
+
+## Statistically Compare the models
+```{r}
+mdl_compare$statistical_compare()  
+```
+
+## Simple Forecasts (with various options)
+
+**This is not currently supported since it needs future values to be passed and we dont have these values yet (unless we forecast them). We will add this functionality in the future.**
+
+```{r fig.width=8}
+mdl_compare$plot_simple_forecasts()
+```
+
+## Plot and compare the forecasts per batch
+```{r fig.width=8}
+mdl_compare$plot_batch_forecasts()
+```
+
+## Plot and compare the ASEs per batch
+```{r fig.width=8}
+mdl_compare$plot_batch_ases() 
+```
+
+## Raw Data and Metrics
+```{r}
+ASEs = mdl_compare$get_tabular_metrics(ases = TRUE)
+print(ASEs)
+```
+
+```{r}
+forecasts = mdl_compare$get_tabular_metrics(ases = FALSE)
+print(forecasts)
+```
+

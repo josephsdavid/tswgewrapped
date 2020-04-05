@@ -12,7 +12,7 @@ ModelCompareBase = R6::R6Class(
     #' @description 
     #' Initialize an object to compare several Univatiate Time Series Models
     #' @param data The dataframe containing the time series realizations (data should not contain time index)
-    #' @param mdl_list A names list of all models (see format below)
+    #' @param mdl_list A named list of all models (see format below)
     #' @param n.ahead The number of observations used to calculate ASE or forecast ahead
     #' @param batch_size If any of the models used sliding ase method,
     #'                   then this number indicates the batch size to use
@@ -161,17 +161,29 @@ ModelCompareBase = R6::R6Class(
           res = private$get_sliding_ase_results(name = name, step_n.ahead = step_n.ahead)
           
           ## Inplace
-          private$models[[name]][['ASEs']] = res$ASEs
-          private$models[[name]][['time_test_start']] = res$time_test_start
-          private$models[[name]][['time_test_end']] = res$time_test_end
-          private$models[[name]][['batch_num']] = res$batch_num
-          private$models[[name]][['f']] = res$f
-          private$models[[name]][['ll']] = res$ll
-          private$models[[name]][['ul']] = res$ul
-          private$models[[name]][['time.forecasts']] = res$time.forecasts
+          # private$models[[name]][['ASEs']] = res$ASEs
+          # private$models[[name]][['time_test_start']] = res$time_test_start
+          # private$models[[name]][['time_test_end']] = res$time_test_end
+          # private$models[[name]][['batch_num']] = res$batch_num
+          # 
+          # private$models[[name]][['f']] = res$f
+          # private$models[[name]][['ll']] = res$ll
+          # private$models[[name]][['ul']] = res$ul
+          # private$models[[name]][['time.forecasts']] = res$time.forecasts
+          
+          private$models[[name]]$ASEs = res$ASEs
+          private$models[[name]]$time_test_start = res$time_test_start
+          private$models[[name]]$time_test_end = res$time_test_end
+          private$models[[name]]$batch_num = res$batch_num
+          
+          private$models[[name]]$f = res$f
+          private$models[[name]]$ll = res$ll
+          private$models[[name]]$ul = res$ul
+          private$models[[name]]$time.forecasts = res$time.forecasts
 
 
-          private$models[[name]][['metric_has_been_computed']] = TRUE
+          # private$models[[name]][['metric_has_been_computed']] = TRUE
+          private$models[[name]]$metric_has_been_computed = TRUE
 
         }
         else{
@@ -224,72 +236,75 @@ ModelCompareBase = R6::R6Class(
     #' @param only_sliding If TRUE, this will only plot the batch forecasts 
     #'                     for the models that used window ASE calculations
     plot_batch_forecasts = function(only_sliding = TRUE){
-
-      results.forecasts = self$get_tabular_metrics(ases = FALSE)
-      
-      model_subset = c("Realization")
-      if (only_sliding){
-        for (name in names(private$get_models())){
-          if (private$models[[name]][['sliding_ase']] == TRUE){
+      if (only_sliding == TRUE & private$any_sliding_ase() == FALSE){
+        message("None of your models are using a sliding ASE calculation, hence nothing will be plotted")
+      }
+      else{
+        results.forecasts = self$get_tabular_metrics(ases = FALSE)
+        
+        model_subset = c("Realization")
+        if (only_sliding){
+          for (name in names(private$get_models())){
+            if (private$models[[name]][['sliding_ase']] == TRUE){
+              model_subset = c(model_subset, name)
+            }
+          }
+        }
+        else{
+          # Add all models
+          for (name in names(private$get_models())){
             model_subset = c(model_subset, name)
           }
         }
-      }
-      else{
-        # Add all models
-        for (name in names(private$get_models())){
-          model_subset = c(model_subset, name)
+        
+        results.forecasts = results.forecasts %>% 
+          dplyr::filter(Model %in% model_subset)
+        
+        # https://stackoverflow.com/questions/9968975/make-the-background-of-a-graph-different-colours-in-different-regions
+        
+        # Get Batch Boundaries
+        results.ases = self$get_tabular_metrics(ases = TRUE)
+        if (private$any_sliding_ase()){
+          for (name in names(private$get_models())){
+            if (private$models[[name]][['sliding_ase']] == TRUE){
+              results.batches = results.ases %>% 
+                  dplyr::filter(Model == name)
+              break()
+            }
+          }
         }
-      }
-      
-      results.forecasts = results.forecasts %>% 
-        dplyr::filter(Model %in% model_subset)
-      
-      # https://stackoverflow.com/questions/9968975/make-the-background-of-a-graph-different-colours-in-different-regions
-      
-      # Get Batch Boundaries
-      results.ases = self$get_tabular_metrics(ases = TRUE)
-      if (private$any_sliding_ase()){
-        for (name in names(private$get_models())){
-          if (private$models[[name]][['sliding_ase']] == TRUE){
+        else{
+          # No model has sliding ASE, so just pick the 1st one
+          for (name in names(private$get_models())){
             results.batches = results.ases %>% 
-                dplyr::filter(Model == name)
+              dplyr::filter(Model == name)
             break()
           }
         }
+        
+        rects = data.frame(xstart = results.batches[['Time_Test_Start']],
+                           xend = results.batches[['Time_Test_End']],
+                           Batch = rep(1, length(results.batches[['Batch']])))
+        
+        
+        p = ggplot2::ggplot() + 
+          ggplot2::geom_rect(data = rects, ggplot2::aes(xmin = xstart, xmax = xend, ymin = -Inf, ymax = Inf, fill = Batch), alpha = 0.1, show.legend = FALSE) +  
+          ggplot2::geom_line(results.forecasts %>% dplyr::filter(Model == 'Realization'), mapping = ggplot2::aes(x = Time, y = f, color = Model), size = 1) +
+          ggplot2::geom_line(results.forecasts %>% dplyr::filter(Model != 'Realization'), mapping = ggplot2::aes(x = Time, y = f, color = Model), size = 0.75) +
+          ggplot2::ylab("Forecasts")
+        
+        print(p) 
+      
+        p = ggplot2::ggplot() +
+          ggplot2::geom_rect(data = rects, ggplot2::aes(xmin = xstart, xmax = xend, ymin = -Inf, ymax = Inf, fill = Batch), alpha = 0.1, show.legend = FALSE) +  
+          ggplot2::geom_line(results.forecasts %>% dplyr::filter(Model == 'Realization'), mapping = ggplot2::aes(x=Time, y=ll, color = Model), size = 1) + 
+          ggplot2::geom_line(results.forecasts %>% dplyr::filter(Model == 'Realization'), mapping = ggplot2::aes(x=Time, y=ll, color = Model), size = 1) + 
+          ggplot2::geom_line(results.forecasts %>% dplyr::filter(Model != 'Realization'), mapping = ggplot2::aes(x=Time, y=ll, color = Model), size = 0.75) + 
+          ggplot2::geom_line(results.forecasts %>% dplyr::filter(Model != 'Realization'), mapping = ggplot2::aes(x=Time, y=ul, color = Model), size = 0.75) +
+          ggplot2::ylab("Upper and Lower Forecast Limits (95%)")
+        
+        print(p)
       }
-      else{
-        # No model has sliding ASE, so just pick the 1st one
-        for (name in names(private$get_models())){
-          results.batches = results.ases %>% 
-            dplyr::filter(Model == name)
-          break()
-        }
-      }
-      
-      rects = data.frame(xstart = results.batches[['Time_Test_Start']],
-                         xend = results.batches[['Time_Test_End']],
-                         Batch = rep(1, length(results.batches[['Batch']])))
-      
-      
-      p = ggplot2::ggplot() + 
-        ggplot2::geom_rect(data = rects, ggplot2::aes(xmin = xstart, xmax = xend, ymin = -Inf, ymax = Inf, fill = Batch), alpha = 0.1, show.legend = FALSE) +  
-        ggplot2::geom_line(results.forecasts %>% dplyr::filter(Model == 'Realization'), mapping = ggplot2::aes(x = Time, y = f, color = Model), size = 1) +
-        ggplot2::geom_line(results.forecasts %>% dplyr::filter(Model != 'Realization'), mapping = ggplot2::aes(x = Time, y = f, color = Model), size = 0.75) +
-        ggplot2::ylab("Forecasts")
-      
-      print(p) 
-      
-      
-      p = ggplot2::ggplot() +
-        ggplot2::geom_rect(data = rects, ggplot2::aes(xmin = xstart, xmax = xend, ymin = -Inf, ymax = Inf, fill = Batch), alpha = 0.1, show.legend = FALSE) +  
-        ggplot2::geom_line(results.forecasts %>% dplyr::filter(Model == 'Realization'), mapping = ggplot2::aes(x=Time, y=ll, color = Model), size = 1) + 
-        ggplot2::geom_line(results.forecasts %>% dplyr::filter(Model == 'Realization'), mapping = ggplot2::aes(x=Time, y=ll, color = Model), size = 1) + 
-        ggplot2::geom_line(results.forecasts %>% dplyr::filter(Model != 'Realization'), mapping = ggplot2::aes(x=Time, y=ll, color = Model), size = 0.75) + 
-        ggplot2::geom_line(results.forecasts %>% dplyr::filter(Model != 'Realization'), mapping = ggplot2::aes(x=Time, y=ul, color = Model), size = 0.75) +
-        ggplot2::ylab("Upper and Lower Forecast Limits (95%)")
-      
-      print(p)
       
     },
     
@@ -297,63 +312,65 @@ ModelCompareBase = R6::R6Class(
     #' @param only_sliding If TRUE, this will only plot the ASEs for
     #'                     the models that used window ASE calculations
     plot_batch_ases = function(only_sliding = TRUE){
-      
-      requireNamespace("patchwork")
-      
-      model_subset = c()
-      
-      if (only_sliding){
-        for (name in names(private$get_models())){
-          if (private$models[[name]][['sliding_ase']] == TRUE){
+      if (only_sliding == TRUE & private$any_sliding_ase() == FALSE){
+        message("None of your models are using a sliding ASE calculation, hence nothing will be plotted")
+      }
+      else{
+        requireNamespace("patchwork")
+        
+        model_subset = c()
+        
+        if (only_sliding){
+          for (name in names(private$get_models())){
+            if (private$models[[name]][['sliding_ase']] == TRUE){
+              model_subset = c(model_subset, name)
+            }
+          }
+        }
+        else{
+          # Add all models
+          for (name in names(private$get_models())){
             model_subset = c(model_subset, name)
           }
         }
-      }
-      else{
-        # Add all models
-        for (name in names(private$get_models())){
-          model_subset = c(model_subset, name)
-        }
-      }
-      
-      ASEs = self$get_tabular_metrics(ases = TRUE) %>% 
-        dplyr::filter(Model %in% model_subset) %>%  
-        tidyr::gather("Index", "Time", -Model, -ASE, -Batch) 
-      
-      all_time = NA
-      
-      for (name in model_subset){
-        if (all(is.na(all_time))){
-          all_time = data.frame(Time = seq(1, private$get_len_x()),
-                                Model = rep(name, private$get_len_x()),
-                                ASE = 0)
-        }
-        else{
-          all_time = rbind(all_time, data.frame(Time = seq(1, private$get_len_x()),
-                                                Model = rep(name, private$get_len_x()),
-                                                ASE = 0))
+        
+        ASEs = self$get_tabular_metrics(ases = TRUE) %>% 
+          dplyr::filter(Model %in% model_subset) %>%  
+          tidyr::gather("Index", "Time", -Model, -ASE, -Batch) 
+        
+        all_time = NA
+        
+        for (name in model_subset){
+          if (all(is.na(all_time))){
+            all_time = data.frame(Time = seq(1, private$get_len_x()),
+                                  Model = rep(name, private$get_len_x()),
+                                  ASE = 0)
+          }
+          else{
+            all_time = rbind(all_time, data.frame(Time = seq(1, private$get_len_x()),
+                                                  Model = rep(name, private$get_len_x()),
+                                                  ASE = 0))
+          }
+          
+          all_time = all_time %>%
+            dplyr::mutate_if(is.factor, as.character)
         }
         
-        all_time = all_time %>%
-          dplyr::mutate_if(is.factor, as.character)
+        results = dplyr::left_join(all_time, ASEs, by = c("Time", "Model")) %>%
+          dplyr::mutate(ASE = ASE.x + ASE.y) %>% 
+          dplyr::group_by(Model) %>% 
+          tidyr::fill(.data$ASE, .direction = "down")
+        
+        data = data.frame(Time = seq(1, private$get_len_x()), Data = self$get_data_var_interest())
+        
+        g1 = ggplot2::ggplot() + 
+          ggplot2::geom_line(data, mapping = ggplot2::aes(x = Time, y = Data), size = 1)
+        
+        g2 = ggplot2::ggplot() +
+          ggplot2::geom_line(results, mapping = ggplot2::aes(x = Time, y = ASE, color = Model), size = 1)
+        
+        print(g1/g2)
       }
-      
-      results = dplyr::left_join(all_time, ASEs, by = c("Time", "Model")) %>%
-        dplyr::mutate(ASE = ASE.x + ASE.y) %>% 
-        dplyr::group_by(Model) %>% 
-        tidyr::fill(.data$ASE, .direction = "down")
-      
-      data = data.frame(Time = seq(1, private$get_len_x()), Data = self$get_data_var_interest())
-      
-      g1 = ggplot2::ggplot() + 
-        ggplot2::geom_line(data, mapping = ggplot2::aes(x = Time, y = Data), size = 1)
-      
-      g2 = ggplot2::ggplot() +
-        ggplot2::geom_line(results, mapping = ggplot2::aes(x = Time, y = ASE, color = Model), size = 1)
-      
-      print(g1/g2)
-      
-
     },
     
     #' @description Plots the histogram of the ASE values for the models
@@ -560,8 +577,8 @@ ModelCompareBase = R6::R6Class(
     },
     
     evaluate_models = function(){
-      private$build_models(verbose = private$get_verbose())
-      private$evaluate_xIC()
+      # private$build_models(verbose = private$get_verbose())
+      # private$evaluate_xIC()
       self$compute_metrics(step_n.ahead = private$get_step_n.ahead())
       print(self$summarize_build())  
     },

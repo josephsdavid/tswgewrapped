@@ -122,7 +122,7 @@ Initialize an object to compare several Univatiate Time Series Models
 \describe{
 \item{\code{data}}{A Univariate Time Series Realization}
 
-\item{\code{mdl_list}}{A names list of all models (see format below)}
+\item{\code{mdl_list}}{A named list of all models (see format below)}
 
 \item{\code{n.ahead}}{The number of observations used to calculate ASE or forecast ahead}
 

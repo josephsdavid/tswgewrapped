@@ -174,8 +174,24 @@ Check out the vignette 'ModelBuildMultivariateVAR'
 
 # Multivariate Time Series Model (VAR) Comparison
 Check out the vignette 'ModelCompareMultivariateVAR'
-* Supports comparig the performance of multiple multivariate VAR models
+* Supports comparing the performance of multiple multivariate VAR models
 * Suppport for simple forecasts and plotting
+* Support for Batch ASE calculations and plotting
+* Statistical Comparison of models (when using batch ASE method)
+* Histogram of model comparison (ASE values)
+* Tabular metrics for manual anaysis (if needed)
+
+# Time Series with nnfor::mlp (Neural Network) Model Building
+Check out the vignette 'ModelCompareNNforCaret'
+* Builds the model with the caret framework.
+* Suppport for predefined or random grid search
+* Supports parallel processing using multiple cores to speed up the grid search
+* Support for sliding ASE while building models
+
+# Time Series with nnfor::mlp (Neural Network) Model Comparison
+Check out the vignette 'ModelCompareNNforCaret'
+* Supports comparing the performance of multiple nnfor::mlp() submodels built by caret
+* Does not suppport simple forecasts and plotting yet (planned for the future)
 * Support for Batch ASE calculations and plotting
 * Statistical Comparison of models (when using batch ASE method)
 * Histogram of model comparison (ASE values)

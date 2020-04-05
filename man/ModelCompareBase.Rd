@@ -52,7 +52,7 @@ Initialize an object to compare several Univatiate Time Series Models
 \describe{
 \item{\code{data}}{The dataframe containing the time series realizations (data should not contain time index)}
 
-\item{\code{mdl_list}}{A names list of all models (see format below)}
+\item{\code{mdl_list}}{A named list of all models (see format below)}
 
 \item{\code{n.ahead}}{The number of observations used to calculate ASE or forecast ahead}
 

@@ -72,7 +72,7 @@ ModelCompareUnivariate = R6::R6Class(
     #' @description 
     #' Initialize an object to compare several Univatiate Time Series Models
     #' @param data A Univariate Time Series Realization
-    #' @param mdl_list A names list of all models (see format below)
+    #' @param mdl_list A named list of all models (see format below)
     #' @param n.ahead The number of observations used to calculate ASE or forecast ahead
     #' @param batch_size If any of the models used sliding ase method,
     #'                   then this number indicates the batch size to use
@@ -282,17 +282,9 @@ ModelCompareUnivariate = R6::R6Class(
     
     set_var_interest = function(var_interest = NA){
       ## Do nothing. There is only 1 variable of interest.
-    },
-    
-    build_models  = function(verbose = 0){
-      ## Do nothing. We are expecting the build model (all parameters known) to be passed
-    },
-    
-    evaluate_xIC = function(){
-      ## Do nothing. Since we are expecting the build model to be passed, the AIC and BIC would be external to this object.   
     }
     
- 
+
     
   )
   
