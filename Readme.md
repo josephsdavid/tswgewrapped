@@ -11,12 +11,18 @@ R CMD INSTALL tswgewrapped
 or
 
 ```r
+if (!require(devtools)) {
+  install.packages("devtools")
+}
 devtools::install_github("josephsdavid/tswgewrapped", build_vignettes = TRUE)
 ```
 
 or
 ```r
-install.packages("remotes")
+if (!require(remotes)) {
+  install.packages("remotes")
+}
+
 remotes::install_github("josephsdavid/tswgewrapped", build_vignettes = TRUE)
 ```
 
