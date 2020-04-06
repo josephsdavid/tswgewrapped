@@ -11,13 +11,13 @@ R CMD INSTALL tswgewrapped
 or
 
 ```r
-devtools::install_github("josephsdavid/tswgewrapped")
+devtools::install_github("josephsdavid/tswgewrapped", build_vignettes = TRUE)
 ```
 
 or
 ```r
 install.packages("remotes")
-remotes::install_github("josephsdavid/tswgewrapped")
+remotes::install_github("josephsdavid/tswgewrapped", build_vignettes = TRUE)
 ```
 
 ## Usage
@@ -151,6 +151,11 @@ xs <- playground(400)
 
 # Univariate Time Series Model Comparison
 Check out the vignette 'ModelCompareUnivariate'
+
+```
+vignette("ModelCompareUnivariate")
+```
+
 * Supports comparig the performance of multiple univariate models (ARMA, ARIMA and Seasonal ARIMA)
 * Suppport for simple forecasts and plotting
 * Support for Batch ASE calculations and plotting
@@ -159,7 +164,7 @@ Check out the vignette 'ModelCompareUnivariate'
 * Tabular metrics for manual anaysis (if needed)
 
 # Multivariate Time Series Model EDA
-Vignete pending
+Vignette pending
 * Supports plotting of realizations
 * Supports scatterplot matrix to check for correlations between variables and independence of dependent variables (assumnption of MLR model with correlated errors)
 * Support for plotting and analyzing cross-correlation data (CCF function)
@@ -167,6 +172,11 @@ Vignete pending
 
 # Multivariate Time Series Model (VAR) Model Building
 Check out the vignette 'ModelBuildMultivariateVAR'
+
+```
+vignette("ModelBuildMultivariateVAR")
+```
+
 * VAR models are prone to overfitting if we use a lot of exogenous variables with a large lag order. 
 * This class supports building multiple VAR models at the same time and provides recommendations for which features to keep in the final model. 
 * User can then choose to keep all original variables or use the recommended model alternative. 
@@ -174,6 +184,11 @@ Check out the vignette 'ModelBuildMultivariateVAR'
 
 # Multivariate Time Series Model (VAR) Comparison
 Check out the vignette 'ModelCompareMultivariateVAR'
+
+```
+vignette("ModelCompareMultivariateVAR")
+```
+
 * Supports comparing the performance of multiple multivariate VAR models
 * Suppport for simple forecasts and plotting
 * Support for Batch ASE calculations and plotting
@@ -182,7 +197,8 @@ Check out the vignette 'ModelCompareMultivariateVAR'
 * Tabular metrics for manual anaysis (if needed)
 
 # Time Series with nnfor::mlp (Neural Network) Model Building
-Check out the vignette 'ModelCompareNNforCaret'
+Vignette pending
+
 * Builds the model with the caret framework.
 * Suppport for predefined or random grid search
 * Supports parallel processing using multiple cores to speed up the grid search
@@ -190,6 +206,11 @@ Check out the vignette 'ModelCompareNNforCaret'
 
 # Time Series with nnfor::mlp (Neural Network) Model Comparison
 Check out the vignette 'ModelCompareNNforCaret'
+
+```
+vignette("ModelCompareNNforCaret")
+```
+
 * Supports comparing the performance of multiple nnfor::mlp() submodels built by caret
 * Does not suppport simple forecasts and plotting yet (planned for the future)
 * Support for Batch ASE calculations and plotting
