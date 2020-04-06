@@ -155,7 +155,7 @@ Check out the vignette 'ModelCompareUnivariate'
 * Suppport for simple forecasts and plotting
 * Support for Batch ASE calculations and plotting
 * Statistical Comparison of models (when using batch ASE method)
-* Histogram of model comparison (ASE values)
+* Boxplot of model comparison (ASE values)
 * Tabular metrics for manual anaysis (if needed)
 
 # Multivariate Time Series Model EDA
@@ -178,7 +178,7 @@ Check out the vignette 'ModelCompareMultivariateVAR'
 * Suppport for simple forecasts and plotting
 * Support for Batch ASE calculations and plotting
 * Statistical Comparison of models (when using batch ASE method)
-* Histogram of model comparison (ASE values)
+* Boxplot of model comparison (ASE values)
 * Tabular metrics for manual anaysis (if needed)
 
 # Time Series with nnfor::mlp (Neural Network) Model Building
@@ -194,6 +194,6 @@ Check out the vignette 'ModelCompareNNforCaret'
 * Does not suppport simple forecasts and plotting yet (planned for the future)
 * Support for Batch ASE calculations and plotting
 * Statistical Comparison of models (when using batch ASE method)
-* Histogram of model comparison (ASE values)
+* Boxplot of model comparison (ASE values)
 * Tabular metrics for manual anaysis (if needed)
 

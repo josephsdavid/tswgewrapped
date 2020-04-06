@@ -77,6 +77,32 @@ ModelCompareBase = R6::R6Class(
       private$verbose = verbose
     },
     
+    #' @description Get all the model names
+    #' @param only_sliding If TRUE, this will only plot the ASEs for
+    #'                     the models that used window ASE calculations
+    #' @return A vector of all model names
+    get_model_names = function(only_sliding = FALSE){
+      
+      model_subset = c()
+      
+      if (only_sliding == TRUE){
+        for (name in names(private$get_models())){
+          if (private$models[[name]][['sliding_ase']] == TRUE){
+            model_subset = c(model_subset, name)
+          }
+        }
+      }
+      else{
+        # Add all models
+        for (name in names(private$get_models())){
+          model_subset = c(model_subset, name)
+        }
+      }
+      
+      return(model_subset)
+      
+      },
+    
     #### General Public Methods ----
     
     #' @description Add models to the existing object
@@ -235,9 +261,13 @@ ModelCompareBase = R6::R6Class(
     #' @description Plots the forecasts per batch for all models
     #' @param only_sliding If TRUE, this will only plot the batch forecasts 
     #'                     for the models that used window ASE calculations
-    plot_batch_forecasts = function(only_sliding = TRUE){
+    #' @param plot If FALSE the plots are not plotted; useful when you want to just return the data (Default = TRUE)
+    #' @param silent If FALSE, any warnings are suppressed
+    plot_batch_forecasts = function(only_sliding = TRUE, plot = TRUE, silent = FALSE){
       if (only_sliding == TRUE & private$any_sliding_ase() == FALSE){
-        message("None of your models are using a sliding ASE calculation, hence nothing will be plotted")
+        if (silent == FALSE){
+          message("None of your models are using a sliding ASE calculation, hence nothing will be plotted")
+        }
       }
       else{
         results.forecasts = self$get_tabular_metrics(ases = FALSE)
@@ -286,24 +316,27 @@ ModelCompareBase = R6::R6Class(
                            xend = results.batches[['Time_Test_End']],
                            Batch = rep(1, length(results.batches[['Batch']])))
         
+        if (plot == TRUE){
+          p = ggplot2::ggplot() + 
+            ggplot2::geom_rect(data = rects, ggplot2::aes(xmin = xstart, xmax = xend, ymin = -Inf, ymax = Inf, fill = Batch), alpha = 0.1, show.legend = FALSE) +  
+            ggplot2::geom_line(results.forecasts %>% dplyr::filter(Model == 'Realization'), mapping = ggplot2::aes(x = Time, y = f, color = Model), size = 1) +
+            ggplot2::geom_line(results.forecasts %>% dplyr::filter(Model != 'Realization'), mapping = ggplot2::aes(x = Time, y = f, color = Model), size = 0.75) +
+            ggplot2::ylab("Forecasts")
+          
+          print(p) 
         
-        p = ggplot2::ggplot() + 
-          ggplot2::geom_rect(data = rects, ggplot2::aes(xmin = xstart, xmax = xend, ymin = -Inf, ymax = Inf, fill = Batch), alpha = 0.1, show.legend = FALSE) +  
-          ggplot2::geom_line(results.forecasts %>% dplyr::filter(Model == 'Realization'), mapping = ggplot2::aes(x = Time, y = f, color = Model), size = 1) +
-          ggplot2::geom_line(results.forecasts %>% dplyr::filter(Model != 'Realization'), mapping = ggplot2::aes(x = Time, y = f, color = Model), size = 0.75) +
-          ggplot2::ylab("Forecasts")
+          p = ggplot2::ggplot() +
+            ggplot2::geom_rect(data = rects, ggplot2::aes(xmin = xstart, xmax = xend, ymin = -Inf, ymax = Inf, fill = Batch), alpha = 0.1, show.legend = FALSE) +  
+            ggplot2::geom_line(results.forecasts %>% dplyr::filter(Model == 'Realization'), mapping = ggplot2::aes(x=Time, y=ll, color = Model), size = 1) + 
+            ggplot2::geom_line(results.forecasts %>% dplyr::filter(Model == 'Realization'), mapping = ggplot2::aes(x=Time, y=ll, color = Model), size = 1) + 
+            ggplot2::geom_line(results.forecasts %>% dplyr::filter(Model != 'Realization'), mapping = ggplot2::aes(x=Time, y=ll, color = Model), size = 0.75) + 
+            ggplot2::geom_line(results.forecasts %>% dplyr::filter(Model != 'Realization'), mapping = ggplot2::aes(x=Time, y=ul, color = Model), size = 0.75) +
+            ggplot2::ylab("Upper and Lower Forecast Limits (95%)")
+          
+          print(p)
+        }
         
-        print(p) 
-      
-        p = ggplot2::ggplot() +
-          ggplot2::geom_rect(data = rects, ggplot2::aes(xmin = xstart, xmax = xend, ymin = -Inf, ymax = Inf, fill = Batch), alpha = 0.1, show.legend = FALSE) +  
-          ggplot2::geom_line(results.forecasts %>% dplyr::filter(Model == 'Realization'), mapping = ggplot2::aes(x=Time, y=ll, color = Model), size = 1) + 
-          ggplot2::geom_line(results.forecasts %>% dplyr::filter(Model == 'Realization'), mapping = ggplot2::aes(x=Time, y=ll, color = Model), size = 1) + 
-          ggplot2::geom_line(results.forecasts %>% dplyr::filter(Model != 'Realization'), mapping = ggplot2::aes(x=Time, y=ll, color = Model), size = 0.75) + 
-          ggplot2::geom_line(results.forecasts %>% dplyr::filter(Model != 'Realization'), mapping = ggplot2::aes(x=Time, y=ul, color = Model), size = 0.75) +
-          ggplot2::ylab("Upper and Lower Forecast Limits (95%)")
-        
-        print(p)
+        return(list(forecasts = results.forecasts, batch_rects = rects))
       }
       
     },
@@ -311,16 +344,20 @@ ModelCompareBase = R6::R6Class(
     #' @description Plots the ASEs per batch for all models
     #' @param only_sliding If TRUE, this will only plot the ASEs for
     #'                     the models that used window ASE calculations
-    plot_batch_ases = function(only_sliding = TRUE){
+    #' @param plot If FALSE the plots are not plotted; useful when you want to just return the data (Default = TRUE)                      
+    #' @param silent If FALSE, any warnings are suppressed
+    plot_batch_ases = function(only_sliding = TRUE, plot = TRUE, silent = FALSE){
       if (only_sliding == TRUE & private$any_sliding_ase() == FALSE){
-        message("None of your models are using a sliding ASE calculation, hence nothing will be plotted")
+        if (silent == FALSE){
+          message("None of your models are using a sliding ASE calculation, hence nothing will be plotted")
+        }
       }
       else{
         requireNamespace("patchwork")
         
         model_subset = c()
         
-        if (only_sliding){
+        if (only_sliding == TRUE){
           for (name in names(private$get_models())){
             if (private$models[[name]][['sliding_ase']] == TRUE){
               model_subset = c(model_subset, name)
@@ -363,23 +400,35 @@ ModelCompareBase = R6::R6Class(
         
         data = data.frame(Time = seq(1, private$get_len_x()), Data = self$get_data_var_interest())
         
-        g1 = ggplot2::ggplot() + 
-          ggplot2::geom_line(data, mapping = ggplot2::aes(x = Time, y = Data), size = 1)
+        if (plot == TRUE){
+          g1 = ggplot2::ggplot() + 
+            ggplot2::geom_line(data, mapping = ggplot2::aes(x = Time, y = Data), size = 1)
         
-        g2 = ggplot2::ggplot() +
-          ggplot2::geom_line(results, mapping = ggplot2::aes(x = Time, y = ASE, color = Model), size = 1)
+          g2 = ggplot2::ggplot() +
+            ggplot2::geom_line(results, mapping = ggplot2::aes(x = Time, y = ASE, color = Model), size = 1)
         
-        print(g1/g2)
+          print(g1/g2)
+        }
+        
+        return(list(data = data, ASEs = results))
       }
     },
     
-    #' @description Plots the histogram of the ASE values for the models
-    plot_histogram_ases = function(){
+    #' @description Plots the boxplot of the ASE values for the models
+    #' @param plot If FALSE the plots are not plotted; useful when you want to just return the data (Default = TRUE)
+    plot_boxplot_ases = function(plot = TRUE){
       results = self$get_tabular_metrics()
-      p = ggplot2::ggplot(results, ggplot2::aes(x = Model, y = ASE, color = Model)) + 
-        ggplot2::geom_boxplot() + 
-        ggplot2::coord_flip()
-      print(p)
+      
+      if (plot == TRUE){
+        p = ggplot2::ggplot(results, ggplot2::aes(x = Model, y = ASE, color = Model)) + 
+          ggplot2::geom_boxplot() + 
+          ggplot2::stat_summary(fun = mean, colour="darkred", geom="point", 
+                                shape=18, size=3, show.legend = FALSE) +
+          ggplot2::coord_flip()
+        print(p)
+      }
+      
+      return(results)
     },
     
     #' @description Statistically compares the ASE values of the models using 

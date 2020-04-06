@@ -27,13 +27,13 @@ test_that("ModelCompareUnivariate", {
   mdl_compare = ModelCompareUnivariate$new(data = airlog, mdl_list = models,
                                            n.ahead = 36, batch_size = 72)
   
-  mdl_compare$plot_simple_forecasts()
-  mdl_compare$plot_simple_forecasts(zoom = 50)
-  mdl_compare$plot_batch_forecasts(only_sliding = TRUE)
-  mdl_compare$plot_batch_forecasts(only_sliding = FALSE)
-  mdl_compare$plot_batch_ases(only_sliding = TRUE)
-  mdl_compare$plot_batch_ases(only_sliding = FALSE)
-  mdl_compare$plot_histogram_ases()
+  p = mdl_compare$plot_simple_forecasts()
+  p = mdl_compare$plot_simple_forecasts(zoom = 50)
+  p = mdl_compare$plot_batch_forecasts(only_sliding = TRUE)
+  p = mdl_compare$plot_batch_forecasts(only_sliding = FALSE)
+  p = mdl_compare$plot_batch_ases(only_sliding = TRUE)
+  p = mdl_compare$plot_batch_ases(only_sliding = FALSE)
+  p = mdl_compare$plot_boxplot_ases()
   mdl_compare$statistical_compare()
   
   mdl_compare$plot_multiple_realizations(n.realizations = 4, seed = 100, scales = 'free_y')
@@ -185,12 +185,12 @@ test_that("ModelCompareUnivariate - Add Models", {
   
   mdl_compare$set_batch_size(72)
   # Check all functions after data manipulation
-  mdl_compare$plot_simple_forecasts()
-  mdl_compare$plot_batch_forecasts(only_sliding = TRUE)
-  mdl_compare$plot_batch_forecasts(only_sliding = FALSE)
-  mdl_compare$plot_batch_ases(only_sliding = TRUE)
-  mdl_compare$plot_batch_ases(only_sliding = FALSE)
-  mdl_compare$plot_histogram_ases()
+  p = mdl_compare$plot_simple_forecasts()
+  p = mdl_compare$plot_batch_forecasts(only_sliding = TRUE)
+  p = mdl_compare$plot_batch_forecasts(only_sliding = FALSE)
+  p = mdl_compare$plot_batch_ases(only_sliding = TRUE)
+  p = mdl_compare$plot_batch_ases(only_sliding = FALSE)
+  p = mdl_compare$plot_boxplot_ases()
   mdl_compare$statistical_compare()
   
   # Remove models
@@ -200,12 +200,12 @@ test_that("ModelCompareUnivariate - Add Models", {
   mdl_compare$add_models(mdl_list = models, batch_size = 72)
   
   # Check all functions after data manipulation
-  mdl_compare$plot_simple_forecasts()
-  mdl_compare$plot_batch_forecasts(only_sliding = TRUE)
-  mdl_compare$plot_batch_forecasts(only_sliding = FALSE)
-  mdl_compare$plot_batch_ases(only_sliding = TRUE)
-  mdl_compare$plot_batch_ases(only_sliding = FALSE)
-  mdl_compare$plot_histogram_ases()
+  p = mdl_compare$plot_simple_forecasts()
+  p = mdl_compare$plot_batch_forecasts(only_sliding = TRUE)
+  p = mdl_compare$plot_batch_forecasts(only_sliding = FALSE)
+  p = mdl_compare$plot_batch_ases(only_sliding = TRUE)
+  p = mdl_compare$plot_batch_ases(only_sliding = FALSE)
+  p = mdl_compare$plot_boxplot_ases()
   mdl_compare$statistical_compare()
   
   

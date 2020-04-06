@@ -1,5 +1,5 @@
 ---
-title: "ModelBuildMultivariateVAR"
+title: "1.2.1 Build Multivariate VAR Models"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{ModelBuildMultivariateVAR}

@@ -1,5 +1,5 @@
 ---
-title: "ModelCompareUnivariate"
+title: "1.1.2 Compare Univariate Models"
 author: "Nikhil Gupta"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
@@ -66,16 +66,16 @@ mdl_compare = ModelCompareUnivariate$new(data = airlog, mdl_list = models,
 
 ## Plot Multiple realizations
 ```{r fig.height=8, fig.width=10, message=FALSE, warning=FALSE}
-mdl_compare$plot_multiple_realizations(n.realizations = 4, seed = 100, plot = "realization", scales = 'fixed')
+p = mdl_compare$plot_multiple_realizations(n.realizations = 4, seed = 100, plot = "realization", scales = 'fixed')
 ```
 
 ```{r fig.height=6, fig.width=10, message=FALSE, warning=FALSE}
-mdl_compare$plot_multiple_realizations(n.realizations = 4, seed = 100, plot = c("acf", "spectrum"), scales = 'fixed')
+p = mdl_compare$plot_multiple_realizations(n.realizations = 4, seed = 100, plot = c("acf", "spectrum"), scales = 'fixed')
 ```
 
-## Compare Histogram of ASE values
+## Compare boxplot of ASE values
 ```{r fig.width=10}
-mdl_compare$plot_histogram_ases()
+p = mdl_compare$plot_boxplot_ases()
 ```
 
 ## Statistically Compare the models
@@ -85,16 +85,16 @@ mdl_compare$statistical_compare()
 
 ## Simple Forecasts (with various options)
 ```{r fig.width = 10}
-mdl_compare$plot_simple_forecasts(lastn = TRUE, limits = FALSE)
-mdl_compare$plot_simple_forecasts(lastn = TRUE, limits = TRUE)
-mdl_compare$plot_simple_forecasts(lastn = FALSE, limits = FALSE)
-mdl_compare$plot_simple_forecasts(lastn = FALSE, limits = TRUE)
-mdl_compare$plot_simple_forecasts(zoom = 50)  ## Zoom into plot
+p = mdl_compare$plot_simple_forecasts(lastn = TRUE, limits = FALSE)
+p = mdl_compare$plot_simple_forecasts(lastn = TRUE, limits = TRUE)
+p = mdl_compare$plot_simple_forecasts(lastn = FALSE, limits = FALSE)
+p = mdl_compare$plot_simple_forecasts(lastn = FALSE, limits = TRUE)
+p = mdl_compare$plot_simple_forecasts(zoom = 50)  ## Zoom into plot
 ```
 
 ## Plot and compare the forecasts per batch
 ```{r fig.width=10}
-mdl_compare$plot_batch_forecasts(only_sliding = TRUE)
+p = mdl_compare$plot_batch_forecasts(only_sliding = TRUE)
 ```
 
 ## Raw Data and Metrics
@@ -148,10 +148,10 @@ mdl_compare$set_batch_size(72)
 
 
 # Check all functions after data manipulation
-mdl_compare$plot_simple_forecasts(zoom = 72)
-mdl_compare$plot_batch_forecasts(only_sliding = TRUE)
-mdl_compare$plot_batch_ases(only_sliding = TRUE)
-mdl_compare$plot_histogram_ases()
+p = mdl_compare$plot_simple_forecasts(zoom = 72)
+p = mdl_compare$plot_batch_forecasts(only_sliding = TRUE)
+p = mdl_compare$plot_batch_ases(only_sliding = TRUE)
+p = mdl_compare$plot_boxplot_ases()
 mdl_compare$statistical_compare()
 ```
 
@@ -164,10 +164,10 @@ mdl_names = c("Woodward Gray Model A", "Parzen Model A", "Box Model A", "Parzen 
 mdl_compare$remove_models(mdl_names = mdl_names)
   
 # Check all functions after data manipulation
-mdl_compare$plot_simple_forecasts()
-mdl_compare$plot_batch_forecasts()
-mdl_compare$plot_batch_ases()
-mdl_compare$plot_histogram_ases()
+p = mdl_compare$plot_simple_forecasts()
+p = mdl_compare$plot_batch_forecasts()
+p = mdl_compare$plot_batch_ases()
+p = mdl_compare$plot_boxplot_ases()
 mdl_compare$statistical_compare()
 ```
 

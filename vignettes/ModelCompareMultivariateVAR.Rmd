@@ -1,5 +1,5 @@
 ---
-title: "ModelMultivariateCompare"
+title: "1.2.2 Compare Multivariate VAR Models"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{ModelMultivariateCompare}
@@ -92,9 +92,9 @@ mdl_compare = ModelCompareMultivariateVAR$new(data = data, var_interest = var_in
 mdl_compare$get_xIC() 
 ```
 
-## Compare Histogram of ASE values
+## Compare boxplot of ASE values
 ```{r fig.width=10}
-mdl_compare$plot_histogram_ases()
+p = mdl_compare$plot_boxplot_ases()
 ```
 
 ## Statistically Compare the models
@@ -104,21 +104,21 @@ mdl_compare$statistical_compare()
 
 ## Simple Forecasts (with various options)
 ```{r fig.width = 10}
-mdl_compare$plot_simple_forecasts(zoom = 50)  ## Zoom into plot
-mdl_compare$plot_simple_forecasts(lastn = TRUE, limits = FALSE, zoom = 50)
-mdl_compare$plot_simple_forecasts(lastn = TRUE, limits = TRUE, zoom = 50)
-mdl_compare$plot_simple_forecasts(lastn = FALSE, limits = FALSE, zoom = 50)
-mdl_compare$plot_simple_forecasts(lastn = FALSE, limits = TRUE, zoom = 50)
+p = mdl_compare$plot_simple_forecasts(zoom = 50)  ## Zoom into plot
+p = mdl_compare$plot_simple_forecasts(lastn = TRUE, limits = FALSE, zoom = 50)
+p = mdl_compare$plot_simple_forecasts(lastn = TRUE, limits = TRUE, zoom = 50)
+p = mdl_compare$plot_simple_forecasts(lastn = FALSE, limits = FALSE, zoom = 50)
+p = mdl_compare$plot_simple_forecasts(lastn = FALSE, limits = TRUE, zoom = 50)
 ```
 
 ## Plot and compare the forecasts per batch
 ```{r fig.width=10}
-mdl_compare$plot_batch_forecasts(only_sliding = FALSE)
+p = mdl_compare$plot_batch_forecasts(only_sliding = FALSE)
 ```
 
 ## Plot and compare the ASEs per batch
 ```{r fig.width=10}
-mdl_compare$plot_batch_ases() 
+p = mdl_compare$plot_batch_ases() 
 ```
 
 ## Raw Data and Metrics

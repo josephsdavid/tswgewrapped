@@ -17,6 +17,7 @@ R6 class ModelCompareMultivariate
 \item \href{#method-new}{\code{ModelCompareNNforCaret$new()}}
 \item \href{#method-get_var_interest}{\code{ModelCompareNNforCaret$get_var_interest()}}
 \item \href{#method-get_data_var_interest}{\code{ModelCompareNNforCaret$get_data_var_interest()}}
+\item \href{#method-get_best_model_id}{\code{ModelCompareNNforCaret$get_best_model_id()}}
 \item \href{#method-summarize_build}{\code{ModelCompareNNforCaret$summarize_build()}}
 \item \href{#method-clone}{\code{ModelCompareNNforCaret$clone()}}
 }
@@ -28,12 +29,13 @@ R6 class ModelCompareMultivariate
 \item \out{<span class="pkg-link" data-pkg="tswgewrapped" data-topic="ModelCompareBase" data-id="compute_metrics">}\href{../../tswgewrapped/html/ModelCompareBase.html#method-compute_metrics}{\code{tswgewrapped::ModelCompareBase$compute_metrics()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="tswgewrapped" data-topic="ModelCompareBase" data-id="get_batch_size">}\href{../../tswgewrapped/html/ModelCompareBase.html#method-get_batch_size}{\code{tswgewrapped::ModelCompareBase$get_batch_size()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="tswgewrapped" data-topic="ModelCompareBase" data-id="get_data">}\href{../../tswgewrapped/html/ModelCompareBase.html#method-get_data}{\code{tswgewrapped::ModelCompareBase$get_data()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="tswgewrapped" data-topic="ModelCompareBase" data-id="get_model_names">}\href{../../tswgewrapped/html/ModelCompareBase.html#method-get_model_names}{\code{tswgewrapped::ModelCompareBase$get_model_names()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="tswgewrapped" data-topic="ModelCompareBase" data-id="get_n.ahead">}\href{../../tswgewrapped/html/ModelCompareBase.html#method-get_n.ahead}{\code{tswgewrapped::ModelCompareBase$get_n.ahead()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="tswgewrapped" data-topic="ModelCompareBase" data-id="get_tabular_metrics">}\href{../../tswgewrapped/html/ModelCompareBase.html#method-get_tabular_metrics}{\code{tswgewrapped::ModelCompareBase$get_tabular_metrics()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="tswgewrapped" data-topic="ModelCompareBase" data-id="keep_models">}\href{../../tswgewrapped/html/ModelCompareBase.html#method-keep_models}{\code{tswgewrapped::ModelCompareBase$keep_models()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="tswgewrapped" data-topic="ModelCompareBase" data-id="plot_batch_ases">}\href{../../tswgewrapped/html/ModelCompareBase.html#method-plot_batch_ases}{\code{tswgewrapped::ModelCompareBase$plot_batch_ases()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="tswgewrapped" data-topic="ModelCompareBase" data-id="plot_batch_forecasts">}\href{../../tswgewrapped/html/ModelCompareBase.html#method-plot_batch_forecasts}{\code{tswgewrapped::ModelCompareBase$plot_batch_forecasts()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="tswgewrapped" data-topic="ModelCompareBase" data-id="plot_histogram_ases">}\href{../../tswgewrapped/html/ModelCompareBase.html#method-plot_histogram_ases}{\code{tswgewrapped::ModelCompareBase$plot_histogram_ases()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="tswgewrapped" data-topic="ModelCompareBase" data-id="plot_boxplot_ases">}\href{../../tswgewrapped/html/ModelCompareBase.html#method-plot_boxplot_ases}{\code{tswgewrapped::ModelCompareBase$plot_boxplot_ases()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="tswgewrapped" data-topic="ModelCompareBase" data-id="plot_simple_forecasts">}\href{../../tswgewrapped/html/ModelCompareBase.html#method-plot_simple_forecasts}{\code{tswgewrapped::ModelCompareBase$plot_simple_forecasts()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="tswgewrapped" data-topic="ModelCompareBase" data-id="remove_models">}\href{../../tswgewrapped/html/ModelCompareBase.html#method-remove_models}{\code{tswgewrapped::ModelCompareBase$remove_models()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="tswgewrapped" data-topic="ModelCompareBase" data-id="set_batch_size">}\href{../../tswgewrapped/html/ModelCompareBase.html#method-set_batch_size}{\code{tswgewrapped::ModelCompareBase$set_batch_size()}}\out{</span>}
@@ -92,6 +94,19 @@ Returns the dependent variable data only
 
 \subsection{Returns}{
 The dependent variable data only
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-get_best_model_id"></a>}}
+\if{latex}{\out{\hypertarget{method-get_best_model_id}{}}}
+\subsection{Method \code{get_best_model_id()}}{
+Returns the model ID for the best model from the search
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{ModelCompareNNforCaret$get_best_model_id()}\if{html}{\out{</div>}}
+}
+
+\subsection{Returns}{
+The model ID for the best model from the search
 }
 }
 \if{html}{\out{<hr>}}
