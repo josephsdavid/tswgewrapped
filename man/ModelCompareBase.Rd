@@ -284,7 +284,11 @@ Useful for cases where realizations that are long and n.ahead is small.}
 \subsection{Method \code{plot_batch_forecasts()}}{
 Plots the forecasts per batch for all models
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{ModelCompareBase$plot_batch_forecasts(only_sliding = TRUE, plot = TRUE)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{ModelCompareBase$plot_batch_forecasts(
+  only_sliding = TRUE,
+  plot = TRUE,
+  silent = FALSE
+)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -294,6 +298,8 @@ Plots the forecasts per batch for all models
 for the models that used window ASE calculations}
 
 \item{\code{plot}}{If FALSE the plots are not plotted; useful when you want to just return the data (Default = TRUE)}
+
+\item{\code{silent}}{If FALSE, any warnings are suppressed}
 }
 \if{html}{\out{</div>}}
 }

@@ -54,14 +54,14 @@ test_that("Random Parallel", {
   good2 = all.equal(as.data.frame(forecasts), forecasts_target %>% dplyr::mutate_if(is.numeric, as.double))
   testthat::expect_equal(good2, TRUE)
   
-  mdl_compare$plot_boxplot_ases()
+  p = mdl_compare$plot_boxplot_ases()
   
   result = mdl_compare$statistical_compare()
   pval = summary(result)[[1]]$`Pr(>F)`[1]
   testthat::expect_equal(round(pval,6), 0.591116)
   
-  mdl_compare$plot_batch_forecasts() 
-  mdl_compare$plot_batch_ases() 
-  mdl_compare$plot_simple_forecasts()
+  p = mdl_compare$plot_batch_forecasts() 
+  p = mdl_compare$plot_batch_ases() 
+  p = mdl_compare$plot_simple_forecasts()
 
 })

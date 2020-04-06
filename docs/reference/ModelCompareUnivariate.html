@@ -95,16 +95,19 @@ R6 class ModelCompareUnivariate" />
   </a>
   <ul class="dropdown-menu" role="menu">
     <li>
-      <a href="../articles/ModelBuildMultivariateVAR.html">ModelBuildMultivariateVAR</a>
+      <a href="../articles/ModelBuildMultivariateVAR.html">1.2.1 Build Multivariate VAR Models</a>
     </li>
     <li>
-      <a href="../articles/ModelCompareMultivariateVAR.html">ModelMultivariateCompare</a>
+      <a href="../articles/ModelCombine.html">2.0 Combine Models</a>
     </li>
     <li>
-      <a href="../articles/ModelCompareNNforCaret.html">ModelCompareNNforCaret</a>
+      <a href="../articles/ModelCompareMultivariateVAR.html">1.2.2 Compare Multivariate VAR Models</a>
     </li>
     <li>
-      <a href="../articles/ModelCompareUnivariate.html">ModelCompareUnivariate</a>
+      <a href="../articles/ModelCompareNNforCaret.html">1.3.2 Compare nnfor::mlp() models</a>
+    </li>
+    <li>
+      <a href="../articles/ModelCompareUnivariate.html">1.1.2 Compare Univariate Models</a>
     </li>
   </ul>
 </li>
@@ -181,6 +184,7 @@ R6 class ModelCompareUnivariate" />
 <p>Initialize an object to compare several Univatiate Time Series Models</p><h3>Usage</h3>
 <p><div class="r"></p><pre><span class='no'>ModelCompareUnivariate</span>$<span class='fu'>new</span>(
   <span class='kw'>data</span> <span class='kw'>=</span> <span class='fl'>NA</span>,
+  <span class='kw'>var_interest</span> <span class='kw'>=</span> <span class='fl'>NA</span>,
   <span class='no'>mdl_list</span>,
   <span class='kw'>n.ahead</span> <span class='kw'>=</span> <span class='fl'>NA</span>,
   <span class='kw'>batch_size</span> <span class='kw'>=</span> <span class='fl'>NA</span>,
@@ -191,6 +195,8 @@ R6 class ModelCompareUnivariate" />
 <h3>Arguments</h3>
 <p><div class="arguments"></p><dl'>
 <dt><code>data</code></dt><dd><p>A Univariate Time Series Realization</p></dd>
+
+<dt><code>var_interest</code></dt><dd><p>If data is a dataframe with multiple columns, then what is the output variable of interest</p></dd>
 
 <dt><code>mdl_list</code></dt><dd><p>A named list of all models (see format below)</p></dd>
 
@@ -306,7 +312,7 @@ this method will check whetehr the residuals are white noise or not.
 #&gt; Batch Size has not been specified. Will assume a single batch.
 #&gt; Batch Size has not been specified. Will assume a single batch.NULL</div><div class='input'><span class='co'># Plots the historgam of the ASE values for each model.</span>
 <span class='co'># This is especially useful when models using a sliding window for ASE calculations. </span>
-<span class='no'>mdl_compare</span>$<span class='fu'>plot_boxplot_ases</span>()</div><div class='output co'>#&gt; <span class='warning'>Warning: `fun.y` is deprecated. Use `fun` instead.</span></div><div class='output co'>#&gt; <span class='warning'>Warning: `show_guide` has been deprecated. Please use `show.legend` instead.</span></div><div class='img'><img src='ModelCompareUnivariate-1.png' alt='' width='700' height='433' /></div><div class='output co'>#&gt; <span style='color: #555555;'># A tibble: 12 x 5</span><span>
+<span class='no'>mdl_compare</span>$<span class='fu'>plot_boxplot_ases</span>()</div><div class='img'><img src='ModelCompareUnivariate-1.png' alt='' width='700' height='433' /></div><div class='output co'>#&gt; <span style='color: #555555;'># A tibble: 12 x 5</span><span>
 #&gt;    Model                     ASE Time_Test_Start Time_Test_End Batch
 #&gt;    </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span>                   </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>           </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>         </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>
 #&gt; </span><span style='color: #555555;'> 1</span><span> Woodward Gray Model A 0.004</span><span style='text-decoration: underline;'>19</span><span>             109           144     1

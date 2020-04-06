@@ -95,16 +95,19 @@ R6 class ModelCompareMultivariate" />
   </a>
   <ul class="dropdown-menu" role="menu">
     <li>
-      <a href="../articles/ModelBuildMultivariateVAR.html">ModelBuildMultivariateVAR</a>
+      <a href="../articles/ModelBuildMultivariateVAR.html">1.2.1 Build Multivariate VAR Models</a>
     </li>
     <li>
-      <a href="../articles/ModelCompareMultivariateVAR.html">ModelMultivariateCompare</a>
+      <a href="../articles/ModelCombine.html">2.0 Combine Models</a>
     </li>
     <li>
-      <a href="../articles/ModelCompareNNforCaret.html">ModelCompareNNforCaret</a>
+      <a href="../articles/ModelCompareMultivariateVAR.html">1.2.2 Compare Multivariate VAR Models</a>
     </li>
     <li>
-      <a href="../articles/ModelCompareUnivariate.html">ModelCompareUnivariate</a>
+      <a href="../articles/ModelCompareNNforCaret.html">1.3.2 Compare nnfor::mlp() models</a>
+    </li>
+    <li>
+      <a href="../articles/ModelCompareUnivariate.html">1.1.2 Compare Univariate Models</a>
     </li>
   </ul>
 </li>
@@ -151,6 +154,7 @@ R6 class ModelCompareMultivariate" />
 <li><p><a href='#method-new'><code>ModelCompareNNforCaret$new()</code></a></p></li>
 <li><p><a href='#method-get_var_interest'><code>ModelCompareNNforCaret$get_var_interest()</code></a></p></li>
 <li><p><a href='#method-get_data_var_interest'><code>ModelCompareNNforCaret$get_data_var_interest()</code></a></p></li>
+<li><p><a href='#method-get_best_model_id'><code>ModelCompareNNforCaret$get_best_model_id()</code></a></p></li>
 <li><p><a href='#method-summarize_build'><code>ModelCompareNNforCaret$summarize_build()</code></a></p></li>
 <li><p><a href='#method-clone'><code>ModelCompareNNforCaret$clone()</code></a></p></li>
 </ul>
@@ -207,6 +211,13 @@ R6 class ModelCompareMultivariate" />
 
 <h3>Returns</h3>
 <p>The dependent variable data only</p>
+<p><hr>
+<a id="method-get_best_model_id"></a></p><h3>Method <code>get_best_model_id()</code></h3>
+<p>Returns the model ID for the best model from the search</p><h3>Usage</h3>
+<p><div class="r"></p><pre><span class='no'>ModelCompareNNforCaret</span>$<span class='fu'>get_best_model_id</span>()</pre><p></div></p>
+
+<h3>Returns</h3>
+<p>The model ID for the best model from the search</p>
 <p><hr>
 <a id="method-summarize_build"></a></p><h3>Method <code>summarize_build()</code></h3>
 <p>Not applicable for the nnfor::mlp models, since we are passing already build models</p><h3>Usage</h3>

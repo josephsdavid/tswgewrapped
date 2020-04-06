@@ -262,9 +262,12 @@ ModelCompareBase = R6::R6Class(
     #' @param only_sliding If TRUE, this will only plot the batch forecasts 
     #'                     for the models that used window ASE calculations
     #' @param plot If FALSE the plots are not plotted; useful when you want to just return the data (Default = TRUE)
-    plot_batch_forecasts = function(only_sliding = TRUE, plot = TRUE){
+    #' @param silent If FALSE, any warnings are suppressed
+    plot_batch_forecasts = function(only_sliding = TRUE, plot = TRUE, silent = FALSE){
       if (only_sliding == TRUE & private$any_sliding_ase() == FALSE){
-        message("None of your models are using a sliding ASE calculation, hence nothing will be plotted")
+        if (silent == FALSE){
+          message("None of your models are using a sliding ASE calculation, hence nothing will be plotted")
+        }
       }
       else{
         results.forecasts = self$get_tabular_metrics(ases = FALSE)
@@ -345,7 +348,7 @@ ModelCompareBase = R6::R6Class(
     #' @param silent If FALSE, any warnings are suppressed
     plot_batch_ases = function(only_sliding = TRUE, plot = TRUE, silent = FALSE){
       if (only_sliding == TRUE & private$any_sliding_ase() == FALSE){
-        if (silent == TRUE){
+        if (silent == FALSE){
           message("None of your models are using a sliding ASE calculation, hence nothing will be plotted")
         }
       }

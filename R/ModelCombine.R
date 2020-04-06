@@ -24,9 +24,9 @@ ModelCombine = R6::R6Class(
     {
       private$set_data(data = data)
       private$set_var_interest(var_interest = var_interest)
-      private$set_uni_models(models = uni_models)
-      private$set_var_models(models = var_models)
-      private$set_mlp_models(models = mlp_models)
+      private$set_uni_compare_objects(models = uni_models)
+      private$set_var_compare_objects(models = var_models)
+      private$set_mlp_compare_objects(models = mlp_models)
       private$validate_models()
     },
     
@@ -56,76 +56,62 @@ ModelCombine = R6::R6Class(
     #' @param only_sliding If TRUE, this will only plot the batch forecasts 
     #'                     for the models that used window ASE calculations
     plot_batch_forecasts = function(only_sliding = TRUE){
-      if (only_sliding == TRUE & private$any_sliding_ase() == FALSE){
+      
+      any_sliding = FALSE
+      
+      forecasts = data.frame()
+      
+      uni_compare_objects = private$get_uni_compare_objects()
+      for (i in seq_along(uni_compare_objects)){
+        subset_results = uni_compare_objects[[i]]$plot_batch_forecasts(only_sliding = only_sliding, plot = FALSE, silent = TRUE)
+        forecasts = dplyr::bind_rows(forecasts, subset_results$forecasts)
+      }
+      
+      var_compare_objects = private$get_var_compare_objects()
+      for (i in seq_along(var_compare_objects)){
+        subset_results = var_compare_objects[[i]]$plot_batch_forecasts(only_sliding = only_sliding, plot = FALSE, silent = TRUE)
+        forecasts = dplyr::bind_rows(forecasts, subset_results$forecasts)
+      }
+      
+      mlp_compare_objects = private$get_mlp_compare_objects()
+      for (i in seq_along(mlp_compare_objects)){
+        subset_results = mlp_compare_objects[[i]]$plot_batch_forecasts(only_sliding = only_sliding, plot = FALSE, silent = TRUE)
+        
+        filtered = subset_results$forecasts %>%  
+          private$filter_best_caret_model(caret_compare_object = mlp_compare_objects[[i]])
+        
+        forecasts = dplyr::bind_rows(forecasts, filtered) 
+        
+        ## MLP Caret is guaranteed to have batches
+        rects = subset_results$batch_rects
+      }
+      
+      if (nrow(forecasts %>% dplyr::filter(Model != 'Realization')) >= 1){
+        any_sliding = TRUE
+      }
+      
+      if (only_sliding == TRUE & any_sliding == FALSE){
         message("None of your models are using a sliding ASE calculation, hence nothing will be plotted")
       }
       else{
-        results.forecasts = self$get_tabular_metrics(ases = FALSE)
-        
-        model_subset = c("Realization")
-        if (only_sliding){
-          for (name in names(private$get_models())){
-            if (private$models[[name]][['sliding_ase']] == TRUE){
-              model_subset = c(model_subset, name)
-            }
-          }
-        }
-        else{
-          # Add all models
-          for (name in names(private$get_models())){
-            model_subset = c(model_subset, name)
-          }
-        }
-        
-        results.forecasts = results.forecasts %>% 
-          dplyr::filter(Model %in% model_subset)
-        
-        # https://stackoverflow.com/questions/9968975/make-the-background-of-a-graph-different-colours-in-different-regions
-        
-        # Get Batch Boundaries
-        results.ases = self$get_tabular_metrics(ases = TRUE)
-        if (private$any_sliding_ase()){
-          for (name in names(private$get_models())){
-            if (private$models[[name]][['sliding_ase']] == TRUE){
-              results.batches = results.ases %>% 
-                dplyr::filter(Model == name)
-              break()
-            }
-          }
-        }
-        else{
-          # No model has sliding ASE, so just pick the 1st one
-          for (name in names(private$get_models())){
-            results.batches = results.ases %>% 
-              dplyr::filter(Model == name)
-            break()
-          }
-        }
-        
-        rects = data.frame(xstart = results.batches[['Time_Test_Start']],
-                           xend = results.batches[['Time_Test_End']],
-                           Batch = rep(1, length(results.batches[['Batch']])))
-        
-        
         p = ggplot2::ggplot() + 
           ggplot2::geom_rect(data = rects, ggplot2::aes(xmin = xstart, xmax = xend, ymin = -Inf, ymax = Inf, fill = Batch), alpha = 0.1, show.legend = FALSE) +  
-          ggplot2::geom_line(results.forecasts %>% dplyr::filter(Model == 'Realization'), mapping = ggplot2::aes(x = Time, y = f, color = Model), size = 1) +
-          ggplot2::geom_line(results.forecasts %>% dplyr::filter(Model != 'Realization'), mapping = ggplot2::aes(x = Time, y = f, color = Model), size = 0.75) +
+          ggplot2::geom_line(forecasts %>% dplyr::filter(Model == 'Realization'), mapping = ggplot2::aes(x = Time, y = f, color = Model), size = 1) +
+          ggplot2::geom_line(forecasts %>% dplyr::filter(Model != 'Realization'), mapping = ggplot2::aes(x = Time, y = f, color = Model), size = 0.75) +
           ggplot2::ylab("Forecasts")
         
         print(p) 
         
         p = ggplot2::ggplot() +
           ggplot2::geom_rect(data = rects, ggplot2::aes(xmin = xstart, xmax = xend, ymin = -Inf, ymax = Inf, fill = Batch), alpha = 0.1, show.legend = FALSE) +  
-          ggplot2::geom_line(results.forecasts %>% dplyr::filter(Model == 'Realization'), mapping = ggplot2::aes(x=Time, y=ll, color = Model), size = 1) + 
-          ggplot2::geom_line(results.forecasts %>% dplyr::filter(Model == 'Realization'), mapping = ggplot2::aes(x=Time, y=ll, color = Model), size = 1) + 
-          ggplot2::geom_line(results.forecasts %>% dplyr::filter(Model != 'Realization'), mapping = ggplot2::aes(x=Time, y=ll, color = Model), size = 0.75) + 
-          ggplot2::geom_line(results.forecasts %>% dplyr::filter(Model != 'Realization'), mapping = ggplot2::aes(x=Time, y=ul, color = Model), size = 0.75) +
+          ggplot2::geom_line(forecasts %>% dplyr::filter(Model == 'Realization'), mapping = ggplot2::aes(x=Time, y=ll, color = Model), size = 1) + 
+          ggplot2::geom_line(forecasts %>% dplyr::filter(Model == 'Realization'), mapping = ggplot2::aes(x=Time, y=ll, color = Model), size = 1) + 
+          ggplot2::geom_line(forecasts %>% dplyr::filter(Model != 'Realization'), mapping = ggplot2::aes(x=Time, y=ll, color = Model), size = 0.75) + 
+          ggplot2::geom_line(forecasts %>% dplyr::filter(Model != 'Realization'), mapping = ggplot2::aes(x=Time, y=ul, color = Model), size = 0.75) +
           ggplot2::ylab("Upper and Lower Forecast Limits (95%)")
         
         print(p)
       }
-      
     },
     
     #' @description Plots the ASEs per batch for all models
@@ -137,22 +123,26 @@ ModelCombine = R6::R6Class(
       
       ASEs = data.frame()
         
-      uni_model_objects = private$get_uni_models()
-      for (i in seq_along(uni_model_objects)){
-        subset_results = uni_model_objects[[i]]$plot_batch_ases(only_sliding = only_sliding, plot = FALSE, silent = TRUE)
+      uni_compare_objects = private$get_uni_compare_objects()
+      for (i in seq_along(uni_compare_objects)){
+        subset_results = uni_compare_objects[[i]]$plot_batch_ases(only_sliding = only_sliding, plot = FALSE, silent = TRUE)
         ASEs = dplyr::bind_rows(ASEs, subset_results$ASEs)
       }
       
-      var_model_objects = private$get_var_models()
-      for (i in seq_along(var_model_objects)){
-        subset_results = var_model_objects[[i]]$plot_batch_ases(only_sliding = only_sliding, plot = FALSE, silent = TRUE)
+      var_compare_objects = private$get_var_compare_objects()
+      for (i in seq_along(var_compare_objects)){
+        subset_results = var_compare_objects[[i]]$plot_batch_ases(only_sliding = only_sliding, plot = FALSE, silent = TRUE)
         ASEs = dplyr::bind_rows(ASEs, subset_results$ASEs)
       }
       
-      mlp_model_objects = private$get_mlp_models()
-      for (i in seq_along(mlp_model_objects)){
-        subset_results = mlp_model_objects[[i]]$plot_batch_ases(only_sliding = only_sliding, plot = FALSE, silent = TRUE)
-        ASEs = dplyr::bind_rows(ASEs, subset_results$ASEs)
+      mlp_compare_objects = private$get_mlp_compare_objects()
+      for (i in seq_along(mlp_compare_objects)){
+        subset_results = mlp_compare_objects[[i]]$plot_batch_ases(only_sliding = only_sliding, plot = FALSE, silent = TRUE) 
+        
+        filtered = subset_results$ASEs %>%  
+          private$filter_best_caret_model(caret_compare_object = mlp_compare_objects[[i]])
+        
+        ASEs = dplyr::bind_rows(ASEs, filtered)
       }
       
       if (nrow(ASEs) >= 1){
@@ -224,21 +214,28 @@ ModelCombine = R6::R6Class(
         results = dplyr::tribble(~Model, ~Time, ~f, ~ll, ~ul) 
       }
       
-      uni_model_objects = private$get_uni_models()
-      for (i in seq_along(uni_model_objects)){
-        subset_results = uni_model_objects[[i]]$get_tabular_metrics(only_sliding = only_sliding, ases = ases)
+      uni_compare_objects = private$get_uni_compare_objects()
+      for (i in seq_along(uni_compare_objects)){
+        subset_results = uni_compare_objects[[i]]$get_tabular_metrics(only_sliding = only_sliding, ases = ases)
         results = rbind(results, subset_results)
       }
       
-      var_model_objects = private$get_var_models()
-      for (i in seq_along(var_model_objects)){
-        subset_results = var_model_objects[[i]]$get_tabular_metrics(only_sliding = only_sliding, ases = ases)
+      var_compare_objects = private$get_var_compare_objects()
+      for (i in seq_along(var_compare_objects)){
+        subset_results = var_compare_objects[[i]]$get_tabular_metrics(only_sliding = only_sliding, ases = ases)
         results = rbind(results, subset_results)
       }
       
-      mlp_model_objects = private$get_mlp_models()
-      for (i in seq_along(mlp_model_objects)){
-        subset_results = mlp_model_objects[[i]]$get_tabular_metrics(only_sliding = only_sliding, ases = ases)
+      mlp_compare_objects = private$get_mlp_compare_objects()
+      for (i in seq_along(mlp_compare_objects)){
+        subset_results = mlp_compare_objects[[i]]$get_tabular_metrics(only_sliding = only_sliding, ases = ases) %>% 
+          private$filter_best_caret_model(caret_compare_object = mlp_compare_objects[[i]])
+        
+        # best_model_id = mlp_compare_objects[[i]]$get_best_model_id()
+        # 
+        # subset_results = subset_results %>% 
+        #   dplyr::filter(Model == best_model_id)
+        
         results = rbind(results, subset_results)
       }
         
@@ -273,20 +270,20 @@ ModelCombine = R6::R6Class(
     
     get_data_subset = function(col_names){return(self$get_data() %>% dplyr::select(col_names))},
     
-    set_uni_models = function(models){
+    set_uni_compare_objects = function(models){
       private$uni_models = c(models) # coerce to list
     },
-    get_uni_models = function(){return(private$uni_models)},
+    get_uni_compare_objects = function(){return(private$uni_models)},
     
-    set_var_models = function(models){
+    set_var_compare_objects = function(models){
       private$var_models = c(models) # coerce to list
     },
-    get_var_models = function(){return(private$var_models)},
+    get_var_compare_objects = function(){return(private$var_models)},
     
-    set_mlp_models = function(models){
+    set_mlp_compare_objects = function(models){
       private$mlp_models = c(models) # coerce to list
     },
-    get_mlp_models = function(){return(private$mlp_models)},
+    get_mlp_compare_objects = function(){return(private$mlp_models)},
     
     get_len_x = function(){return(nrow(self$get_data()))},
     
@@ -341,8 +338,66 @@ ModelCombine = R6::R6Class(
       return(results)
     },
     
+    filter_best_caret_model = function(data, caret_compare_object){
+      # Given a caret_compare_object and a dataframe 'data' that has a 'Model' column
+      # indicating the caret model ID, this method will filter out the data to include 
+      # the results from only the best (final) model
+      
+      if (!("ModelCompareNNforCaret" %in% class(caret_compare_object))){
+        warning("You have not passed a compare object of type ModelCompareNNforCaret. Results will not be filtered.")
+      }
+      else{
+        best_model_id = caret_compare_object$get_best_model_id()
+        
+        data = data %>% 
+          assertr::verify(assertr::has_all_names("Model")) %>% 
+          dplyr::filter(Model == best_model_id)
+      }
+      
+      return(data)
+    
+    },
+    
     validate_models = function(){
       # TODO: Check if there is at least one object with at least 1 sliding ASE model
+      # Is this needed? What if we just need to compare and not build an ensemble
+    },
+    
+    any_sliding_ase = function(){
+      ## This seems like a hack. Had to do this since any_sliding_ase is a private method in the compare objects
+      ## TODO: evaluate if this needs to be changed to a public method
+      
+      any_sliding = FALSE
+      
+      ASEs = data.frame()
+      
+      uni_compare_objects = private$get_uni_compare_objects()
+      for (i in seq_along(uni_compare_objects)){
+        subset_results = uni_compare_objects[[i]]$plot_batch_ases(only_sliding = TRUE, plot = FALSE, silent = TRUE)
+        ASEs = dplyr::bind_rows(ASEs, subset_results$ASEs)
+      }
+      
+      var_compare_objects = private$get_var_compare_objects()
+      for (i in seq_along(var_compare_objects)){
+        subset_results = var_compare_objects[[i]]$plot_batch_ases(only_sliding = TRUE, plot = FALSE, silent = TRUE)
+        ASEs = dplyr::bind_rows(ASEs, subset_results$ASEs)
+      }
+      
+      mlp_compare_objects = private$get_mlp_compare_objects()
+      for (i in seq_along(mlp_compare_objects)){
+        subset_results = mlp_compare_objects[[i]]$plot_batch_ases(only_sliding = TRUE, plot = FALSE, silent = TRUE) 
+        
+        filtered = subset_results$ASEs %>%  
+          private$filter_best_caret_model(caret_compare_object = mlp_compare_objects[[i]])
+        
+        ASEs = dplyr::bind_rows(ASEs, filtered)
+      }
+      
+      if (nrow(ASEs) >= 1){
+        any_sliding = TRUE
+      }
+      
+      return(any_sliding)
     }
     
     

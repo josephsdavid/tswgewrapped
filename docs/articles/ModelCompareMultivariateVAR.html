@@ -5,13 +5,13 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ModelMultivariateCompare • tswgewrapped</title>
+<title>1.2.2 Compare Multivariate VAR Models • tswgewrapped</title>
 <!-- jquery --><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script><!-- Bootstrap --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/css/bootstrap.min.css" integrity="sha256-bZLfwXAP04zRMK2BjiO8iu9pf4FbLqX6zitd+tIvLhE=" crossorigin="anonymous">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha256-nuL8/2cJ5NDSSwnKD8VqreErSWHtnEP9E7AySL+1ev4=" crossorigin="anonymous"></script><!-- bootstrap-toc --><link rel="stylesheet" href="../bootstrap-toc.css">
 <script src="../bootstrap-toc.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous">
 <!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- pkgdown --><link href="../pkgdown.css" rel="stylesheet">
-<script src="../pkgdown.js"></script><meta property="og:title" content="ModelMultivariateCompare">
+<script src="../pkgdown.js"></script><meta property="og:title" content="1.2.2 Compare Multivariate VAR Models">
 <meta property="og:description" content="tswgewrapped">
 <!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/config/TeX-AMS-MML_HTMLorMML.js" integrity="sha256-84DKXVJXs0/F8OTMzX4UR909+jtl4G7SPypPavF+GfA=" crossorigin="anonymous"></script><!--[if lt IE 9]>
 <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
@@ -54,16 +54,19 @@
   </a>
   <ul class="dropdown-menu" role="menu">
 <li>
-      <a href="../articles/ModelBuildMultivariateVAR.html">ModelBuildMultivariateVAR</a>
+      <a href="../articles/ModelBuildMultivariateVAR.html">1.2.1 Build Multivariate VAR Models</a>
     </li>
     <li>
-      <a href="../articles/ModelCompareMultivariateVAR.html">ModelMultivariateCompare</a>
+      <a href="../articles/ModelCombine.html">2.0 Combine Models</a>
     </li>
     <li>
-      <a href="../articles/ModelCompareNNforCaret.html">ModelCompareNNforCaret</a>
+      <a href="../articles/ModelCompareMultivariateVAR.html">1.2.2 Compare Multivariate VAR Models</a>
     </li>
     <li>
-      <a href="../articles/ModelCompareUnivariate.html">ModelCompareUnivariate</a>
+      <a href="../articles/ModelCompareNNforCaret.html">1.3.2 Compare nnfor::mlp() models</a>
+    </li>
+    <li>
+      <a href="../articles/ModelCompareUnivariate.html">1.1.2 Compare Univariate Models</a>
     </li>
   </ul>
 </li>
@@ -81,7 +84,7 @@
       </header><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
-      <h1 data-toc-skip>ModelMultivariateCompare</h1>
+      <h1 data-toc-skip>1.2.2 Compare Multivariate VAR Models</h1>
             
       
       
@@ -677,25 +680,8 @@ mdl_compare = ModelCompareMultivariateVAR$new(data = data, var_interest = var_in
 <div id="compare-boxplot-of-ase-values" class="section level2">
 <h2 class="hasAnchor">
 <a href="#compare-boxplot-of-ase-values" class="anchor"></a>Compare boxplot of ASE values</h2>
-<div class="sourceCode"><html><body><pre class="r">mdl_compare$plot_boxplot_ases()
-#&gt; Warning: `fun.y` is deprecated. Use `fun` instead.
-#&gt; Warning: `show_guide` has been deprecated. Please use `show.legend`
-#&gt; instead.</pre></body></html></div>
+<div class="sourceCode"><html><body><pre class="r"><span class="no">p</span> <span class="kw">=</span> <span class="no">mdl_compare</span>$<span class="fu">plot_boxplot_ases</span>()</pre></body></html></div>
 <p><img src="ModelCompareMultivariateVAR_files/figure-html/unnamed-chunk-12-1.png" width="960"></p>
-<pre><code>#&gt; # A tibble: 300 x 5
-#&gt;    Model          ASE Time_Test_Start Time_Test_End Batch
-#&gt;    &lt;chr&gt;        &lt;dbl&gt;           &lt;dbl&gt;         &lt;dbl&gt; &lt;dbl&gt;
-#&gt;  1 AIC None 0.000685               37            38     1
-#&gt;  2 AIC None 0.000220               39            40     2
-#&gt;  3 AIC None 0.000335               41            42     3
-#&gt;  4 AIC None 0.0000418              43            44     4
-#&gt;  5 AIC None 0.000231               45            46     5
-#&gt;  6 AIC None 0.000560               47            48     6
-#&gt;  7 AIC None 0.0000166              49            50     7
-#&gt;  8 AIC None 0.0000129              51            52     8
-#&gt;  9 AIC None 0.0000701              53            54     9
-#&gt; 10 AIC None 0.000173               55            56    10
-#&gt; # ... with 290 more rows</code></pre>
 </div>
 <div id="statistically-compare-the-models" class="section level2">
 <h2 class="hasAnchor">
@@ -744,258 +730,35 @@ mdl_compare = ModelCompareMultivariateVAR$new(data = data, var_interest = var_in
 <div id="simple-forecasts-with-various-options" class="section level2">
 <h2 class="hasAnchor">
 <a href="#simple-forecasts-with-various-options" class="anchor"></a>Simple Forecasts (with various options)</h2>
-<div class="sourceCode"><html><body><pre class="r"><span class="no">mdl_compare</span>$<span class="fu">plot_simple_forecasts</span>(<span class="kw">zoom</span> <span class="kw">=</span> <span class="fl">50</span>)  <span class="co">## Zoom into plot</span></pre></body></html></div>
+<div class="sourceCode"><html><body><pre class="r"><span class="no">p</span> <span class="kw">=</span> <span class="no">mdl_compare</span>$<span class="fu">plot_simple_forecasts</span>(<span class="kw">zoom</span> <span class="kw">=</span> <span class="fl">50</span>)  <span class="co">## Zoom into plot</span></pre></body></html></div>
 <p><img src="ModelCompareMultivariateVAR_files/figure-html/unnamed-chunk-14-1.png" width="960"></p>
-<div class="sourceCode"><html><body><pre class="r"><span class="no">mdl_compare</span>$<span class="fu">plot_simple_forecasts</span>(<span class="kw">lastn</span> <span class="kw">=</span> <span class="fl">TRUE</span>, <span class="kw">limits</span> <span class="kw">=</span> <span class="fl">FALSE</span>, <span class="kw">zoom</span> <span class="kw">=</span> <span class="fl">50</span>)</pre></body></html></div>
+<div class="sourceCode"><html><body><pre class="r"><span class="no">p</span> <span class="kw">=</span> <span class="no">mdl_compare</span>$<span class="fu">plot_simple_forecasts</span>(<span class="kw">lastn</span> <span class="kw">=</span> <span class="fl">TRUE</span>, <span class="kw">limits</span> <span class="kw">=</span> <span class="fl">FALSE</span>, <span class="kw">zoom</span> <span class="kw">=</span> <span class="fl">50</span>)</pre></body></html></div>
 <p><img src="ModelCompareMultivariateVAR_files/figure-html/unnamed-chunk-14-2.png" width="960"></p>
-<div class="sourceCode"><html><body><pre class="r"><span class="no">mdl_compare</span>$<span class="fu">plot_simple_forecasts</span>(<span class="kw">lastn</span> <span class="kw">=</span> <span class="fl">TRUE</span>, <span class="kw">limits</span> <span class="kw">=</span> <span class="fl">TRUE</span>, <span class="kw">zoom</span> <span class="kw">=</span> <span class="fl">50</span>)</pre></body></html></div>
+<div class="sourceCode"><html><body><pre class="r"><span class="no">p</span> <span class="kw">=</span> <span class="no">mdl_compare</span>$<span class="fu">plot_simple_forecasts</span>(<span class="kw">lastn</span> <span class="kw">=</span> <span class="fl">TRUE</span>, <span class="kw">limits</span> <span class="kw">=</span> <span class="fl">TRUE</span>, <span class="kw">zoom</span> <span class="kw">=</span> <span class="fl">50</span>)</pre></body></html></div>
 <p><img src="ModelCompareMultivariateVAR_files/figure-html/unnamed-chunk-14-3.png" width="960"></p>
-<div class="sourceCode"><html><body><pre class="r"><span class="no">mdl_compare</span>$<span class="fu">plot_simple_forecasts</span>(<span class="kw">lastn</span> <span class="kw">=</span> <span class="fl">FALSE</span>, <span class="kw">limits</span> <span class="kw">=</span> <span class="fl">FALSE</span>, <span class="kw">zoom</span> <span class="kw">=</span> <span class="fl">50</span>)</pre></body></html></div>
+<div class="sourceCode"><html><body><pre class="r"><span class="no">p</span> <span class="kw">=</span> <span class="no">mdl_compare</span>$<span class="fu">plot_simple_forecasts</span>(<span class="kw">lastn</span> <span class="kw">=</span> <span class="fl">FALSE</span>, <span class="kw">limits</span> <span class="kw">=</span> <span class="fl">FALSE</span>, <span class="kw">zoom</span> <span class="kw">=</span> <span class="fl">50</span>)</pre></body></html></div>
 <p><img src="ModelCompareMultivariateVAR_files/figure-html/unnamed-chunk-14-4.png" width="960"></p>
-<div class="sourceCode"><html><body><pre class="r"><span class="no">mdl_compare</span>$<span class="fu">plot_simple_forecasts</span>(<span class="kw">lastn</span> <span class="kw">=</span> <span class="fl">FALSE</span>, <span class="kw">limits</span> <span class="kw">=</span> <span class="fl">TRUE</span>, <span class="kw">zoom</span> <span class="kw">=</span> <span class="fl">50</span>)</pre></body></html></div>
+<div class="sourceCode"><html><body><pre class="r"><span class="no">p</span> <span class="kw">=</span> <span class="no">mdl_compare</span>$<span class="fu">plot_simple_forecasts</span>(<span class="kw">lastn</span> <span class="kw">=</span> <span class="fl">FALSE</span>, <span class="kw">limits</span> <span class="kw">=</span> <span class="fl">TRUE</span>, <span class="kw">zoom</span> <span class="kw">=</span> <span class="fl">50</span>)</pre></body></html></div>
 <p><img src="ModelCompareMultivariateVAR_files/figure-html/unnamed-chunk-14-5.png" width="960"></p>
 </div>
 <div id="plot-and-compare-the-forecasts-per-batch" class="section level2">
 <h2 class="hasAnchor">
 <a href="#plot-and-compare-the-forecasts-per-batch" class="anchor"></a>Plot and compare the forecasts per batch</h2>
-<div class="sourceCode"><html><body><pre class="r">mdl_compare$plot_batch_forecasts(only_sliding = FALSE)
+<div class="sourceCode"><html><body><pre class="r">p = mdl_compare$plot_batch_forecasts(only_sliding = FALSE)
 #&gt; Warning: Removed 216 row(s) containing missing values (geom_path).</pre></body></html></div>
 <p><img src="ModelCompareMultivariateVAR_files/figure-html/unnamed-chunk-15-1.png" width="960"></p>
 <pre><code>#&gt; Warning: Removed 216 row(s) containing missing values (geom_path).
 
 #&gt; Warning: Removed 216 row(s) containing missing values (geom_path).</code></pre>
 <p><img src="ModelCompareMultivariateVAR_files/figure-html/unnamed-chunk-15-2.png" width="960"></p>
-<pre><code>#&gt; $forecasts
-#&gt; # A tibble: 952 x 5
-#&gt;    Model     Time     f    ll    ul
-#&gt;    &lt;chr&gt;    &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
-#&gt;  1 AIC None     1    NA    NA    NA
-#&gt;  2 AIC None     2    NA    NA    NA
-#&gt;  3 AIC None     3    NA    NA    NA
-#&gt;  4 AIC None     4    NA    NA    NA
-#&gt;  5 AIC None     5    NA    NA    NA
-#&gt;  6 AIC None     6    NA    NA    NA
-#&gt;  7 AIC None     7    NA    NA    NA
-#&gt;  8 AIC None     8    NA    NA    NA
-#&gt;  9 AIC None     9    NA    NA    NA
-#&gt; 10 AIC None    10    NA    NA    NA
-#&gt; # ... with 942 more rows
-#&gt; 
-#&gt; $batch_rects
-#&gt;    xstart xend Batch
-#&gt; 1      37   38     1
-#&gt; 2      39   40     1
-#&gt; 3      41   42     1
-#&gt; 4      43   44     1
-#&gt; 5      45   46     1
-#&gt; 6      47   48     1
-#&gt; 7      49   50     1
-#&gt; 8      51   52     1
-#&gt; 9      53   54     1
-#&gt; 10     55   56     1
-#&gt; 11     57   58     1
-#&gt; 12     59   60     1
-#&gt; 13     61   62     1
-#&gt; 14     63   64     1
-#&gt; 15     65   66     1
-#&gt; 16     67   68     1
-#&gt; 17     69   70     1
-#&gt; 18     71   72     1
-#&gt; 19     73   74     1
-#&gt; 20     75   76     1
-#&gt; 21     77   78     1
-#&gt; 22     79   80     1
-#&gt; 23     81   82     1
-#&gt; 24     83   84     1
-#&gt; 25     85   86     1
-#&gt; 26     87   88     1
-#&gt; 27     89   90     1
-#&gt; 28     91   92     1
-#&gt; 29     93   94     1
-#&gt; 30     95   96     1
-#&gt; 31     97   98     1
-#&gt; 32     99  100     1
-#&gt; 33    101  102     1
-#&gt; 34    103  104     1
-#&gt; 35    105  106     1
-#&gt; 36    107  108     1
-#&gt; 37    109  110     1
-#&gt; 38    111  112     1
-#&gt; 39    113  114     1
-#&gt; 40    115  116     1
-#&gt; 41    117  118     1
-#&gt; 42    119  120     1
-#&gt; 43    121  122     1
-#&gt; 44    123  124     1
-#&gt; 45    125  126     1
-#&gt; 46    127  128     1
-#&gt; 47    129  130     1
-#&gt; 48    131  132     1
-#&gt; 49    133  134     1
-#&gt; 50    135  136     1</code></pre>
 </div>
 <div id="plot-and-compare-the-ases-per-batch" class="section level2">
 <h2 class="hasAnchor">
 <a href="#plot-and-compare-the-ases-per-batch" class="anchor"></a>Plot and compare the ASEs per batch</h2>
-<div class="sourceCode"><html><body><pre class="r">mdl_compare$plot_batch_ases() 
+<div class="sourceCode"><html><body><pre class="r">p = mdl_compare$plot_batch_ases() 
 #&gt; Loading required namespace: patchwork
 #&gt; Warning: Removed 216 row(s) containing missing values (geom_path).</pre></body></html></div>
 <p><img src="ModelCompareMultivariateVAR_files/figure-html/unnamed-chunk-16-1.png" width="960"></p>
-<pre><code>#&gt; $data
-#&gt;     Time     Data
-#&gt; 1      1 7.249073
-#&gt; 2      2 7.245084
-#&gt; 3      3 7.257003
-#&gt; 4      4 7.271565
-#&gt; 5      5 7.292746
-#&gt; 6      6 7.303641
-#&gt; 7      7 7.316880
-#&gt; 8      8 7.325610
-#&gt; 9      9 7.323633
-#&gt; 10    10 7.328175
-#&gt; 11    11 7.328897
-#&gt; 12    12 7.339927
-#&gt; 13    13 7.348137
-#&gt; 14    14 7.347557
-#&gt; 15    15 7.353402
-#&gt; 16    16 7.337783
-#&gt; 17    17 7.317279
-#&gt; 18    18 7.322643
-#&gt; 19    19 7.346010
-#&gt; 20    20 7.369412
-#&gt; 21    21 7.381751
-#&gt; 22    22 7.400621
-#&gt; 23    23 7.396028
-#&gt; 24    24 7.404523
-#&gt; 25    25 7.421537
-#&gt; 26    26 7.418661
-#&gt; 27    27 7.419620
-#&gt; 28    28 7.411012
-#&gt; 29    29 7.421357
-#&gt; 30    30 7.433726
-#&gt; 31    31 7.447926
-#&gt; 32    32 7.470167
-#&gt; 33    33 7.483188
-#&gt; 34    34 7.493540
-#&gt; 35    35 7.502793
-#&gt; 36    36 7.501137
-#&gt; 37    37 7.514582
-#&gt; 38    38 7.528332
-#&gt; 39    39 7.545654
-#&gt; 40    40 7.552815
-#&gt; 41    41 7.574918
-#&gt; 42    42 7.583451
-#&gt; 43    43 7.593475
-#&gt; 44    44 7.597747
-#&gt; 45    45 7.619184
-#&gt; 46    46 7.633563
-#&gt; 47    47 7.649359
-#&gt; 48    48 7.672106
-#&gt; 49    49 7.691702
-#&gt; 50    50 7.694302
-#&gt; 51    51 7.704496
-#&gt; 52    52 7.709398
-#&gt; 53    53 7.715034
-#&gt; 54    54 7.720994
-#&gt; 55    55 7.735302
-#&gt; 56    56 7.740925
-#&gt; 57    57 7.752464
-#&gt; 58    58 7.769336
-#&gt; 59    59 7.777080
-#&gt; 60    60 7.776115
-#&gt; 61    61 7.790075
-#&gt; 62    62 7.791440
-#&gt; 63    63 7.796963
-#&gt; 64    64 7.792968
-#&gt; 65    65 7.786801
-#&gt; 66    66 7.785929
-#&gt; 67    67 7.798031
-#&gt; 68    68 7.788958
-#&gt; 69    69 7.815449
-#&gt; 70    70 7.815368
-#&gt; 71    71 7.820480
-#&gt; 72    72 7.820440
-#&gt; 73    73 7.842122
-#&gt; 74    74 7.861380
-#&gt; 75    75 7.871731
-#&gt; 76    76 7.890321
-#&gt; 77    77 7.913521
-#&gt; 78    78 7.916078
-#&gt; 79    79 7.915093
-#&gt; 80    80 7.924000
-#&gt; 81    81 7.918410
-#&gt; 82    82 7.921245
-#&gt; 83    83 7.908130
-#&gt; 84    84 7.899302
-#&gt; 85    85 7.879556
-#&gt; 86    86 7.889684
-#&gt; 87    87 7.906510
-#&gt; 88    88 7.920338
-#&gt; 89    89 7.938945
-#&gt; 90    90 7.943392
-#&gt; 91    91 7.947537
-#&gt; 92    92 7.957457
-#&gt; 93    93 7.971086
-#&gt; 94    94 7.987083
-#&gt; 95    95 8.006967
-#&gt; 96    96 8.004399
-#&gt; 97    97 8.013178
-#&gt; 98    98 8.044273
-#&gt; 99    99 8.052806
-#&gt; 100  100 8.065139
-#&gt; 101  101 8.065171
-#&gt; 102  102 8.064291
-#&gt; 103  103 8.073216
-#&gt; 104  104 8.071312
-#&gt; 105  105 8.081289
-#&gt; 106  106 8.057377
-#&gt; 107  107 8.058042
-#&gt; 108  108 8.070656
-#&gt; 109  109 8.089820
-#&gt; 110  110 8.086472
-#&gt; 111  111 8.090893
-#&gt; 112  112 8.076919
-#&gt; 113  113 8.061613
-#&gt; 114  114 8.064605
-#&gt; 115  115 8.056585
-#&gt; 116  116 8.058106
-#&gt; 117  117 8.066710
-#&gt; 118  118 8.088961
-#&gt; 119  119 8.103615
-#&gt; 120  120 8.121213
-#&gt; 121  121 8.146622
-#&gt; 122  122 8.159947
-#&gt; 123  123 8.166387
-#&gt; 124  124 8.170525
-#&gt; 125  125 8.182420
-#&gt; 126  126 8.188467
-#&gt; 127  127 8.198584
-#&gt; 128  128 8.205874
-#&gt; 129  129 8.221291
-#&gt; 130  130 8.219218
-#&gt; 131  131 8.221828
-#&gt; 132  132 8.225423
-#&gt; 133  133 8.236606
-#&gt; 134  134 8.248791
-#&gt; 135  135 8.259795
-#&gt; 136  136 8.274612
-#&gt; 
-#&gt; $ASEs
-#&gt; # A tibble: 816 x 7
-#&gt; # Groups:   Model [6]
-#&gt;     Time Model    ASE.x ASE.y Batch Index   ASE
-#&gt;    &lt;dbl&gt; &lt;chr&gt;    &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;chr&gt; &lt;dbl&gt;
-#&gt;  1     1 AIC Both     0    NA    NA &lt;NA&gt;     NA
-#&gt;  2     2 AIC Both     0    NA    NA &lt;NA&gt;     NA
-#&gt;  3     3 AIC Both     0    NA    NA &lt;NA&gt;     NA
-#&gt;  4     4 AIC Both     0    NA    NA &lt;NA&gt;     NA
-#&gt;  5     5 AIC Both     0    NA    NA &lt;NA&gt;     NA
-#&gt;  6     6 AIC Both     0    NA    NA &lt;NA&gt;     NA
-#&gt;  7     7 AIC Both     0    NA    NA &lt;NA&gt;     NA
-#&gt;  8     8 AIC Both     0    NA    NA &lt;NA&gt;     NA
-#&gt;  9     9 AIC Both     0    NA    NA &lt;NA&gt;     NA
-#&gt; 10    10 AIC Both     0    NA    NA &lt;NA&gt;     NA
-#&gt; # ... with 806 more rows</code></pre>
 </div>
 <div id="raw-data-and-metrics" class="section level2">
 <h2 class="hasAnchor">

@@ -1,5 +1,5 @@
 ---
-title: "ModelCompareNNforCaret"
+title: "1.3.2 Compare nnfor::mlp() models"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{ModelCompareNNforCaret}
@@ -71,7 +71,7 @@ mdl_compare = ModelCompareNNforCaret$new(data = data, var_interest = 'logGNP',
 
 ## Compare boxplot of ASE values
 ```{r fig.width = 8}
-mdl_compare$plot_boxplot_ases()
+p = mdl_compare$plot_boxplot_ases()
 ```
 
 ## Statistically Compare the models
@@ -84,17 +84,17 @@ mdl_compare$statistical_compare()
 **This is not currently supported since it needs future values to be passed and we dont have these values yet (unless we forecast them). We will add this functionality in the future.**
 
 ```{r fig.width=8}
-mdl_compare$plot_simple_forecasts()
+p = mdl_compare$plot_simple_forecasts()
 ```
 
 ## Plot and compare the forecasts per batch
 ```{r fig.width=8}
-mdl_compare$plot_batch_forecasts()
+p = mdl_compare$plot_batch_forecasts()
 ```
 
 ## Plot and compare the ASEs per batch
 ```{r fig.width=8}
-mdl_compare$plot_batch_ases() 
+p = mdl_compare$plot_batch_ases() 
 ```
 
 ## Raw Data and Metrics

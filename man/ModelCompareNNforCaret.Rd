@@ -17,6 +17,7 @@ R6 class ModelCompareMultivariate
 \item \href{#method-new}{\code{ModelCompareNNforCaret$new()}}
 \item \href{#method-get_var_interest}{\code{ModelCompareNNforCaret$get_var_interest()}}
 \item \href{#method-get_data_var_interest}{\code{ModelCompareNNforCaret$get_data_var_interest()}}
+\item \href{#method-get_best_model_id}{\code{ModelCompareNNforCaret$get_best_model_id()}}
 \item \href{#method-summarize_build}{\code{ModelCompareNNforCaret$summarize_build()}}
 \item \href{#method-clone}{\code{ModelCompareNNforCaret$clone()}}
 }
@@ -93,6 +94,19 @@ Returns the dependent variable data only
 
 \subsection{Returns}{
 The dependent variable data only
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-get_best_model_id"></a>}}
+\if{latex}{\out{\hypertarget{method-get_best_model_id}{}}}
+\subsection{Method \code{get_best_model_id()}}{
+Returns the model ID for the best model from the search
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{ModelCompareNNforCaret$get_best_model_id()}\if{html}{\out{</div>}}
+}
+
+\subsection{Returns}{
+The model ID for the best model from the search
 }
 }
 \if{html}{\out{<hr>}}

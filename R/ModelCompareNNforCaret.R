@@ -41,6 +41,14 @@ ModelCompareNNforCaret = R6::R6Class(
     #' @return The dependent variable data only
     get_data_var_interest = function(){return(self$get_data()[, self$get_var_interest()])},
     
+    #' @description Returns the model ID for the best model from the search
+    #' @return The model ID for the best model from the search
+    get_best_model_id = function(){
+      return(private$get_caret_model()[['bestTune']] %>%
+               private$add_model_id() %>% 
+               purrr::pluck("ID"))
+    },
+    
     #### General Public Methods ----
    
     #' @description Not applicable for the nnfor::mlp models, since we are passing already build models 
