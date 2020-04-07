@@ -39,6 +39,7 @@ ModelBuildNNforCaret = R6::R6Class(
     {
       # https://stackoverflow.com/questions/34520448/source-file-in-r-package
       # source("R/source_caret_nnfor.R")
+      
       private$set_data(data = data)
       private$set_var_interest(var_interest = var_interest)
       private$set_m(m = m)
@@ -292,8 +293,22 @@ ModelBuildNNforCaret = R6::R6Class(
       
       # http://sshaikh.org/2015/05/06/parallelize-machine-learning-in-r-with-multi-core-cpus/
       if (private$get_parallel() == TRUE){
-        num_cores = parallel::detectCores()
-        cl = parallel::makeCluster(ifelse(num_cores <= 1, 1, num_cores - 1)) # Leave 1 out
+        
+        # https://stackoverflow.com/questions/50571325/r-cran-check-fail-when-using-parallel-functions
+        # https://stackoverflow.com/questions/41307178/error-processing-vignette-failed-with-diagnostics-4-simultaneous-processes-spa
+        chk = Sys.getenv("_R_CHECK_LIMIT_CORES_", "")
+        
+        if (nzchar(chk) && chk == "TRUE") {
+          # use 2 cores in CRAN/Travis/AppVeyor
+          num_workers = 2L
+        } else {
+          # use all cores in devtools::test()
+          num_cores = parallel::detectCores()
+          num_workers = ifelse(num_cores <= 1, 1, num_cores - 1) # Leave 1 out
+        }
+        
+        cl = parallel::makeCluster(num_workers) 
+        
         doParallel::registerDoParallel(cl)
       }
       
