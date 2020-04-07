@@ -84,7 +84,7 @@ mdl_compare$statistical_compare()
 **This is not currently supported since it needs future values to be passed and we dont have these values yet (unless we forecast them). We will add this functionality in the future.**
 
 ```{r fig.width=8}
-p = mdl_compare$plot_simple_forecasts()
+# p = mdl_compare$plot_simple_forecasts()
 ```
 
 ## Plot and compare the forecasts per batch
