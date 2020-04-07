@@ -262,7 +262,9 @@ ModelCompareUnivariate = R6::R6Class(
       return (res)
     },
     
-    compute_simple_forecasts = function(lastn){
+    compute_simple_forecasts = function(lastn, newxreg){
+      ## newxreg is not needed for Univariate Analysis
+      
       results = dplyr::tribble(~Model, ~Time, ~f, ~ll, ~ul)
       
       if (lastn == FALSE){

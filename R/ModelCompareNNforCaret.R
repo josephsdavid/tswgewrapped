@@ -1,5 +1,4 @@
 #' @title R6 class ModelCompareMultivariate
-#' 
 #' @export
 ModelCompareNNforCaret = R6::R6Class(
   classname = "ModelCompareNNforCaret",
@@ -128,54 +127,60 @@ ModelCompareNNforCaret = R6::R6Class(
       return (res)
     },
     
-    compute_simple_forecasts = function(lastn){
-      ## TODO: Needed for NNFOR
-      ## But add an argument xreg
-      ## Used by plot_simple_forecasts in the base class
+    compute_simple_forecasts = function(lastn, newxreg){
+      if (lastn == TRUE){
+        message("This class does not support lastn = TRUE since the model has already been built using the entire data. Hence, lastn will be set to FALSE.")
+        lastn = FALSE
+      }
       
-      message("This function is not supported for nnfor::mlp at this time.")
+      if (all(is.na(newxreg))){
+        stop("You have not provided the values for 'newxreg' which are needed to make future forecasts")
+      }
       
       results = dplyr::tribble(~Model, ~Time, ~f, ~ll, ~ul)
-      # 
-      # if (lastn == FALSE){
-      #   data_start = 1
-      #   data_end = private$get_len_x()
-      #   train_data = self$get_data()[data_start:data_end, ]
-      #   
-      # }
-      # else{
-      #   data_start = 1
-      #   data_end = private$get_len_x() - self$get_n.ahead()
-      #   train_data = self$get_data()[data_start:data_end, ]
-      # }
-      # 
-      # from = data_end + 1
-      # to = data_end + self$get_n.ahead()
-      # 
-      # # Define Train Data
-      # 
-      # for (name in names(private$get_models())){
-      #   
-      #   var_interest = self$get_var_interest()
-      #   k = private$get_models()[[name]][['k_final']]
-      #   trend_type = private$get_models()[[name]][['trend_type']]
-      #   
-      #   # Fit model for the batch
-      #   varfit = vars::VAR(train_data, p=k, type=trend_type)
-      #   
-      #   # Forecast for the batch
-      #   forecasts = stats::predict(varfit, n.ahead=self$get_n.ahead())
-      #   forecasts = forecasts$fcst[[var_interest]] ## Get the forecasts only for the dependent variable
-      #   
-      #   results = results %>% 
-      #     dplyr::add_row(Model = name,
-      #                    Time = (from:to),
-      #                    f = forecasts[, 'fcst'],
-      #                    ll = forecasts[, 'lower'],
-      #                    ul = forecasts[, 'upper'])
-      #   
-      # }
-      # 
+
+      if (lastn == FALSE){
+        data_start = 1
+        data_end = private$get_len_x()
+        train_data = self$get_data()[data_start:data_end, ]
+
+      }
+      else{
+        data_start = 1
+        data_end = private$get_len_x() - self$get_n.ahead()
+        train_data = self$get_data()[data_start:data_end, ]
+      }
+
+      ## nnfor::mlp needs xreg to be a dataframe
+      newxreg = as.data.frame(newxreg)
+      
+      from = data_end + 1
+      to = data_end + nrow(newxreg) # self$get_n.ahead()
+      
+      original_xreg = private$get_caret_model()[['trainingData']] %>%
+        dplyr::select(- .outcome)
+
+      reqd_cols = colnames(original_xreg)
+      
+      if (!all(sort(reqd_cols) == sort(colnames(newxreg)))){
+        stop("The colnames for newxreg dont match those provided during the training of the model.")
+      }
+      
+      newxreg = newxreg %>%
+        # assertr::verify(assertr::has_all_names(!!reqd_cols)) %>%  ## does not accept variables
+        dplyr::select(reqd_cols)
+      
+      ## caret predict (so we only need to pass newxreg)
+      #full_xreg = dplyr::bind_rows(original_xreg, newxreg)
+      forecasts = caret::predict.train(private$get_caret_model(), newdata = newxreg)  
+      
+      results = results %>% 
+        dplyr::add_row(Model = self$get_best_model_id(),
+                       Time = (from:to),
+                       f = forecasts$mean,
+                       ll = forecasts$mean,
+                       ul = forecasts$mean)
+      
       return(results)
     },
     

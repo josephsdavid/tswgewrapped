@@ -157,7 +157,8 @@ ModelCompareMultivariateVAR = R6::R6Class(
       return (res)
     },
     
-    compute_simple_forecasts = function(lastn){
+    compute_simple_forecasts = function(lastn, newxreg){
+      ## newxreg is not needed for VAR
       
       results = dplyr::tribble(~Model, ~Time, ~f, ~ll, ~ul)
       
