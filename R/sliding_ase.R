@@ -35,7 +35,9 @@ sliding_ase_univariate = function(x,
   n = length(x)
   
   if (is.na(batch_size)){
-    cat("\nBatch Size has not been specified. Will assume a single batch.")
+    if (verbose >= 1){
+      cat("\nBatch Size has not been specified. Will assume a single batch.")
+    }
     batch_size = n
   }
   

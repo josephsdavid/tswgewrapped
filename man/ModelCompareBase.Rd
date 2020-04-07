@@ -259,6 +259,7 @@ Plots the simple forecast for each model
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{ModelCompareBase$plot_simple_forecasts(
   lastn = FALSE,
+  newxreg = NA,
   limits = FALSE,
   zoom = NA
 )}\if{html}{\out{</div>}}
@@ -268,6 +269,8 @@ Plots the simple forecast for each model
 \if{html}{\out{<div class="arguments">}}
 \describe{
 \item{\code{lastn}}{If TRUE, this will plot the forecasts forthe last n.ahead values of the realization (Default: FALSE)}
+
+\item{\code{newxreg}}{The future exogenous variable values. Applicable to models that require the values of the new exogenous variables to be provided for future forecasts, e.g. nnfor::mlp()}
 
 \item{\code{limits}}{If TRUE, this will also plot the lower and upper limits of the forecasts (Default: FALSE)}
 
