@@ -15,6 +15,15 @@ knitr::opts_chunk$set(
 ```
 
 # Setup Libraries
+
+```{r include=FALSE}
+## Needed otherwise vignette is not building automatically during devtools::check(), although it works ok standalone
+if(!require("lattice")){
+  # https://github.com/topepo/caret/issues/411#issuecomment-209973908
+  install.packages("lattice", repos = "http://cran.us.r-project.org", dependencies = c("Depends", "Imports", "Suggests"))
+}
+```
+
 ```{r setup}
 library(tswgewrapped)
 ```

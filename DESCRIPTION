@@ -1,6 +1,6 @@
 Package: tswgewrapped
 Title: Helpful wrappers for 'tswge', 'vars' and 'nnfor' time series packages
-Version: 1.8.10.4
+Version: 1.8.10.5
 Authors@R: c(
     person("David", "Josephs", email = "josephsd@smu.edu", role = c("aut", "cre")),
     person("Nikhil", "Gupta", email = "guptan@smu.edu", role = c("aut")))
@@ -10,29 +10,31 @@ Encoding: UTF-8
 LazyData: true
 Imports: 
     assertr,
+    caret,
     doParallel,
     dplyr,
     foreach,
+    forecast,
     ggfortify,
     GGally,
     ggplot2,
+    lattice,
     magrittr,
     nnfor,
-    rlang,
     pander,
     parallel,
     patchwork,
     purrr,
+    rlang,
     R6,
     RColorBrewer,
     Rfast,
     tibble,
     tictoc,
     tswge,
-    vars,
-    forecast
+    vars
 RoxygenNote: 7.1.0
-Suggests: 
+Suggests:
     testthat (>= 2.1.0),
     knitr,
     rmarkdown

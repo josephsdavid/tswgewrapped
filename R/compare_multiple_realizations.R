@@ -150,7 +150,6 @@ generate_multiple_realization = function(x, phi = 0, theta = 0, d = 0, s = 0, va
 #'
 plot_multiple_realizations = function(data, results, plot = c("all"), scales = 'free_y'){
   
-  # library(magrittr)
   requireNamespace("ggfortify")
   requireNamespace("patchwork")
   

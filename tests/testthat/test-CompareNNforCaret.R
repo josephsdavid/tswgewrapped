@@ -14,7 +14,7 @@ test_that("Random Parallel", {
   # library(caret)
   # 
   # # Random Parallel
-  # model = ModelBuildNNforCaret$new(data = data, var_interest = "logGNP", m = 2,
+  # model = ModelBuildNNforCaret$new(data = data, var_interest = "logGNP", m = 4,
   #                                  search = 'random',
   #                                  grid = NA, tuneLength = 2,
   #                                  batch_size = 132, h = 2,
@@ -62,6 +62,6 @@ test_that("Random Parallel", {
   
   p = mdl_compare$plot_batch_forecasts() 
   p = mdl_compare$plot_batch_ases() 
-  p = mdl_compare$plot_simple_forecasts()
+  # p = mdl_compare$plot_simple_forecasts()
 
 })

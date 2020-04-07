@@ -220,13 +220,16 @@ ModelCompareBase = R6::R6Class(
     
     #' @description Plots the simple forecast for each model
     #' @param lastn If TRUE, this will plot the forecasts forthe last n.ahead values of the realization (Default: FALSE)
+    #' @param newxreg The future exogenous variable values. Applicable to models that require the values of the new exogenous variables to be provided for future forecasts, e.g. nnfor::mlp()
     #' @param limits If TRUE, this will also plot the lower and upper limits of the forecasts (Default: FALSE)
     #' @param zoom A number indicating how much to zoom into the plot. 
     #'             For example zoom = 50 will only plot the last 50 points of the realization
     #'             Useful for cases where realizations that are long and n.ahead is small.
-    plot_simple_forecasts = function(lastn = FALSE, limits = FALSE, zoom = NA){
+    plot_simple_forecasts = function(lastn = FALSE, newxreg = NA, limits = FALSE, zoom = NA){
       
-      results = private$compute_simple_forecasts_with_validation(lastn = lastn) %>%   
+      forecasts = private$compute_simple_forecasts_with_validation(lastn = lastn, newxreg = newxreg)
+        
+      results = forecasts %>%   
         dplyr::add_row(Model = "Actual",
                        Time = seq_along(self$get_data_var_interest()),
                        f = self$get_data_var_interest(),
@@ -255,6 +258,8 @@ ModelCompareBase = R6::R6Class(
       }
       
       print(p)
+      
+      return(forecasts)
       
     },
     
@@ -583,9 +588,9 @@ ModelCompareBase = R6::R6Class(
       stop("You are calling the 'compute_simple_forecasts' method in the parent class. This should be implemented in the child class.")  
     },
     
-    compute_simple_forecasts_with_validation = function(lastn){
+    compute_simple_forecasts_with_validation = function(lastn, newxreg){
       
-      results = private$compute_simple_forecasts(lastn = lastn) %>% 
+      results = private$compute_simple_forecasts(lastn = lastn, newxreg = newxreg) %>% 
         assertr::verify(assertr::has_all_names("Model", "Time", "f", "ll", "ul"))
       
       return(results)
