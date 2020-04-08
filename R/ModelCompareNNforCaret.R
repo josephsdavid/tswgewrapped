@@ -129,7 +129,7 @@ ModelCompareNNforCaret = R6::R6Class(
     
     compute_simple_forecasts = function(lastn, newxreg){
       if (lastn == TRUE){
-        message("This class does not support lastn = TRUE since the model has already been built using the entire data. Hence, lastn will be set to FALSE.")
+        message(paste0("The '",  self$classname, "' class does not support lastn = TRUE since the model has already been built using the entire data. Hence, lastn will be set to FALSE."))
         lastn = FALSE
       }
       

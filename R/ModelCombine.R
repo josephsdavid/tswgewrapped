@@ -22,6 +22,7 @@ ModelCombine = R6::R6Class(
     #' @return A new `ModelCombine` object.
     initialize = function(data = NA, var_interest = NA, uni_models = NA, var_models = NA, mlp_models = NA, verbose = 0)
     {
+      self$set_verbose(verbose = verbose)
       private$set_data(data = data)
       private$set_var_interest(var_interest = var_interest)
       private$set_uni_compare_objects(models = uni_models)
@@ -51,7 +52,61 @@ ModelCombine = R6::R6Class(
     set_verbose = function(verbose = 0){ private$verbose = verbose },
     
     #### General Public Methods ----
-   
+    
+    #' @description Plots the simple forecast for each model
+    #' @param lastn If TRUE, this will plot the forecasts forthe last n.ahead values of the realization (Default: FALSE)
+    #' @param newxreg The future exogenous variable values to be used for prediction.
+    #'                Applicable to models that require the values of the new exogenous variables to be provided for future forecasts, e.g. nnfor::mlp()
+    #' @param limits If TRUE, this will also plot the lower and upper limits of the forecasts (Default: FALSE)
+    #' @param zoom A number indicating how much to zoom into the plot. 
+    #'             For example zoom = 50 will only plot the last 50 points of the realization
+    #'             Useful for cases where realizations that are long and n.ahead is small.
+    plot_simple_forecasts = function(lastn = FALSE, newxreg = NA, limits = FALSE, zoom = NA){
+      
+      forecasts = data.frame()
+      
+      mlp_compare_objects = private$get_mlp_compare_objects()
+      if (length(mlp_compare_objects) >= 1 & lastn == TRUE){
+        stop(paste0("Your '", self$classname, "' object has a ModelCompareNNforCaret object which does not support plotting simple forecasts with lastn = TRUE. Please make lastn = FALSE and rerun with xreg passed."))
+      }
+      for (i in seq_along(mlp_compare_objects)){
+        subset_results = mlp_compare_objects[[i]]$plot_simple_forecasts(lastn = lastn, newxreg = newxreg, limits = limits, zoom = zoom, plot = FALSE)
+        
+        filtered = subset_results$plot_data %>%  
+          private$filter_best_caret_model(caret_compare_object = mlp_compare_objects[[i]])
+        
+        forecasts = dplyr::bind_rows(forecasts, filtered) 
+      }
+      
+      uni_compare_objects = private$get_uni_compare_objects()
+      for (i in seq_along(uni_compare_objects)){
+        subset_results = uni_compare_objects[[i]]$plot_simple_forecasts(lastn = lastn, newxreg = newxreg, limits = limits, zoom = zoom, plot = FALSE)
+        forecasts = dplyr::bind_rows(forecasts, subset_results$plot_data)
+      }
+      
+      var_compare_objects = private$get_var_compare_objects()
+      for (i in seq_along(var_compare_objects)){
+        subset_results = var_compare_objects[[i]]$plot_simple_forecasts(lastn = lastn, newxreg = newxreg, limits = limits, zoom = zoom, plot = FALSE)
+        forecasts = dplyr::bind_rows(forecasts, subset_results$plot_data)
+      }
+      
+      p = ggplot2::ggplot() +
+        ggplot2::geom_line(forecasts %>% dplyr::filter(Model == "Actual"), mapping = ggplot2::aes(x=Time, y=f, color = Model), size = 1) +
+        ggplot2::geom_line(forecasts %>% dplyr::filter(Model != "Actual"), mapping = ggplot2::aes(x=Time, y=f, color = Model), size = 0.75) +
+        ggplot2::ylab("Simple Forecasts")
+      
+      if (limits == TRUE){
+        p = p + 
+          ggplot2::geom_line(forecasts, mapping = ggplot2::aes(x=Time, y=ll, color = Model), linetype = "dashed", size = 0.5) +
+          ggplot2::geom_line(forecasts, mapping = ggplot2::aes(x=Time, y=ul, color = Model), linetype = "dashed", size = 0.5)
+      }
+      
+      print(p)
+      
+      return(forecasts)
+
+    },
+    
     #' @description Plots the forecasts per batch for all models
     #' @param only_sliding If TRUE, this will only plot the batch forecasts 
     #'                     for the models that used window ASE calculations
@@ -231,22 +286,110 @@ ModelCombine = R6::R6Class(
         subset_results = mlp_compare_objects[[i]]$get_tabular_metrics(only_sliding = only_sliding, ases = ases) %>% 
           private$filter_best_caret_model(caret_compare_object = mlp_compare_objects[[i]])
         
-        # best_model_id = mlp_compare_objects[[i]]$get_best_model_id()
-        # 
-        # subset_results = subset_results %>% 
-        #   dplyr::filter(Model == best_model_id)
-        
         results = rbind(results, subset_results)
       }
         
       return(results)
     },
     
+    #' @description Computes the simple forecasts using all the models
+    #' @param lastn If TRUE, this will get the forecasts for the last n.ahead values of the realization (Default: FALSE). 
+    #'              If there is a ModelCompareNNforCaret object passed to this object, then lastn must be TRUE.
+    #' @param newxreg The future exogenous variable values to be used for prediction.
+    #'                Applicable to models that require the values of the new exogenous variables to be provided for future forecasts, e.g. nnfor::mlp()
+    #' @return The forecasted values
+    compute_simple_forecasts = function(lastn = FALSE, newxreg = NA){
+      
+      forecasts = data.frame()
+      
+      mlp_compare_objects = private$get_mlp_compare_objects()
+      if (length(mlp_compare_objects) >= 1 & lastn == TRUE){
+        stop(paste0("Your '", self$classname, "' object has a ModelCompareNNforCaret object which does not support plotting simple forecasts with lastn = TRUE. Please make lastn = FALSE and rerun with xreg passed."))
+      }
+      for (i in seq_along(mlp_compare_objects)){
+        subset_results = mlp_compare_objects[[i]]$plot_simple_forecasts(lastn = lastn, newxreg = newxreg, limits = FALSE, plot = FALSE)
+        
+        filtered = subset_results$forecasts %>%  
+          private$filter_best_caret_model(caret_compare_object = mlp_compare_objects[[i]])
+        
+        forecasts = dplyr::bind_rows(forecasts, filtered) 
+      }
+      
+      uni_compare_objects = private$get_uni_compare_objects()
+      for (i in seq_along(uni_compare_objects)){
+        subset_results = uni_compare_objects[[i]]$plot_simple_forecasts(lastn = lastn, newxreg = newxreg, limits = FALSE, plot = FALSE)
+        forecasts = dplyr::bind_rows(forecasts, subset_results$forecasts)
+      }
+      
+      var_compare_objects = private$get_var_compare_objects()
+      for (i in seq_along(var_compare_objects)){
+        subset_results = var_compare_objects[[i]]$plot_simple_forecasts(lastn = lastn, newxreg = newxreg, limits = FALSE, plot = FALSE)
+        forecasts = dplyr::bind_rows(forecasts, subset_results$forecasts)
+      }
+      
+      return(forecasts)
+    },
+    
     #' @description Creates an ensemble model based on all the models provided
     create_ensemble = function(){
+      data_for_model = self$get_tabular_metrics(only_sliding = TRUE, ases = FALSE) %>%
+        dplyr::distinct() %>%  # Remove duplicate entries for Model = 'Realization'
+        assertr::verify(assertr::has_all_names("Time", "Model", "f")) %>%
+        tidyr::pivot_wider(id_cols = Time, names_from = Model, values_from = f) %>% 
+        stats::na.omit() %>% 
+        dplyr::select(-Time)
+      
+      print(str(data_for_model))
+     
+      glm_ensemble = glm(formula = Realization ~ ., data = data_for_model)
+      
+      if (private$get_verbose() >= 1){
+        print(summary(glm_ensemble))
+      }
+      private$set_ensemble_model(model = glm_ensemble)
+    },
+    
+    #' @description Makes a prediction based on the ensemble model
+    #' @param naive If TRUE, the ensemble will be a simple mean of the prediction of all the models
+    #'              If FALSE, the ensemble will use a glm model created from the batch predictions of all the models
+    #' @param comb If 'naive' = TRUE, how to combine the predictions. Allowed values are 'mean' or 'median'
+    #' @param newxreg  The future exogenous variable values to be used for prediction.
+    #'                 Applicable to models that require the values of the new exogenous variables to be provided for future forecasts, e.g. nnfor::mlp()             
+    #' @return The predictions from each model along with the ensemble prediction                
+    predict_ensemble = function(naive = FALSE, comb = 'median', newxreg = NA){
+      
+      if (naive == TRUE){
+        if (comb != 'median' & comb != 'mean'){
+          warning(paste0("You are using a naive model, but the value of comb is set to '", comb, "' . The allowed values are 'median' or 'mean'. This will be set to the default value of 'median'."))
+          comb = 'median'
+        }
+      }
+      
+      forecasts = self$compute_simple_forecasts(lastn = FALSE, newxreg = newxreg) %>% 
+        assertr::verify(assertr::has_all_names("Time", "Model", "f")) %>% 
+        tidyr::pivot_wider(id_cols = Time, names_from = Model, values_from = f) %>% 
+        stats::na.omit() %>% 
+        dplyr::select(-Time)
+      
+      if (naive == TRUE){
+        if (comb == 'mean'){
+          forecasts = forecasts %>% 
+            dplyr::mutate(ensemble = rowMeans(.))
+        }
+        if (comb == 'median'){
+          forecasts = forecasts %>% 
+            dplyr::mutate(ensemble = Rfast::rowMedians(as.matrix(.)))
+        }
+      }
+      else{
+        forecasts = forecasts %>% 
+          dplyr::mutate(ensemble = stats::predict(private$get_ensemble_model(), newdata = forecasts)) %>% 
+          dplyr::mutate_if(is.numeric, as.double)  # Converts Named numeric (output of predict) to simple numeric 
+      }
+      
+      return(forecasts)
       
     }
-
   ),
   
   
@@ -258,6 +401,7 @@ ModelCombine = R6::R6Class(
     var_models = NA,
     mlp_models = NA,
     verbose = NA,
+    ensemble_model = NA,
     
     set_data = function(data){
       if (all(is.na(data))){ stop("You have not provided the time series data. Please provide to continue.") }
@@ -285,58 +429,12 @@ ModelCombine = R6::R6Class(
     },
     get_mlp_compare_objects = function(){return(private$mlp_models)},
     
-    get_len_x = function(){return(nrow(self$get_data()))},
-    
-    compute_simple_forecasts = function(lastn){
-      ## TODO: Needed for NNFOR
-      ## But add an argument xreg
-      ## Used by plot_simple_forecasts in the base class
-      
-      message("This function is not supported for nnfor::mlp at this time.")
-      
-      results = dplyr::tribble(~Model, ~Time, ~f, ~ll, ~ul)
-      # 
-      # if (lastn == FALSE){
-      #   data_start = 1
-      #   data_end = private$get_len_x()
-      #   train_data = self$get_data()[data_start:data_end, ]
-      #   
-      # }
-      # else{
-      #   data_start = 1
-      #   data_end = private$get_len_x() - self$get_n.ahead()
-      #   train_data = self$get_data()[data_start:data_end, ]
-      # }
-      # 
-      # from = data_end + 1
-      # to = data_end + self$get_n.ahead()
-      # 
-      # # Define Train Data
-      # 
-      # for (name in names(private$get_models())){
-      #   
-      #   var_interest = self$get_var_interest()
-      #   k = private$get_models()[[name]][['k_final']]
-      #   trend_type = private$get_models()[[name]][['trend_type']]
-      #   
-      #   # Fit model for the batch
-      #   varfit = vars::VAR(train_data, p=k, type=trend_type)
-      #   
-      #   # Forecast for the batch
-      #   forecasts = stats::predict(varfit, n.ahead=self$get_n.ahead())
-      #   forecasts = forecasts$fcst[[var_interest]] ## Get the forecasts only for the dependent variable
-      #   
-      #   results = results %>% 
-      #     dplyr::add_row(Model = name,
-      #                    Time = (from:to),
-      #                    f = forecasts[, 'fcst'],
-      #                    ll = forecasts[, 'lower'],
-      #                    ul = forecasts[, 'upper'])
-      #   
-      # }
-      # 
-      return(results)
+    set_ensemble_model = function(model){
+      private$ensemble_model = model
     },
+    get_ensemble_model = function(){return(private$ensemble_model)},
+    
+    get_len_x = function(){return(nrow(self$get_data()))},
     
     filter_best_caret_model = function(data, caret_compare_object){
       # Given a caret_compare_object and a dataframe 'data' that has a 'Model' column

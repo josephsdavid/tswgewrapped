@@ -1,6 +1,6 @@
 Package: tswgewrapped
 Title: Helpful wrappers for 'tswge', 'vars' and 'nnfor' time series packages
-Version: 1.8.10.5
+Version: 1.8.10.6
 Authors@R: c(
     person("David", "Josephs", email = "josephsd@smu.edu", role = c("aut", "cre")),
     person("Nikhil", "Gupta", email = "guptan@smu.edu", role = c("aut")))
@@ -31,6 +31,7 @@ Imports:
     Rfast,
     tibble,
     tictoc,
+    tidyr (>= 1.0.0),
     tswge,
     vars
 RoxygenNote: 7.1.0

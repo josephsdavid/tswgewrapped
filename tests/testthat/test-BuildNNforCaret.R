@@ -11,7 +11,7 @@
 test_that("Random Serial", {
   # http://r-pkgs.had.co.nz/tests.html
   # TODO: Disable test before submitting to CRAN
-  # testthat::skip_on_cran()
+  testthat::skip_on_cran()
   
   # Load Data
   data = USeconomic
