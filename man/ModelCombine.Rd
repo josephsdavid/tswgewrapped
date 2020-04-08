@@ -16,12 +16,15 @@ R6 class ModelCompareMultivariate
 \item \href{#method-get_var_interest}{\code{ModelCombine$get_var_interest()}}
 \item \href{#method-get_data_var_interest}{\code{ModelCombine$get_data_var_interest()}}
 \item \href{#method-set_verbose}{\code{ModelCombine$set_verbose()}}
+\item \href{#method-plot_simple_forecasts}{\code{ModelCombine$plot_simple_forecasts()}}
 \item \href{#method-plot_batch_forecasts}{\code{ModelCombine$plot_batch_forecasts()}}
 \item \href{#method-plot_batch_ases}{\code{ModelCombine$plot_batch_ases()}}
 \item \href{#method-plot_boxplot_ases}{\code{ModelCombine$plot_boxplot_ases()}}
 \item \href{#method-statistical_compare}{\code{ModelCombine$statistical_compare()}}
 \item \href{#method-get_tabular_metrics}{\code{ModelCombine$get_tabular_metrics()}}
+\item \href{#method-compute_simple_forecasts}{\code{ModelCombine$compute_simple_forecasts()}}
 \item \href{#method-create_ensemble}{\code{ModelCombine$create_ensemble()}}
+\item \href{#method-predict_ensemble}{\code{ModelCombine$predict_ensemble()}}
 \item \href{#method-clone}{\code{ModelCombine$clone()}}
 }
 }
@@ -121,6 +124,37 @@ Adjust the verbosity level
 }
 }
 \if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-plot_simple_forecasts"></a>}}
+\if{latex}{\out{\hypertarget{method-plot_simple_forecasts}{}}}
+\subsection{Method \code{plot_simple_forecasts()}}{
+Plots the simple forecast for each model
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{ModelCombine$plot_simple_forecasts(
+  lastn = FALSE,
+  newxreg = NA,
+  limits = FALSE,
+  zoom = NA
+)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{lastn}}{If TRUE, this will plot the forecasts forthe last n.ahead values of the realization (Default: FALSE)}
+
+\item{\code{newxreg}}{The future exogenous variable values to be used for prediction.
+Applicable to models that require the values of the new exogenous variables to be provided for future forecasts, e.g. nnfor::mlp()}
+
+\item{\code{limits}}{If TRUE, this will also plot the lower and upper limits of the forecasts (Default: FALSE)}
+
+\item{\code{zoom}}{A number indicating how much to zoom into the plot. 
+For example zoom = 50 will only plot the last 50 points of the realization
+Useful for cases where realizations that are long and n.ahead is small.}
+}
+\if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-plot_batch_forecasts"></a>}}
 \if{latex}{\out{\hypertarget{method-plot_batch_forecasts}{}}}
 \subsection{Method \code{plot_batch_forecasts()}}{
@@ -202,6 +236,30 @@ forecasts, and the lower and upper limits asscoiated with the forecasts}
 }
 }
 \if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-compute_simple_forecasts"></a>}}
+\if{latex}{\out{\hypertarget{method-compute_simple_forecasts}{}}}
+\subsection{Method \code{compute_simple_forecasts()}}{
+Computes the simple forecasts using all the models
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{ModelCombine$compute_simple_forecasts(lastn = FALSE, newxreg = NA)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{lastn}}{If TRUE, this will get the forecasts for the last n.ahead values of the realization (Default: FALSE). 
+If there is a ModelCompareNNforCaret object passed to this object, then lastn must be TRUE.}
+
+\item{\code{newxreg}}{The future exogenous variable values to be used for prediction.
+Applicable to models that require the values of the new exogenous variables to be provided for future forecasts, e.g. nnfor::mlp()}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+The forecasted values
+}
+}
+\if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-create_ensemble"></a>}}
 \if{latex}{\out{\hypertarget{method-create_ensemble}{}}}
 \subsection{Method \code{create_ensemble()}}{
@@ -210,6 +268,32 @@ Creates an ensemble model based on all the models provided
 \if{html}{\out{<div class="r">}}\preformatted{ModelCombine$create_ensemble()}\if{html}{\out{</div>}}
 }
 
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-predict_ensemble"></a>}}
+\if{latex}{\out{\hypertarget{method-predict_ensemble}{}}}
+\subsection{Method \code{predict_ensemble()}}{
+Makes a prediction based on the ensemble model
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{ModelCombine$predict_ensemble(naive = FALSE, comb = "median", newxreg = NA)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{naive}}{If TRUE, the ensemble will be a simple mean of the prediction of all the models
+If FALSE, the ensemble will use a glm model created from the batch predictions of all the models}
+
+\item{\code{comb}}{If 'naive' = TRUE, how to combine the predictions. Allowed values are 'mean' or 'median'}
+
+\item{\code{newxreg}}{The future exogenous variable values to be used for prediction.
+Applicable to models that require the values of the new exogenous variables to be provided for future forecasts, e.g. nnfor::mlp()}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+The predictions from each model along with the ensemble prediction
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-clone"></a>}}

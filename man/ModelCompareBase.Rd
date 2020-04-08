@@ -261,7 +261,8 @@ Plots the simple forecast for each model
   lastn = FALSE,
   newxreg = NA,
   limits = FALSE,
-  zoom = NA
+  zoom = NA,
+  plot = TRUE
 )}\if{html}{\out{</div>}}
 }
 
@@ -277,6 +278,8 @@ Plots the simple forecast for each model
 \item{\code{zoom}}{A number indicating how much to zoom into the plot. 
 For example zoom = 50 will only plot the last 50 points of the realization
 Useful for cases where realizations that are long and n.ahead is small.}
+
+\item{\code{plot}}{If FALSE the plots are not plotted; useful when you want to just return the data (Default = TRUE)}
 }
 \if{html}{\out{</div>}}
 }

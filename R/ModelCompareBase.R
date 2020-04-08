@@ -225,7 +225,8 @@ ModelCompareBase = R6::R6Class(
     #' @param zoom A number indicating how much to zoom into the plot. 
     #'             For example zoom = 50 will only plot the last 50 points of the realization
     #'             Useful for cases where realizations that are long and n.ahead is small.
-    plot_simple_forecasts = function(lastn = FALSE, newxreg = NA, limits = FALSE, zoom = NA){
+    #' @param plot If FALSE the plots are not plotted; useful when you want to just return the data (Default = TRUE)
+    plot_simple_forecasts = function(lastn = FALSE, newxreg = NA, limits = FALSE, zoom = NA, plot = TRUE){
       
       forecasts = private$compute_simple_forecasts_with_validation(lastn = lastn, newxreg = newxreg)
         
@@ -235,6 +236,7 @@ ModelCompareBase = R6::R6Class(
                        f = self$get_data_var_interest(),
                        ll = self$get_data_var_interest(),
                        ul = self$get_data_var_interest())
+      
       
       if (!is.na(zoom)){
         zoom = private$validate_zoom(zoom)
@@ -246,20 +248,22 @@ ModelCompareBase = R6::R6Class(
           dplyr::filter(Time >= start)
       }
       
-      p = ggplot2::ggplot() +
-        ggplot2::geom_line(results %>% dplyr::filter(Model == "Actual"), mapping = ggplot2::aes(x=Time, y=f, color = Model), size = 1) +
-        ggplot2::geom_line(results %>% dplyr::filter(Model != "Actual"), mapping = ggplot2::aes(x=Time, y=f, color = Model), size = 0.75) +
-        ggplot2::ylab("Simple Forecasts")
-      
-      if (limits == TRUE){
-        p = p + 
-          ggplot2::geom_line(results, mapping = ggplot2::aes(x=Time, y=ll, color = Model), linetype = "dashed", size = 0.5) +
-          ggplot2::geom_line(results, mapping = ggplot2::aes(x=Time, y=ul, color = Model), linetype = "dashed", size = 0.5)
+      if (plot == TRUE){  
+        p = ggplot2::ggplot() +
+          ggplot2::geom_line(results %>% dplyr::filter(Model == "Actual"), mapping = ggplot2::aes(x=Time, y=f, color = Model), size = 1) +
+          ggplot2::geom_line(results %>% dplyr::filter(Model != "Actual"), mapping = ggplot2::aes(x=Time, y=f, color = Model), size = 0.75) +
+          ggplot2::ylab("Simple Forecasts")
+        
+        if (limits == TRUE){
+          p = p + 
+            ggplot2::geom_line(results, mapping = ggplot2::aes(x=Time, y=ll, color = Model), linetype = "dashed", size = 0.5) +
+            ggplot2::geom_line(results, mapping = ggplot2::aes(x=Time, y=ul, color = Model), linetype = "dashed", size = 0.5)
+        }
+        
+        print(p)
       }
       
-      print(p)
-      
-      return(forecasts)
+      return(list(forecasts = forecasts, plot_data = results))
       
     },
     
