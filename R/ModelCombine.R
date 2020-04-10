@@ -335,10 +335,7 @@ ModelCombine = R6::R6Class(
     create_ensemble = function(cuts = NA){
       
       private$set_cuts(cuts)
-      
-      # print("Cuts")
-      # print(private$get_cuts())
-      
+
       data_for_model = self$get_tabular_metrics(only_sliding = TRUE, ases = FALSE) %>%
         dplyr::distinct() %>%  # Remove duplicate entries for Model = 'Realization'
         assertr::verify(assertr::has_all_names("Time", "Model", "f")) %>%
@@ -352,8 +349,6 @@ ModelCombine = R6::R6Class(
           dplyr::select(-Realization_cut)
       }
       
-      print(str(data_for_model))
-        
       glm_ensemble = glm(formula = Realization ~ ., data = data_for_model)
       
       if (private$get_verbose() >= 1){
@@ -390,16 +385,14 @@ ModelCombine = R6::R6Class(
         dplyr::select(-Time) %>% 
         private$add_cuts(private$get_cuts())
       
-      print(str(forecasts))
-      
       if (naive == TRUE){
         if (comb == 'mean'){
           forecasts = forecasts %>% 
-            dplyr::mutate(ensemble = rowMeans(.))
+            dplyr::mutate(ensemble = rowMeans(., na.rm = FALSE))
         }
         if (comb == 'median'){
           forecasts = forecasts %>% 
-            dplyr::mutate(ensemble = Rfast::rowMedians(as.matrix(.)))
+            dplyr::mutate(ensemble = Rfast::rowMedians(as.matrix(.), na.rm = FALSE))
         }
       }
       else{
@@ -408,9 +401,15 @@ ModelCombine = R6::R6Class(
           self$create_ensemble()
         }
         
-        forecasts = forecasts %>% 
-          dplyr::mutate(ensemble = stats::predict(private$get_ensemble_model(), newdata = forecasts)) %>% 
-          dplyr::mutate_if(is.numeric, as.double)  # Converts Named numeric (output of predict) to simple numeric 
+        if (any(is.na(forecasts))){
+          warning("Some of your predictions have NA values. glm ensemble predictions will not be computed. Please use a naive method to make forecasts.")
+          print(forecasts)
+        }
+        else{
+          forecasts = forecasts %>% 
+            dplyr::mutate(ensemble = stats::predict(private$get_ensemble_model(), newdata = forecasts)) %>% 
+            dplyr::mutate_if(is.numeric, as.double)  # Converts Named numeric (output of predict) to simple numeric 
+        }
         
       }
       
@@ -565,13 +564,12 @@ ModelCombine = R6::R6Class(
       #   data = data %>% bind_cols(cut_data)
       # }
       
-      warning("Cuts is not supported curently. This may be added at a later point in time.")
+      if (!all(is.na(cuts))){
+        warning("Cuts is not supported curently. This may be added at a later point in time.")
+      }
       
       return(data)
     }
-    
-    
-    
     
     
     

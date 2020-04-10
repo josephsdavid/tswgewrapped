@@ -1,4 +1,4 @@
-Model,trend_type,season,num_sig_vars,lag_to_use,vars_to_use,season_to_use
+Model,trend_type,season,num_sig_lag_vars,lag_to_use,lag_vars_to_use,season_to_use
 AIC Both,both,0,2,3,"logGNP,logM1",0
 AIC None,none,0,1,1,logGNP,0
 AIC Trend,trend,0,3,1,"logGNP,rs,rl",0

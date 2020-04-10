@@ -98,7 +98,8 @@ MultivariateEDA = R6::R6Class(
       
       p = ggplot2::ggplot(df_melted) + 
         ggplot2::facet_wrap(variable ~ ., ncol = ncol, scales = scales, ...) + 
-        ggplot2::geom_line(mapping = ggplot2::aes(x = Time, y = value, colour = variable))
+        ggplot2::geom_line(mapping = ggplot2::aes(x = Time, y = value, colour = variable)) +
+        ggplot2::theme(legend.position="none")
       
       print(p)
       

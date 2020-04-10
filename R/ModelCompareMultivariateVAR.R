@@ -165,33 +165,35 @@ ModelCompareMultivariateVAR = R6::R6Class(
       if (lastn == FALSE){
         data_start = 1
         data_end = private$get_len_x()
-        train_data = self$get_data()[data_start:data_end, ]
-        
       }
       else{
         data_start = 1
         data_end = private$get_len_x() - self$get_n.ahead()
-        train_data = self$get_data()[data_start:data_end, ]
       }
       
       from = data_end + 1
       to = data_end + self$get_n.ahead()
       
       # Define Train Data
-      
       for (name in names(private$get_models())){
         
+        # col_names = private$get_models()[[name]][['cols_used']]
+        col_names = private$get_models()[[name]][['vars_to_use']]
+
+        train_data = private$get_data_subset(col_names = col_names) %>%
+          dplyr::slice(data_start:data_end)
+
         var_interest = self$get_var_interest()
         k = private$get_models()[[name]][['k_final']]
         trend_type = private$get_models()[[name]][['trend_type']]
         
         # Fit model for the batch
         varfit = vars::VAR(train_data, p=k, type=trend_type)
-        
+
         # Forecast for the batch
         forecasts = stats::predict(varfit, n.ahead=self$get_n.ahead())
         forecasts = forecasts$fcst[[var_interest]] ## Get the forecasts only for the dependent variable
-        
+
         results = results %>% 
           dplyr::add_row(Model = name,
                          Time = (from:to),
