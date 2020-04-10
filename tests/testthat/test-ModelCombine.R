@@ -82,6 +82,13 @@ test_that("Combine Models", {
                                                verbose = 1)
   
   
+  # Passing MLP model should give error
+  testthat::expect_error(ModelCompareNNforCaret$new(data = data_train, var_interest = var_interest,
+                                                    mdl_list = caret_model$finalModel,
+                                                    verbose = 1),
+                         regexp = "You have passed the 'mlp' model to this class. You need to pass the caret model. This can be obtained from the ModelBuildNNforCaret class object by using the get_final_models method with subset = 'a' argument.")
+
+
   #### 2.0 Combine all models ####
   
   mdl_combine = ModelCombine$new(data = data_train, var_interest = "logGNP",
@@ -144,12 +151,11 @@ test_that("Combine Models", {
   ## Forecast Compariaon
   test_var_interest = data_test[var_interest]
   newxreg = data_test %>% dplyr::select(-!!var_interest)
-  # # Individual
-  # p = mdl_compare_uni$plot_simple_forecasts(lastn = FALSE)
-  # p = mdl_compare_var$plot_simple_forecasts(lastn = FALSE)
-  # p = mdl_compare_mlp$plot_simple_forecasts(lastn = FALSE, newxreg = data_test %>% dplyr::select(-!!var_interest), zoom = 5) 
-  # Combined
   p = mdl_combine$plot_simple_forecasts(lastn = FALSE, newxreg = data_test %>% dplyr::select(-!!var_interest), zoom = 5) 
+  
+  # ## Warning 
+  testthat::expect_warning(mdl_combine$predict_ensemble(naive = FALSE, newxreg = newxreg),
+                           regexp = "The ensemble with a glm model has not been built yet. A simple glm ensemble will be built. If you need more granularity, please use the 'build_ensemble' method to create it manually.")
   
   mdl_combine$create_ensemble()
   print("Expected Values")
