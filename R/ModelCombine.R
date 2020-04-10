@@ -23,6 +23,7 @@ ModelCombine = R6::R6Class(
     initialize = function(data = NA, var_interest = NA, uni_models = NA, var_models = NA, mlp_models = NA, verbose = 0)
     {
       self$set_verbose(verbose = verbose)
+      private$set_ensemble_built(FALSE)
       private$set_data(data = data)
       private$set_var_interest(var_interest = var_interest)
       private$set_uni_compare_objects(models = uni_models)
@@ -331,22 +332,39 @@ ModelCombine = R6::R6Class(
     },
     
     #' @description Creates an ensemble model based on all the models provided
-    create_ensemble = function(){
+    create_ensemble = function(cuts = NA){
+      
+      private$set_cuts(cuts)
+      
+      # print("Cuts")
+      # print(private$get_cuts())
+      
       data_for_model = self$get_tabular_metrics(only_sliding = TRUE, ases = FALSE) %>%
         dplyr::distinct() %>%  # Remove duplicate entries for Model = 'Realization'
         assertr::verify(assertr::has_all_names("Time", "Model", "f")) %>%
         tidyr::pivot_wider(id_cols = Time, names_from = Model, values_from = f) %>% 
         stats::na.omit() %>% 
-        dplyr::select(-Time)
+        dplyr::select(-Time) %>% 
+        private$add_cuts(cuts = private$get_cuts()) 
+      
+      if (!all(is.na(private$get_cuts()))){
+        data_for_model = data_for_model %>% 
+          dplyr::select(-Realization_cut)
+      }
       
       print(str(data_for_model))
-     
+        
       glm_ensemble = glm(formula = Realization ~ ., data = data_for_model)
       
       if (private$get_verbose() >= 1){
         print(summary(glm_ensemble))
+        par(ask = FALSE) 
+        plot(glm_ensemble)  
       }
+      
       private$set_ensemble_model(model = glm_ensemble)
+      private$set_ensemble_built(TRUE)
+      
     },
     
     #' @description Makes a prediction based on the ensemble model
@@ -369,7 +387,10 @@ ModelCombine = R6::R6Class(
         assertr::verify(assertr::has_all_names("Time", "Model", "f")) %>% 
         tidyr::pivot_wider(id_cols = Time, names_from = Model, values_from = f) %>% 
         stats::na.omit() %>% 
-        dplyr::select(-Time)
+        dplyr::select(-Time) %>% 
+        private$add_cuts(private$get_cuts())
+      
+      print(str(forecasts))
       
       if (naive == TRUE){
         if (comb == 'mean'){
@@ -382,9 +403,15 @@ ModelCombine = R6::R6Class(
         }
       }
       else{
+        if (private$get_ensemble_built() == FALSE){
+          warning("The ensemble with a glm model has not been built yet. A simple glm ensemble will be built. If you need more granularity, please use the 'build_ensemble' method to create it manually.")
+          self$create_ensemble()
+        }
+        
         forecasts = forecasts %>% 
           dplyr::mutate(ensemble = stats::predict(private$get_ensemble_model(), newdata = forecasts)) %>% 
           dplyr::mutate_if(is.numeric, as.double)  # Converts Named numeric (output of predict) to simple numeric 
+        
       }
       
       return(forecasts)
@@ -402,6 +429,8 @@ ModelCombine = R6::R6Class(
     mlp_models = NA,
     verbose = NA,
     ensemble_model = NA,
+    ensemble_built = NA,
+    cuts = NA,
     
     set_data = function(data){
       if (all(is.na(data))){ stop("You have not provided the time series data. Please provide to continue.") }
@@ -435,6 +464,12 @@ ModelCombine = R6::R6Class(
     get_ensemble_model = function(){return(private$ensemble_model)},
     
     get_len_x = function(){return(nrow(self$get_data()))},
+    
+    set_ensemble_built = function(ar) { private$ensemble_built = ar},
+    get_ensemble_built = function() { return(private$ensemble_built)},
+    
+    set_cuts = function(ar) { private$cuts = ar},
+    get_cuts = function() { return(private$cuts)},
     
     filter_best_caret_model = function(data, caret_compare_object){
       # Given a caret_compare_object and a dataframe 'data' that has a 'Model' column
@@ -496,6 +531,43 @@ ModelCombine = R6::R6Class(
       }
       
       return(any_sliding)
+    },
+    
+    add_cuts = function(data, cuts = NA){
+      
+      # if (!all(is.na(cuts))){
+      #   # minValue = min(apply(data,2,min))
+      #   # maxValue = max(apply(data,2,max))
+      #   
+      #   cuts = c(-1E9, cuts, 1E9)
+      #   
+      #   # print(paste0("Min: ", minValue))
+      #   # print(paste0("Max: ", minValue))
+      #   
+      #   # if (minValue < cuts[1]){
+      #   #   warning("The cuts do not cover the minimum value of the predictons. Hence the cuts will be adjusted.")
+      #   # cuts = c(-1E9, cuts)
+      #   # }
+      #   # if (maxValue > cuts[length(cuts)]){
+      #   #   warning("The cuts do not cover the maximum value of the predictons. Hence the cuts will be adjusted.")
+      #   #  cuts = c(cuts, 1E9)
+      #   # }
+      #   
+      #   print(cuts)
+      #   
+      #   cut_data = as.data.frame(apply(data, 2, function(x) {cut(as.numeric(x), cuts)}))
+      #   
+      #   if (any(is.na(cut_data))){
+      #     warning("Making cuts introduced NA values. Please make sure that the cut values are sufficiently large to cover the min and max range of the predictions.")
+      #   }
+      #   
+      #   colnames(cut_data) = paste0(colnames(cut_data), "_cut")
+      #   data = data %>% bind_cols(cut_data)
+      # }
+      
+      warning("Cuts is not supported curently. This may be added at a later point in time.")
+      
+      return(data)
     }
     
     

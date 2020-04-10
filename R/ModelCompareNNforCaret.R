@@ -20,6 +20,14 @@ ModelCompareNNforCaret = R6::R6Class(
     #' @return A new `ModelCompareNNforCaret` object.
     initialize = function(data = NA, var_interest = NA, mdl_list, verbose = 0)
     {
+      if (class(mdl_list) == 'mlp'){
+        stop("You have passed the 'mlp' model to this class. You need to pass the caret model. This can be obtained from the ModelBuildNNforCaret class object by using the get_final_models method with subset = 'a' argument.")
+      }
+      
+      if (!(any(class(mdl_list) == 'train') & any(class(mdl_list) == 'train.formula'))){
+        stop("You have not passed a caret model to this class. You need to pass the caret model. This can be obtained from the ModelBuildNNforCaret class object by using the get_final_models method with subset = 'a' argument.")
+      }
+      
       private$set_caret_model(caret_model = mdl_list)
       n.ahead = private$compute_n.ahead()
       batch_size = private$compute_batch_size()
@@ -81,7 +89,7 @@ ModelCompareNNforCaret = R6::R6Class(
     
     clean_model_input = function(mdl_list, batch_size){
       ## mdl_list is actually the caret model here (which technically is also a list :))
-      
+     
       results_with_id = mdl_list[['results']] %>% 
         private$add_model_id()
       

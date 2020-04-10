@@ -265,7 +265,7 @@ The forecasted values
 \subsection{Method \code{create_ensemble()}}{
 Creates an ensemble model based on all the models provided
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{ModelCombine$create_ensemble()}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{ModelCombine$create_ensemble(cuts = NA)}\if{html}{\out{</div>}}
 }
 
 }
