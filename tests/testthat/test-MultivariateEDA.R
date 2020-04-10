@@ -1,5 +1,5 @@
 #### Multivariate EDA Class ####
-test_that("ModelCompareMultivariateVAR", {
+test_that("Multivariate EDA Plotting", {
   
   eda = MultivariateEDA$new(data = USeconomic, var_interest = "logGNP")
   

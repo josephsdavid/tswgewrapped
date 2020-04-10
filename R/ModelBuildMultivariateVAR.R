@@ -110,10 +110,10 @@ ModelBuildMultivariateVAR = R6::R6Class(
         dplyr::filter(!(OriginalVar %in% c("trend", "const"))) %>% 
         dplyr::filter(!(grepl("^sd[0-9]+$", OriginalVar))) %>% # Remove seasonality factors
         dplyr::group_by(Model, trend_type, season) %>% 
-        dplyr::summarise(num_sig_vars = dplyr::n(),
+        dplyr::summarise(num_sig_lag_vars = dplyr::n_distinct(OriginalVar),
                          lag_to_use = -min(MaxLag, na.rm = TRUE),
-                         vars_to_use =  paste0(OriginalVar, collapse = ",")) %>%
-        dplyr::ungroup() %>% 
+                         lag_vars_to_use =  paste0(unique(OriginalVar), collapse = ",")) %>%
+        dplyr::ungroup() %>%
         dplyr::left_join(season_data, by = c("Model", "trend_type", "season")) %>% 
         dplyr::mutate(season_to_use = ifelse(sig_season_factors == TRUE, season, 0)) %>% 
         tidyr::replace_na(list(season_to_use = 0)) %>% 
@@ -129,7 +129,7 @@ ModelBuildMultivariateVAR = R6::R6Class(
         dplyr::mutate(model_built = FALSE) %>% 
         tibble::column_to_rownames(var = "Model") %>% 
         dplyr::rename(p = lag_to_use) %>% 
-        dplyr::select(-num_sig_vars) 
+        dplyr::select(-num_sig_lag_vars) 
       
       # https://stackoverflow.com/questions/3492379/data-frame-rows-to-a-list
       recommendations = setNames(split(recommendations, seq(nrow(recommendations))), rownames(recommendations))
@@ -149,7 +149,7 @@ ModelBuildMultivariateVAR = R6::R6Class(
             cat(paste0("\nSeasonality: ", season))
           }
           
-          col_names = unlist(strsplit(recommendations[[name]][['vars_to_use']], split = ","))
+          col_names = unlist(strsplit(recommendations[[name]][['lag_vars_to_use']], split = ","))
           col_names = c(self$get_var_interest(), col_names)
           col_names = unique(col_names)
 
@@ -185,7 +185,6 @@ ModelBuildMultivariateVAR = R6::R6Class(
             private$models[[name]][['sigvars']] = NA  # We dont care here since we are going to use all
             private$models[[name]][['model_type']] = "recommended"
             private$models[[name]][['model_built']] = TRUE
-     
           }
         }
         else{
@@ -423,7 +422,7 @@ ModelBuildMultivariateVAR = R6::R6Class(
           private$models[[name]][['varselect']] = varselect
           private$models[[name]][['varfit']] = varfit
           private$models[[name]][['p']] = p
-          private$models[[name]][['sigvars']] = private$get_significant_vars(results, alpha)  # What were the significant column (variables in the model)
+          private$models[[name]][['sigvars']] = private$get_significant_vars(results, alpha)  # What were the significant columns (variables in the model)
           private$models[[name]][['model_type']] = "user_defined"
           private$models[[name]][['model_built']] = TRUE
           
@@ -439,7 +438,9 @@ ModelBuildMultivariateVAR = R6::R6Class(
       criteria = vselect$criteria
       
       if(sum(criteria == -Inf, na.rm = TRUE) > 0){
+        cat("\n")
         warning("VARselect produced -Inf values. These will be removed before making final 'K' selection.")
+        cat("\n")
         
         criteria[criteria == -Inf] = max(criteria) + 1
       }
@@ -464,7 +465,7 @@ ModelBuildMultivariateVAR = R6::R6Class(
         dplyr::mutate(lag = -as.numeric(stringr::str_replace(lag, "l", ""))) %>% 
         dplyr::group_by(original_var) %>% 
         dplyr::mutate(max_lag = min(lag)) %>% 
-        dplyr::ungroup()
+        dplyr::ungroup() 
       
       return(sig_vars)
     }

@@ -206,13 +206,25 @@ ModelCompareNNforCaret = R6::R6Class(
     compute_batch_size = function(){
       data = private$get_data_to_compute_batch_info()
       # Batch Size Definition = Training + Test 
-      batch_size = data %>% purrr::pluck("Resample") %>% min() + private$compute_n.ahead()  
+      batch_size = data %>% purrr::pluck("Resample") %>% min() + private$compute_n.ahead()
+      
+      # if (private$get_verbose() >= 1){
+      #   print(paste0("Batch Size: ", batch_size))
+      # }
       return(batch_size)
     },
     
     compute_n.ahead = function(){
       data = private$get_data_to_compute_batch_info()
-      n.ahead = nrow(private$get_caret_model()[['trainingData']]) - data %>% purrr::pluck("Resample") %>% max()
+      #n.ahead = nrow(private$get_caret_model()[['trainingData']]) - data %>% purrr::pluck("Resample") %>% max()
+      temp = data %>% purrr::pluck("Resample")
+      
+      ## TODO: Add check if there is only 1 resample, then we need to somehow take care of it.
+      n.ahead = temp[2] - temp[1]
+      
+      # if (private$get_verbose() >= 1){
+      #   print(paste0("n.ahead: ", n.ahead))
+      # }
       return(n.ahead)
     },
     
@@ -221,7 +233,6 @@ ModelCompareNNforCaret = R6::R6Class(
         private$add_model_id()
       
       one_name = data %>% dplyr::slice(1) %>% purrr::pluck("ID")
-      
       data = private$clean_resample_info(data = private$get_caret_model()[['resample']], subset = one_name)
       
       return(data)
