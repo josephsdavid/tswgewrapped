@@ -17,6 +17,8 @@ if (!require(devtools)) {
 devtools::install_github("josephsdavid/tswgewrapped", build_vignettes = TRUE)
 ```
 
+**NOTE: If you face issues with vignettes during installation, try with build_vignettes = FALSE**
+
 or
 ```r
 if (!require(remotes)) {
@@ -25,6 +27,8 @@ if (!require(remotes)) {
 
 remotes::install_github("josephsdavid/tswgewrapped", build_vignettes = TRUE)
 ```
+
+**NOTE: If you face issues with vignettes during installation, try with build_vignettes = FALSE**
 
 ## Usage
 Currently we have wrappers for arma, arima, aruma, sigplusnoise generators and forecasters
