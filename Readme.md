@@ -1,5 +1,5 @@
 # TSWGE, wrapped
-This package contains several convenient wrappers for tswge, useful for Dr. Sadler's time series class
+This package contains several convenient wrappers for tswge, VAR and nnfor, useful for Dr. Sadler's time series class.
 
 ## Installation
 
@@ -31,7 +31,9 @@ remotes::install_github("josephsdavid/tswgewrapped", build_vignettes = TRUE)
 **NOTE: If you face issues with vignettes during installation, try with build_vignettes = FALSE**
 
 ## Usage
-Currently we have wrappers for arma, arima, aruma, sigplusnoise generators and forecasters
+**<font color = red>This readme provides a small overview of how to run some functions in this library, but for detailed examples, please refer to the 'Articles' section of [this website](https://josephsdavid.github.io/tswgewrapped/index.html). </font>**
+
+# Univariate Time Series Model Building
 
 ### Time series generation and forecasting
 the `generate(type, ...)` function generates time series, while the `fcst(type, ...)` function forecasts
