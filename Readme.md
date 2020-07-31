@@ -30,8 +30,11 @@ remotes::install_github("josephsdavid/tswgewrapped", build_vignettes = TRUE)
 
 **NOTE: If you face issues with vignettes during installation, try with build_vignettes = FALSE**
 
-## Usage
-**<font color = red>This readme provides a small overview of how to run some functions in this library, but for detailed examples, please refer to the 'Articles' section of [this website](https://josephsdavid.github.io/tswgewrapped/index.html). </font>**
+# Useful examples
+
+1. **This readme provides a small overview of how to run some functions in this library, but for detailed examples, please refer to the 'Articles' section of [this website](https://josephsdavid.github.io/tswgewrapped/index.html).**
+2. **[GDP Prediction](https://htmlpreview.github.io/?https://github.com/ngupta23/gdp_prediction/blob/master/analysis/gdp_prediction_analysis.html) using tswgewrapped.**
+
 
 # Univariate Time Series Model Building
 
@@ -211,10 +214,18 @@ vignette("ModelCompareMultivariateVAR")
 # Time Series with nnfor::mlp (Neural Network) Model Building
 Vignette pending
 
-* Builds the model with the caret framework.
+* Builds the model with the caret framework (currently supports only multivariate datasets, but workaround exists for a univariate dataset - see below).
 * Suppport for predefined or random grid search
 * Supports parallel processing using multiple cores to speed up the grid search
 * Support for sliding ASE while building models
+* Workaround for Univariate Dataset is to add a dummy multivariate column with some noise and use that in the build object 
+```r
+# example of how to add a dummy noise column to dataset
+NUM_OBS = nrow(train_data)
+train_data$dummy = rnorm(NUM_OBS, 0, 0.0001)
+
+# Then use train_data in the ModelBuildNNforCaret$new call
+```
 
 # Time Series with nnfor::mlp (Neural Network) Model Comparison
 Check out the vignette 'ModelCompareNNforCaret'
